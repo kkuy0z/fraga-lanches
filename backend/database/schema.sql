@@ -1,5 +1,5 @@
 
-CREATE DATABASE IF NOT EXISTS fraga_db;
+CREATE DATABASE fraga_db;
 USE fraga_db;
 
 -- USUÁRIOS
