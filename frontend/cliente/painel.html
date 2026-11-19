@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Cliente | Fraga Lanches</title>
+<link rel="manifest" href="/manifest.json">
+</head>
+<body>
+    <header>
+        <h1>Fraga Lanches</h1>
+        <button id="btn-sair">Sair</button>
+    </header>
+    <main>
+        <h2>Bem-vindo, <span id="nome-usuario">Cliente</span>!</h2>
+<p>FaÃƒÂ§a seus pedidos e acompanhe suas compras.</p>
+<section>
+    <h3>CardÃƒÂ¡pio</h3>
+    <p>Confira nossos produtos.</p>
+    <a href="/cliente/cardapio.html">Acessar cardÃƒÂ¡pio</a>
+</section>
+<section>
+    <h3>Meus pedidos</h3>
+    <a href="/cliente/meus-pedidos.html">Acompanhar pedidos</a>
+</section>
+<section>
+    <h3>Minha conta</h3>
+    <a href="/cliente/perfil.html">Ver meu perfil</a>
+</section>
+    </main>
+    <script src="painel.js"></script>
+<script src="/pwa.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js")
+            .catch(erro => console.error("Erro ao registrar Service Worker:", erro));
+    });
+}
+</script>
+</body>
+</html>
+

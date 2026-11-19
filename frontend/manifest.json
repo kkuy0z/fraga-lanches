@@ -1,0 +1,22 @@
+﻿
+{
+    "id": "/",
+    "name": "Fraga Lanches",
+    "short_name": "Fraga",
+    "description": "Faça seus pedidos pelo Fraga Lanches.",
+    "lang": "pt-BR",
+    "start_url": "/inicio.html",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "icons": [
+        {
+            "src": "/assets/images/icons/logo.png",
+            "sizes": "any",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}

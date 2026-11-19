@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel da Cozinha | Fraga Lanches</title>
+<link rel="manifest" href="/manifest.json">
+</head>
+<body>
+    <header>
+        <h1>Fraga Lanches</h1>
+        <button id="btn-sair">Sair</button>
+    </header>
+    <main>
+        <h2>ÃƒÂrea da Cozinha</h2>
+<p>Gerenciamento dos pedidos para preparo.</p>
+<section>
+    <h3>Pedidos recebidos</h3>
+    <div id="pedidos">
+        <p>Aguardando integraÃƒÂ§ÃƒÂ£o com a rota de pedidos.</p>
+    </div>
+</section>
+    </main>
+    <script src="painel.js"></script>
+<script src="/pwa.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js")
+            .catch(erro => console.error("Erro ao registrar Service Worker:", erro));
+    });
+}
+</script>
+</body>
+</html>
+

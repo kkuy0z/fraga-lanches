@@ -1,0 +1,30 @@
+{
+  "name": "fraga-lanches-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend do sistema Fraga Lanches",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "dependencies": {
+    "argon2": "^0.45.2",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "express-rate-limit": "latest",
+    "helmet": "latest",
+    "jsonwebtoken": "latest",
+    "mercadopago": "latest",
+    "multer": "latest",
+    "mysql2": "latest",
+    "nodemailer": "latest",
+    "socket.io": "latest",
+    "web-push": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "nodemon": "latest"
+  }
+}
