@@ -1,10 +1,31 @@
+
 const categoriasFiltro = document.getElementById("categoriasFiltro");
 const cardapioGrid = document.getElementById("cardapioGrid");
 const emptyState = document.getElementById("emptyState");
-const pagination = document.getElementById("pagination");
 
 let categoriaSelecionada = null;
 let produtos = [];
+
+const CHAVE_CARRINHO = "fraga_carrinho";
+
+function obterCarrinho() {
+    try {
+        return JSON.parse(localStorage.getItem(CHAVE_CARRINHO)) || [];
+    } catch {
+        return [];
+    }
+}
+
+function salvarCarrinho(carrinho) {
+    localStorage.setItem(CHAVE_CARRINHO, JSON.stringify(carrinho));
+}
+
+function formatarMoeda(valor) {
+    return Number(valor).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    });
+}
 
 async function carregarCategorias() {
     try {
@@ -33,7 +54,6 @@ async function carregarCategorias() {
 
         categorias.forEach(categoria => {
             const botao = document.createElement("button");
-
             botao.type = "button";
             botao.textContent = categoria.nome;
 
@@ -107,7 +127,8 @@ function renderizarProdutos() {
         imagem.loading = "lazy";
 
         imagem.addEventListener("error", () => {
-            imagem.src = "/img/produto-sem-imagem.png";
+            imagem.removeAttribute("src");
+            imagem.alt = "Imagem indisponível";
         }, { once: true });
 
         const nome = document.createElement("h2");
@@ -117,28 +138,22 @@ function renderizarProdutos() {
         descricao.textContent = produto.descricao || "";
 
         const preco = document.createElement("p");
-        preco.textContent = Number(produto.preco).toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL"
-        });
+        preco.textContent = formatarMoeda(produto.preco);
 
         const botao = document.createElement("button");
         botao.type = "button";
-        botao.textContent = "Ver adicionais";
-
-        botao.addEventListener("click", () => {
-            carregarAdicionais(produto.id);
-        });
+        botao.textContent = "Adicionar ao carrinho";
+        botao.addEventListener("click", () => carregarAdicionais(produto));
 
         artigo.append(imagem, nome, descricao, preco, botao);
         cardapioGrid.appendChild(artigo);
     });
 }
 
-async function carregarAdicionais(produtoId) {
+async function carregarAdicionais(produto) {
     try {
         const resposta = await fetch(
-            `/api/cardapio/produtos/${produtoId}/adicionais`
+            `/api/cardapio/produtos/${produto.id}/adicionais`
         );
 
         if (!resposta.ok) {
@@ -147,21 +162,7 @@ async function carregarAdicionais(produtoId) {
 
         const adicionais = await resposta.json();
 
-        if (adicionais.length === 0) {
-            alert("Este produto não possui adicionais disponíveis.");
-            return;
-        }
-
-        const mensagem = adicionais.map(adicional => {
-            const preco = Number(adicional.preco).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL"
-            });
-
-            return `${adicional.nome} - ${preco}`;
-        }).join("\n");
-
-        alert(`Adicionais disponíveis:\n\n${mensagem}`);
+        abrirModalAdicionais(produto, adicionais);
 
     } catch (erro) {
         console.error(erro);
@@ -169,7 +170,114 @@ async function carregarAdicionais(produtoId) {
     }
 }
 
+function abrirModalAdicionais(produto, adicionais) {
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+
+    const modal = document.createElement("div");
+    modal.className = "modal";
+    modal.style.maxWidth = "480px";
+
+    const titulo = document.createElement("h2");
+    titulo.textContent = produto.nome;
+
+    const descricao = document.createElement("p");
+    descricao.textContent = "Selecione os adicionais desejados.";
+
+    const lista = document.createElement("div");
+    lista.style.display = "grid";
+    lista.style.gap = "12px";
+    lista.style.margin = "20px 0";
+
+    adicionais.forEach(adicional => {
+        const label = document.createElement("label");
+        label.style.display = "flex";
+        label.style.alignItems = "center";
+        label.style.gap = "10px";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = adicional.id;
+        checkbox.dataset.nome = adicional.nome;
+        checkbox.dataset.preco = adicional.preco;
+
+        const texto = document.createElement("span");
+        texto.textContent = `${adicional.nome} (+${formatarMoeda(adicional.preco)})`;
+
+        label.append(checkbox, texto);
+        lista.appendChild(label);
+    });
+
+    const botoes = document.createElement("div");
+    botoes.style.display = "flex";
+    botoes.style.gap = "10px";
+    botoes.style.justifyContent = "flex-end";
+
+    const cancelar = document.createElement("button");
+    cancelar.type = "button";
+    cancelar.className = "btn btn-secondary";
+    cancelar.textContent = "Cancelar";
+    cancelar.addEventListener("click", () => overlay.remove());
+
+    const adicionar = document.createElement("button");
+    adicionar.type = "button";
+    adicionar.className = "btn btn-primary";
+    adicionar.textContent = "Adicionar";
+
+    adicionar.addEventListener("click", () => {
+        const selecionados = [...lista.querySelectorAll("input:checked")].map(input => ({
+            id: Number(input.value),
+            nome: input.dataset.nome,
+            preco: Number(input.dataset.preco)
+        }));
+
+        adicionarAoCarrinho(produto, selecionados);
+        overlay.remove();
+    });
+
+    botoes.append(cancelar, adicionar);
+    modal.append(titulo, descricao, lista, botoes);
+    overlay.appendChild(modal);
+
+    overlay.addEventListener("click", evento => {
+        if (evento.target === overlay) overlay.remove();
+    });
+
+    document.body.appendChild(overlay);
+}
+
+function adicionarAoCarrinho(produto, adicionaisSelecionados) {
+    const carrinho = obterCarrinho();
+
+    const chave = `${produto.id}-${adicionaisSelecionados
+        .map(adicional => adicional.id)
+        .sort((a, b) => a - b)
+        .join(",")}`;
+
+    const existente = carrinho.find(item => item.chave === chave);
+
+    if (existente) {
+        existente.quantidade += 1;
+    } else {
+        carrinho.push({
+            chave,
+            produtoId: produto.id,
+            nome: produto.nome,
+            preco: Number(produto.preco),
+            imagem: produto.imagem || "",
+            quantidade: 1,
+            adicionais: adicionaisSelecionados
+        });
+    }
+
+    salvarCarrinho(carrinho);
+
+    alert(`${produto.nome} adicionado ao carrinho!`);
+}
+
 async function iniciarCardapio() {
+    if (!categoriasFiltro || !cardapioGrid || !emptyState) return;
+
     await carregarCategorias();
     await carregarProdutos();
 }

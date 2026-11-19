@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Horários - Fraga Lanches Admin</title>
-    <link rel="stylesheet" href="/frontend/design-system.css">
+    <title>HorÃ¡rios - Fraga Lanches Admin</title>
+    <link rel="stylesheet" href="/design-system.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0c0c0c">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -31,7 +31,7 @@
                 </a>
             </div>
 
-            <nav class="admin-nav" id="adminNav" role="navigation" aria-label="Navegação administrativa">
+            <nav class="admin-nav" id="adminNav" role="navigation" aria-label="NavegaÃ§Ã£o administrativa">
                 <a href="/inicio/admin-dashboard.html" data-page="dashboard">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <rect x="3" y="3" width="7" height="7" rx="1"></rect>
@@ -72,7 +72,7 @@
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    Horários
+                    HorÃ¡rios
                 </a>
                 <a href="/inicio/admin-entrega.html" data-page="entrega">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -96,13 +96,13 @@
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
-                    Usuários
+                    UsuÃ¡rios
                 </a>
             </nav>
 
             <div class="header-actions">
                 <div class="user-menu" id="userMenu">
-                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuário">
+                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuÃ¡rio">
                         <div class="user-avatar" id="userAvatar">?</div>
                         <span id="userName">Admin</span>
                     </button>
@@ -152,12 +152,12 @@
                 <div class="page-header-inner">
                     <div class="d-flex justify-between align-center" style="flex-wrap: wrap; gap: var(--space-4);">
                         <div>
-                            <h1 class="page-title">Horários de Funcionamento</h1>
-                            <p class="page-subtitle">Configure os dias e horários de atendimento</p>
+                            <h1 class="page-title">HorÃ¡rios de Funcionamento</h1>
+                            <p class="page-subtitle">Configure os dias e horÃ¡rios de atendimento</p>
                         </div>
                         <button class="btn btn-primary" id="btnNovoHorario">
                             <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
-                            Novo Horário
+                            Novo HorÃ¡rio
                         </button>
                     </div>
                     <div class="yellow-line"></div>
@@ -169,7 +169,7 @@
                 <div class="d-flex justify-between align-center" style="flex-wrap: wrap; gap: var(--space-4);">
                     <div>
                         <h3 class="card-title" style="margin-bottom: var(--space-1);">Status do Estabelecimento</h3>
-                        <p style="color: var(--color-text-muted); font-size: var(--fs-sm);">Baseado nos horários configurados e horário atual</p>
+                        <p style="color: var(--color-text-muted); font-size: var(--fs-sm);">Baseado nos horÃ¡rios configurados e horÃ¡rio atual</p>
                     </div>
                     <div id="statusAtualContainer" class="d-flex align-center gap-3">
                         <div class="status-indicator" id="statusIndicator" style="width: 12px; height: 12px; border-radius: 50%; background: var(--color-text-muted);"></div>
@@ -178,8 +178,8 @@
                 </div>
             </div>
 
-            <!-- Tabela de Horários -->
-            <section class="admin-table-section" aria-label="Lista de horários">
+            <!-- Tabela de HorÃ¡rios -->
+            <section class="admin-table-section" aria-label="Lista de horÃ¡rios">
                 <div class="table-container">
                     <table class="table" id="tabelaHorarios">
                         <thead>
@@ -188,7 +188,7 @@
                                 <th>Abre</th>
                                 <th>Fecha</th>
                                 <th>Status</th>
-                                <th>Ações</th>
+                                <th>AÃ§Ãµes</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyHorarios">
@@ -208,11 +208,11 @@
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                 </div>
-                <h2 class="empty-state-title">Nenhum horário cadastrado</h2>
-                <p class="empty-state-message">Adicione os horários de funcionamento para cada dia da semana.</p>
+                <h2 class="empty-state-title">Nenhum horÃ¡rio cadastrado</h2>
+                <p class="empty-state-message">Adicione os horÃ¡rios de funcionamento para cada dia da semana.</p>
                 <button class="btn btn-primary" id="btnPrimeiroHorario" style="margin-top: var(--space-4);">
                     <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
-                    Adicionar Horário
+                    Adicionar HorÃ¡rio
                 </button>
             </div>
         </div>
@@ -220,11 +220,11 @@
 
     <!-- Footer will be injected by shared-components.js -->
 
-    <!-- Modal Novo/Editar Horário -->
+    <!-- Modal Novo/Editar HorÃ¡rio -->
     <div class="modal-overlay hidden" id="horarioModal" role="dialog" aria-modal="true" aria-labelledby="horarioModalTitulo">
         <div class="modal modal-md">
             <div class="modal-header">
-                <h2 class="modal-title" id="horarioModalTitulo">Novo Horário</h2>
+                <h2 class="modal-title" id="horarioModalTitulo">Novo HorÃ¡rio</h2>
                 <button class="modal-close" id="horarioModalClose" aria-label="Fechar modal">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-x" /></svg>
                 </button>
@@ -238,21 +238,21 @@
                         <option value="">Selecione o dia</option>
                         <option value="0">Domingo</option>
                         <option value="1">Segunda-feira</option>
-                        <option value="2">Terça-feira</option>
+                        <option value="2">TerÃ§a-feira</option>
                         <option value="3">Quarta-feira</option>
                         <option value="4">Quinta-feira</option>
                         <option value="5">Sexta-feira</option>
-                        <option value="6">Sábado</option>
+                        <option value="6">SÃ¡bado</option>
                     </select>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group" style="flex: 1;">
-                        <label for="horarioAbre" class="form-label">Horário de Abertura *</label>
+                        <label for="horarioAbre" class="form-label">HorÃ¡rio de Abertura *</label>
                         <input type="time" id="horarioAbre" name="hora_abre" class="form-input" required>
                     </div>
                     <div class="form-group" style="flex: 1;">
-                        <label for="horarioFecha" class="form-label">Horário de Fechamento *</label>
+                        <label for="horarioFecha" class="form-label">HorÃ¡rio de Fechamento *</label>
                         <input type="time" id="horarioFecha" name="hora_fecha" class="form-input" required>
                     </div>
                 </div>
@@ -266,21 +266,21 @@
                 <button type="button" class="btn btn-secondary" id="btnCancelarHorario">Cancelar</button>
                 <button type="submit" form="horarioForm" class="btn btn-primary" id="btnSalvarHorario">
                     <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
-                    Salvar Horário
+                    Salvar HorÃ¡rio
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Confirmar Exclusão -->
+    <!-- Modal Confirmar ExclusÃ£o -->
     <div class="modal-overlay hidden" id="deleteHorarioModal" role="dialog" aria-modal="true" aria-labelledby="deleteHorarioModalTitulo">
         <div class="modal modal-sm">
             <div class="modal-header">
-                <h2 class="modal-title" id="deleteHorarioModalTitulo">Confirmar Exclusão</h2>
+                <h2 class="modal-title" id="deleteHorarioModalTitulo">Confirmar ExclusÃ£o</h2>
             </div>
             <div class="modal-body">
-                <p>Tem certeza que deseja excluir o horário de <strong id="deleteHorarioDia"></strong>?</p>
-                <p class="form-help">Esta ação não pode ser desfeita.</p>
+                <p>Tem certeza que deseja excluir o horÃ¡rio de <strong id="deleteHorarioDia"></strong>?</p>
+                <p class="form-help">Esta aÃ§Ã£o nÃ£o pode ser desfeita.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="btnCancelarDeleteHorario">Cancelar</button>

@@ -1115,6 +1115,22 @@ textarea {
   border-top: 1px solid var(--color-border-subtle);
 }
 
+/* CORREÇÃO DOS MODAIS DO ADMIN */
+.modal-overlay.show {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+}
+
+.modal-overlay.show .modal {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
 /* ===== PROGRESS STEPS (Checkout) ===== */
 .checkout-progress {
   position: fixed;

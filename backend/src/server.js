@@ -16,6 +16,9 @@ const authRoutes = require("./routes/auth");
 const cardapioRoutes = require("./routes/cardapio");
 const adminCategoriasRoutes = require("./routes/adminCategorias");
 const adminProdutosRoutes = require("./routes/adminProdutos");
+const adminPedidosRoutes = require("./routes/adminPedidos");
+const pedidosRoutes = require("./routes/pedidos");
+const adminDashboardRoutes = require("./routes/adminDashboard");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,6 +32,9 @@ app.use("/api/auth", authRoutes);
 app.use("/api/cardapio", cardapioRoutes);
 app.use("/api/admin/categorias", adminCategoriasRoutes);
 app.use("/api/admin/produtos", adminProdutosRoutes);
+app.use("/api/admin/pedidos", adminPedidosRoutes);
+app.use("/api/pedidos", pedidosRoutes);
+app.use("/api/admin/dashboard", adminDashboardRoutes);
 
 app.get("/api/status", async (req, res) => {
     try {

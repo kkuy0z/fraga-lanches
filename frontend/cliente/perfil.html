@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Perfil - Fraga Lanches</title>
-    <link rel="stylesheet" href="/frontend/design-system.css">
+    <link rel="stylesheet" href="/design-system.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0c0c0c">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -31,11 +31,11 @@
             </div>
 
             <nav class="nav-menu" id="navMenu" role="navigation" aria-label="Menu principal">
-                <a href="/inicio/index.html">INÍCIO</a>
-                <a href="/cliente/cliente/cardapio.html">CARDÁPIO</a>
+                <a href="/inicio/index.html">INÃCIO</a>
+                <a href="/cliente/cliente/cardapio.html">CARDÃPIO</a>
                 <a href="/inicio/index.html#sobre">SOBRE</a>
-                <a href="/inicio/index.html#espaco">ESPAÇO</a>
-                <a href="/inicio/index.html#avaliacoes">AVALIAÇÕES</a>
+                <a href="/inicio/index.html#espaco">ESPAÃ‡O</a>
+                <a href="/inicio/index.html#avaliacoes">AVALIAÃ‡Ã•ES</a>
                 <a href="/inicio/index.html#contato">CONTATO</a>
             </nav>
 
@@ -51,7 +51,7 @@
                 </a>
 
                 <div class="user-menu" id="userMenu">
-                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuário">
+                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuÃ¡rio">
                         <div class="user-avatar" id="userAvatar">?</div>
                         <span id="userName">Minha Conta</span>
                     </button>
@@ -82,22 +82,22 @@
             <div class="page-header">
                 <div class="page-header-inner">
                     <h1 class="page-title">Meu <span class="accent">Perfil</span></h1>
-                    <p class="page-subtitle">Gerencie seus dados pessoais, endereços e segurança</p>
+                    <p class="page-subtitle">Gerencie seus dados pessoais, endereÃ§os e seguranÃ§a</p>
                     <div class="yellow-line"></div>
                 </div>
             </div>
 
             <!-- Tabs Navigation -->
-            <nav class="tabs" id="perfilTabs" role="tablist" aria-label="Seções do perfil">
+            <nav class="tabs" id="perfilTabs" role="tablist" aria-label="SeÃ§Ãµes do perfil">
                 <button role="tab" class="tab-btn active" aria-selected="true" aria-controls="tab-dados" id="tab-btn-dados" data-tab="dados">Dados Pessoais</button>
-                <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-enderecos" id="tab-btn-enderecos" data-tab="enderecos">Endereços</button>
-                <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-seguranca" id="tab-btn-seguranca" data-tab="seguranca">Segurança</button>
+                <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-enderecos" id="tab-btn-enderecos" data-tab="enderecos">EndereÃ§os</button>
+                <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-seguranca" id="tab-btn-seguranca" data-tab="seguranca">SeguranÃ§a</button>
             </nav>
 
             <!-- Tab: Dados Pessoais -->
             <div role="tabpanel" id="tab-dados" class="tab-panel active" aria-labelledby="tab-btn-dados">
                 <form id="formDadosPessoais" class="card" style="padding: var(--space-6);" novalidate>
-                    <h3 class="card-title" style="margin-bottom: var(--space-6);">Informações Pessoais</h3>
+                    <h3 class="card-title" style="margin-bottom: var(--space-6);">InformaÃ§Ãµes Pessoais</h3>
 
                     <div class="form-row">
                         <div class="form-group" style="flex: 1;">
@@ -107,7 +107,7 @@
                         <div class="form-group" style="flex: 1;">
                             <label for="perfilEmail" class="form-label">E-mail *</label>
                             <input type="email" id="perfilEmail" name="email" class="form-input" required maxlength="120" readonly style="background: var(--color-bg-secondary); cursor: not-allowed;">
-                            <p class="form-help">O e-mail não pode ser alterado. Entre em contato com o suporte se precisar alterá-lo.</p>
+                            <p class="form-help">O e-mail nÃ£o pode ser alterado. Entre em contato com o suporte se precisar alterÃ¡-lo.</p>
                         </div>
                     </div>
 
@@ -121,24 +121,24 @@
                     <div class="d-flex justify-end gap-2" style="margin-top: var(--space-6);">
                         <button type="submit" class="btn btn-primary">
                             <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
-                            Salvar Alterações
+                            Salvar AlteraÃ§Ãµes
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Tab: Endereços -->
+            <!-- Tab: EndereÃ§os -->
             <div role="tabpanel" id="tab-enderecos" class="tab-panel hidden" aria-labelledby="tab-btn-enderecos">
                 <div class="d-flex justify-between align-center" style="margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-3);">
-                    <h3 class="card-title" style="margin: 0;">Meus Endereços</h3>
-                    <button class="btn btn-primary" id="btnNovoEndereco" aria-label="Adicionar novo endereço">
+                    <h3 class="card-title" style="margin: 0;">Meus EndereÃ§os</h3>
+                    <button class="btn btn-primary" id="btnNovoEndereco" aria-label="Adicionar novo endereÃ§o">
                         <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
-                        Novo Endereço
+                        Novo EndereÃ§o
                     </button>
                 </div>
 
                 <div id="enderecosList" class="enderecos-grid">
-                    <!-- Endereços serão inseridos via JS -->
+                    <!-- EndereÃ§os serÃ£o inseridos via JS -->
                 </div>
 
                 <!-- Estado Vazio -->
@@ -146,16 +146,16 @@
                     <div class="empty-state-icon">
                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><use href="#i-map-marker" /></svg>
                     </div>
-                    <h2 class="empty-state-title">Nenhum endereço cadastrado</h2>
-                    <p class="empty-state-message">Adicione um endereço para agilizar seus pedidos.</p>
+                    <h2 class="empty-state-title">Nenhum endereÃ§o cadastrado</h2>
+                    <p class="empty-state-message">Adicione um endereÃ§o para agilizar seus pedidos.</p>
                 </div>
             </div>
 
-            <!-- Tab: Segurança -->
+            <!-- Tab: SeguranÃ§a -->
             <div role="tabpanel" id="tab-seguranca" class="tab-panel hidden" aria-labelledby="tab-btn-seguranca">
                 <form id="formAlterarSenha" class="card" style="padding: var(--space-6); max-width: 500px;" novalidate>
                     <h3 class="card-title" style="margin-bottom: var(--space-2);">Alterar Senha</h3>
-                    <p class="form-help" style="margin-bottom: var(--space-6);">Sua senha deve ter no mínimo 8 caracteres.</p>
+                    <p class="form-help" style="margin-bottom: var(--space-6);">Sua senha deve ter no mÃ­nimo 8 caracteres.</p>
 
                     <div class="form-group">
                         <label for="senhaAtual" class="form-label">Senha Atual *</label>
@@ -173,7 +173,7 @@
                     <div class="form-group">
                         <label for="senhaNova" class="form-label">Nova Senha *</label>
                         <div class="input-with-icon">
-                            <input type="password" id="senhaNova" name="senha_nova" class="form-input" required placeholder="Mínimo 8 caracteres" autocomplete="new-password" minlength="8" aria-describedby="senhaNovaHelp">
+                            <input type="password" id="senhaNova" name="senha_nova" class="form-input" required placeholder="MÃ­nimo 8 caracteres" autocomplete="new-password" minlength="8" aria-describedby="senhaNovaHelp">
                             <button type="button" class="input-icon-btn" id="toggleSenhaNova" aria-label="Mostrar/ocultar senha">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -181,7 +181,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <p class="form-help" id="senhaNovaHelp">Mínimo 8 caracteres</p>
+                        <p class="form-help" id="senhaNovaHelp">MÃ­nimo 8 caracteres</p>
                     </div>
 
                     <div class="form-group">
@@ -210,11 +210,11 @@
 
     <!-- Footer will be injected by shared-components.js -->
 
-    <!-- Modal Novo/Editar Endereço -->
+    <!-- Modal Novo/Editar EndereÃ§o -->
     <div class="modal-overlay hidden" id="enderecoModal" role="dialog" aria-modal="true" aria-labelledby="enderecoModalTitulo">
         <div class="modal modal-md">
             <div class="modal-header">
-                <h2 class="modal-title" id="enderecoModalTitulo">Novo Endereço</h2>
+                <h2 class="modal-title" id="enderecoModalTitulo">Novo EndereÃ§o</h2>
                 <button class="modal-close" id="enderecoModalClose" aria-label="Fechar modal">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-x" /></svg>
                 </button>
@@ -226,11 +226,11 @@
                     <label for="enderecoCep" class="form-label">CEP *</label>
                     <div class="input-with-icon">
                         <input type="text" id="enderecoCep" name="cep" class="form-input" required placeholder="00000-000" maxlength="9" aria-describedby="cepHelp">
-                        <button type="button" class="input-icon-btn" id="btnBuscarCep" aria-label="Buscar endereço pelo CEP">
+                        <button type="button" class="input-icon-btn" id="btnBuscarCep" aria-label="Buscar endereÃ§o pelo CEP">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-search" /></svg>
                         </button>
                     </div>
-                    <p class="form-help" id="cepHelp">Digite o CEP e clique no ícone de busca para preencher automaticamente</p>
+                    <p class="form-help" id="cepHelp">Digite o CEP e clique no Ã­cone de busca para preencher automaticamente</p>
                 </div>
 
                 <div class="form-row">
@@ -239,8 +239,8 @@
                         <input type="text" id="enderecoLogradouro" name="logradouro" class="form-input" required maxlength="150" placeholder="Rua, Avenida, etc.">
                     </div>
                     <div class="form-group" style="flex: 0 0 100px;">
-                        <label for="enderecoNumero" class="form-label">Número *</label>
-                        <input type="text" id="enderecoNumero" name="numero" class="form-input" required maxlength="10" placeholder="Nº">
+                        <label for="enderecoNumero" class="form-label">NÃºmero *</label>
+                        <input type="text" id="enderecoNumero" name="numero" class="form-input" required maxlength="10" placeholder="NÂº">
                     </div>
                 </div>
 
@@ -258,28 +258,28 @@
 
                 <div class="form-check" style="margin-top: var(--space-4);">
                     <input type="checkbox" id="enderecoPrincipal" name="principal" class="form-check-input">
-                    <label for="enderecoPrincipal" class="form-check-label">Definir como endereço principal</label>
+                    <label for="enderecoPrincipal" class="form-check-label">Definir como endereÃ§o principal</label>
                 </div>
             </form>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="btnCancelarEnderecoModal">Cancelar</button>
                 <button type="submit" form="enderecoForm" class="btn btn-primary" id="btnSalvarEndereco">
                     <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
-                    Salvar Endereço
+                    Salvar EndereÃ§o
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Confirmar Exclusão Endereço -->
+    <!-- Modal Confirmar ExclusÃ£o EndereÃ§o -->
     <div class="modal-overlay hidden" id="deleteEnderecoModal" role="dialog" aria-modal="true" aria-labelledby="deleteEnderecoModalTitulo">
         <div class="modal modal-sm">
             <div class="modal-header">
-                <h2 class="modal-title" id="deleteEnderecoModalTitulo">Confirmar Exclusão</h2>
+                <h2 class="modal-title" id="deleteEnderecoModalTitulo">Confirmar ExclusÃ£o</h2>
             </div>
             <div class="modal-body">
-                <p>Tem certeza que deseja excluir este endereço?</p>
-                <p class="form-help">Esta ação não pode ser desfeita.</p>
+                <p>Tem certeza que deseja excluir este endereÃ§o?</p>
+                <p class="form-help">Esta aÃ§Ã£o nÃ£o pode ser desfeita.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="btnCancelarDeleteEndereco">Cancelar</button>

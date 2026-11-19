@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formas de Pagamento - Fraga Lanches Admin</title>
-    <link rel="stylesheet" href="/frontend/design-system.css">
+    <link rel="stylesheet" href="/design-system.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0c0c0c">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -31,7 +31,7 @@
                 </a>
             </div>
 
-            <nav class="admin-nav" id="adminNav" role="navigation" aria-label="Navegação administrativa">
+            <nav class="admin-nav" id="adminNav" role="navigation" aria-label="NavegaÃ§Ã£o administrativa">
                 <a href="/inicio/admin-dashboard.html" data-page="dashboard">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <rect x="3" y="3" width="7" height="7" rx="1"></rect>
@@ -72,7 +72,7 @@
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    Horários
+                    HorÃ¡rios
                 </a>
                 <a href="/inicio/admin-entrega.html" data-page="entrega">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -96,13 +96,13 @@
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
-                    Usuários
+                    UsuÃ¡rios
                 </a>
             </nav>
 
             <div class="header-actions">
                 <div class="user-menu" id="userMenu">
-                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuário">
+                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuÃ¡rio">
                         <div class="user-avatar" id="userAvatar">?</div>
                         <span id="userName">Admin</span>
                     </button>
@@ -188,7 +188,7 @@
                                 <th>Prazo (dias)</th>
                                 <th>Ordem</th>
                                 <th>Status</th>
-                                <th>Ações</th>
+                                <th>AÃ§Ãµes</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyPagamentos">
@@ -216,8 +216,8 @@
                 </button>
             </div>
 
-            <!-- Paginação -->
-            <nav class="pagination" id="pagination" aria-label="Paginação" style="display: none;"></nav>
+            <!-- PaginaÃ§Ã£o -->
+            <nav class="pagination" id="pagination" aria-label="PaginaÃ§Ã£o" style="display: none;"></nav>
         </div>
     </main>
 
@@ -237,7 +237,7 @@
 
                 <div class="form-group">
                     <label for="pagamentoNome" class="form-label">Nome *</label>
-                    <input type="text" id="pagamentoNome" name="nome" class="form-input" required maxlength="50" placeholder="Ex: Dinheiro, Cartão de Crédito, PIX">
+                    <input type="text" id="pagamentoNome" name="nome" class="form-input" required maxlength="50" placeholder="Ex: Dinheiro, CartÃ£o de CrÃ©dito, PIX">
                 </div>
 
                 <div class="form-row">
@@ -246,8 +246,8 @@
                         <select id="pagamentoTipo" name="tipo" class="form-select" required>
                             <option value="">Selecione o tipo</option>
                             <option value="dinheiro">Dinheiro</option>
-                            <option value="credito">Cartão de Crédito</option>
-                            <option value="debito">Cartão de Débito</option>
+                            <option value="credito">CartÃ£o de CrÃ©dito</option>
+                            <option value="debito">CartÃ£o de DÃ©bito</option>
                             <option value="pix">PIX</option>
                             <option value="boleto">Boleto</option>
                             <option value="outro">Outro</option>
@@ -265,19 +265,19 @@
                         <input type="number" id="pagamentoPrazo" name="prazo_recebimento" class="form-input" min="0" placeholder="0" value="0">
                     </div>
                     <div class="form-group" style="flex: 1;">
-                        <label for="pagamentoOrdem" class="form-label">Ordem de Exibição</label>
+                        <label for="pagamentoOrdem" class="form-label">Ordem de ExibiÃ§Ã£o</label>
                         <input type="number" id="pagamentoOrdem" name="ordem_exibicao" class="form-input" min="0" placeholder="0" value="0">
                     </div>
                 </div>
 
                 <div class="form-check" style="margin-top: var(--space-4);">
                     <input type="checkbox" id="pagamentoAtivo" name="ativo" class="form-check-input" checked>
-                    <label for="pagamentoAtivo" class="form-check-label">Forma de pagamento ativa (disponível no checkout)</label>
+                    <label for="pagamentoAtivo" class="form-check-label">Forma de pagamento ativa (disponÃ­vel no checkout)</label>
                 </div>
 
                 <div class="form-check" style="margin-top: var(--space-2);">
                     <input type="checkbox" id="pagamentoOnline" name="online" class="form-check-input">
-                    <label for="pagamentoOnline" class="form-check-label">Pagamento online (integração com gateway)</label>
+                    <label for="pagamentoOnline" class="form-check-label">Pagamento online (integraÃ§Ã£o com gateway)</label>
                 </div>
             </form>
             <div class="modal-footer">
@@ -290,15 +290,15 @@
         </div>
     </div>
 
-    <!-- Modal Confirmar Exclusão -->
+    <!-- Modal Confirmar ExclusÃ£o -->
     <div class="modal-overlay hidden" id="deletePagamentoModal" role="dialog" aria-modal="true" aria-labelledby="deletePagamentoModalTitulo">
         <div class="modal modal-sm">
             <div class="modal-header">
-                <h2 class="modal-title" id="deletePagamentoModalTitulo">Confirmar Exclusão</h2>
+                <h2 class="modal-title" id="deletePagamentoModalTitulo">Confirmar ExclusÃ£o</h2>
             </div>
             <div class="modal-body">
                 <p>Tem certeza que deseja excluir a forma de pagamento <strong id="deletePagamentoNome"></strong>?</p>
-                <p class="form-help">Esta ação não pode ser desfeita. Pedidos existentes manterão o registro.</p>
+                <p class="form-help">Esta aÃ§Ã£o nÃ£o pode ser desfeita. Pedidos existentes manterÃ£o o registro.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="btnCancelarDeletePagamento">Cancelar</button>

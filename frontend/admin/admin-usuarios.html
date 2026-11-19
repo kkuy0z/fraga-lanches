@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usuários Admin - Fraga Lanches Admin</title>
-    <link rel="stylesheet" href="/frontend/design-system.css">
+    <title>UsuÃ¡rios Admin - Fraga Lanches Admin</title>
+    <link rel="stylesheet" href="/design-system.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0c0c0c">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -31,7 +31,7 @@
                 </a>
             </div>
 
-            <nav class="admin-nav" id="adminNav" role="navigation" aria-label="Navegação administrativa">
+            <nav class="admin-nav" id="adminNav" role="navigation" aria-label="NavegaÃ§Ã£o administrativa">
                 <a href="/inicio/admin-dashboard.html" data-page="dashboard">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <rect x="3" y="3" width="7" height="7" rx="1"></rect>
@@ -72,7 +72,7 @@
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
-                    Horários
+                    HorÃ¡rios
                 </a>
                 <a href="/inicio/admin-entrega.html" data-page="entrega">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -96,13 +96,13 @@
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
-                    Usuários
+                    UsuÃ¡rios
                 </a>
             </nav>
 
             <div class="header-actions">
                 <div class="user-menu" id="userMenu">
-                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuário">
+                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuÃ¡rio">
                         <div class="user-avatar" id="userAvatar">?</div>
                         <span id="userName">Admin</span>
                     </button>
@@ -152,12 +152,12 @@
                 <div class="page-header-inner">
                     <div class="d-flex justify-between align-center" style="flex-wrap: wrap; gap: var(--space-4);">
                         <div>
-                            <h1 class="page-title">Usuários Administrativos</h1>
-                            <p class="page-subtitle">Gerencie usuários do painel administrativo</p>
+                            <h1 class="page-title">UsuÃ¡rios Administrativos</h1>
+                            <p class="page-subtitle">Gerencie usuÃ¡rios do painel administrativo</p>
                         </div>
                         <button class="btn btn-primary" id="btnNovoUsuario">
                             <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
-                            Novo Usuário
+                            Novo UsuÃ¡rio
                         </button>
                     </div>
                     <div class="yellow-line"></div>
@@ -183,8 +183,8 @@
                 </div>
             </div>
 
-            <!-- Tabela de Usuários -->
-            <section class="admin-table-section" aria-label="Lista de usuários administrativos">
+            <!-- Tabela de UsuÃ¡rios -->
+            <section class="admin-table-section" aria-label="Lista de usuÃ¡rios administrativos">
                 <div class="table-container">
                     <table class="table" id="tabelaUsuarios">
                         <thead>
@@ -192,9 +192,9 @@
                                 <th>Nome</th>
                                 <th>E-mail</th>
                                 <th>Perfil</th>
-                                <th>Último Login</th>
+                                <th>Ãšltimo Login</th>
                                 <th>Status</th>
-                                <th>Ações</th>
+                                <th>AÃ§Ãµes</th>
                             </tr>
                         </thead>
                         <tbody id="tbodyUsuarios">
@@ -216,26 +216,26 @@
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
                 </div>
-                <h2 class="empty-state-title">Nenhum usuário encontrado</h2>
-                <p class="empty-state-message">Adicione o primeiro usuário administrativo.</p>
+                <h2 class="empty-state-title">Nenhum usuÃ¡rio encontrado</h2>
+                <p class="empty-state-message">Adicione o primeiro usuÃ¡rio administrativo.</p>
                 <button class="btn btn-primary" id="btnPrimeiroUsuario" style="margin-top: var(--space-4);">
                     <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
-                    Criar Usuário
+                    Criar UsuÃ¡rio
                 </button>
             </div>
 
-            <!-- Paginação -->
-            <nav class="pagination" id="pagination" aria-label="Paginação" style="display: none;"></nav>
+            <!-- PaginaÃ§Ã£o -->
+            <nav class="pagination" id="pagination" aria-label="PaginaÃ§Ã£o" style="display: none;"></nav>
         </div>
     </main>
 
     <!-- Footer will be injected by shared-components.js -->
 
-    <!-- Modal Novo/Editar Usuário -->
+    <!-- Modal Novo/Editar UsuÃ¡rio -->
     <div class="modal-overlay hidden" id="usuarioModal" role="dialog" aria-modal="true" aria-labelledby="usuarioModalTitulo">
         <div class="modal modal-md">
             <div class="modal-header">
-                <h2 class="modal-title" id="usuarioModalTitulo">Novo Usuário</h2>
+                <h2 class="modal-title" id="usuarioModalTitulo">Novo UsuÃ¡rio</h2>
                 <button class="modal-close" id="usuarioModalClose" aria-label="Fechar modal">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-x" /></svg>
                 </button>
@@ -245,7 +245,7 @@
 
                 <div class="form-group">
                     <label for="usuarioNome" class="form-label">Nome Completo *</label>
-                    <input type="text" id="usuarioNome" name="nome" class="form-input" required maxlength="100" placeholder="Nome completo do usuário">
+                    <input type="text" id="usuarioNome" name="nome" class="form-input" required maxlength="100" placeholder="Nome completo do usuÃ¡rio">
                 </div>
 
                 <div class="form-group">
@@ -256,7 +256,7 @@
                 <div class="form-group" id="senhaGroup">
                     <label for="usuarioSenha" class="form-label">Senha *</label>
                     <div class="input-with-icon">
-                        <input type="password" id="usuarioSenha" name="senha" class="form-input" required minlength="8" placeholder="Mínimo 8 caracteres" autocomplete="new-password">
+                        <input type="password" id="usuarioSenha" name="senha" class="form-input" required minlength="8" placeholder="MÃ­nimo 8 caracteres" autocomplete="new-password">
                         <button type="button" class="input-icon-btn" id="toggleUsuarioSenha" aria-label="Mostrar/ocultar senha">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -264,7 +264,7 @@
                             </svg>
                         </button>
                     </div>
-                    <p class="form-help" id="senhaHelp">Mínimo 8 caracteres</p>
+                    <p class="form-help" id="senhaHelp">MÃ­nimo 8 caracteres</p>
                 </div>
 
                 <div class="form-group" id="confirmarSenhaGroup" style="display: none;">
@@ -295,25 +295,25 @@
 
                 <div class="form-check" style="margin-top: var(--space-4);">
                     <input type="checkbox" id="usuarioAtivo" name="ativo" class="form-check-input" checked>
-                    <label for="usuarioAtivo" class="form-check-label">Usuário ativo (pode acessar o painel)</label>
+                    <label for="usuarioAtivo" class="form-check-label">UsuÃ¡rio ativo (pode acessar o painel)</label>
                 </div>
 
                 <div class="form-check" id="forcaTrocaSenhaGroup" style="display: none; margin-top: var(--space-2);">
                     <input type="checkbox" id="usuarioForcaTrocaSenha" name="forca_troca_senha" class="form-check-input">
-                    <label for="usuarioForcaTrocaSenha" class="form-check-label">Forçar troca de senha no próximo login</label>
+                    <label for="usuarioForcaTrocaSenha" class="form-check-label">ForÃ§ar troca de senha no prÃ³ximo login</label>
                 </div>
             </form>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="btnCancelarUsuario">Cancelar</button>
                 <button type="submit" form="usuarioForm" class="btn btn-primary" id="btnSalvarUsuario">
                     <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
-                    Salvar Usuário
+                    Salvar UsuÃ¡rio
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Alterar Senha (para usuário logado alterar a própria) -->
+    <!-- Modal Alterar Senha (para usuÃ¡rio logado alterar a prÃ³pria) -->
     <div class="modal-overlay hidden" id="alterarSenhaModal" role="dialog" aria-modal="true" aria-labelledby="alterarSenhaModalTitulo">
         <div class="modal modal-md">
             <div class="modal-header">
@@ -339,7 +339,7 @@
                 <div class="form-group">
                     <label for="novaSenha" class="form-label">Nova Senha *</label>
                     <div class="input-with-icon">
-                        <input type="password" id="novaSenha" name="nova_senha" class="form-input" required minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+                        <input type="password" id="novaSenha" name="nova_senha" class="form-input" required minlength="8" autocomplete="new-password" placeholder="MÃ­nimo 8 caracteres">
                         <button type="button" class="input-icon-btn" id="toggleNovaSenha" aria-label="Mostrar/ocultar senha">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -347,7 +347,7 @@
                             </svg>
                         </button>
                     </div>
-                    <p class="form-help">Mínimo 8 caracteres</p>
+                    <p class="form-help">MÃ­nimo 8 caracteres</p>
                 </div>
 
                 <div class="form-group">
@@ -373,15 +373,15 @@
         </div>
     </div>
 
-    <!-- Modal Confirmar Exclusão -->
+    <!-- Modal Confirmar ExclusÃ£o -->
     <div class="modal-overlay hidden" id="deleteUsuarioModal" role="dialog" aria-modal="true" aria-labelledby="deleteUsuarioModalTitulo">
         <div class="modal modal-sm">
             <div class="modal-header">
-                <h2 class="modal-title" id="deleteUsuarioModalTitulo">Confirmar Exclusão</h2>
+                <h2 class="modal-title" id="deleteUsuarioModalTitulo">Confirmar ExclusÃ£o</h2>
             </div>
             <div class="modal-body">
-                <p>Tem certeza que deseja excluir o usuário <strong id="deleteUsuarioNome"></strong>?</p>
-                <p class="form-help">Esta ação não pode ser desfeita.</p>
+                <p>Tem certeza que deseja excluir o usuÃ¡rio <strong id="deleteUsuarioNome"></strong>?</p>
+                <p class="form-help">Esta aÃ§Ã£o nÃ£o pode ser desfeita.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" id="btnCancelarDeleteUsuario">Cancelar</button>
