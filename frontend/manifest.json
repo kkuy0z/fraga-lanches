@@ -10,7 +10,7 @@
     "orientation": "portrait-primary",
     "icons": [
         {
-            "src": "/assets/images/icons/logo.png",
+            "src": "/frontend/imagens/logo.png",
             "sizes": "any",
             "type": "image/png",
             "purpose": "any"
@@ -29,7 +29,7 @@
             "url": "/cliente/cardapio.html",
             "icons": [
                 {
-                    "src": "/assets/images/icons/logo.png",
+                    "src": "/frontend/imagens/logo.png",
                     "sizes": "any",
                     "type": "image/png"
                 }
@@ -42,7 +42,7 @@
             "url": "/cliente/meus-pedidos.html",
             "icons": [
                 {
-                    "src": "/assets/images/icons/logo.png",
+                    "src": "/frontend/imagens/logo.png",
                     "sizes": "any",
                     "type": "image/png"
                 }
@@ -55,7 +55,7 @@
             "url": "/cliente/carrinho.html",
             "icons": [
                 {
-                    "src": "/assets/images/icons/logo.png",
+                    "src": "/frontend/imagens/logo.png",
                     "sizes": "any",
                     "type": "image/png"
                 }

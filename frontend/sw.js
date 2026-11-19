@@ -13,7 +13,7 @@ const ARQUIVOS = [
     "/cliente/checkout.html",
     "/cliente/meus-pedidos.html",
     "/cliente/perfil.html",
-    "/assets/images/icons/logo.png"
+    "/frontend/imagens/logo.png"
 ];
 
 self.addEventListener("install", (event) => {
