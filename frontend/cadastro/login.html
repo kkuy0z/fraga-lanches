@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0c0c0c">
-    <meta name="description" content="Entre na sua conta Fraga Lanches e acompanhe seus pedidos, veja seu histórico e aproveite ofertas exclusivas.">
+    <meta name="description" content="Entre na sua conta Fraga Lanches e acompanhe seus pedidos, veja seu histÃ³rico e aproveite ofertas exclusivas.">
     <title>Entrar | Fraga Lanches</title>
     <link rel="icon" href="/img/logo.png">
     <link rel="manifest" href="/inicio/manifest.json">
@@ -25,7 +25,7 @@
     <main class="cad" style="padding-top: var(--header-height, 72px);">
         <div class="cad-grid">
 
-            <!-- Apresentação -->
+            <!-- ApresentaÃ§Ã£o -->
             <div class="cad-intro">
                 <img class="cad-logo" src="/img/logo.png" alt="Logo Fraga Lanches Delivery">
                 <p class="cad-eyebrow">Bem-vindo de volta</p>
@@ -33,19 +33,19 @@
                 <p class="cad-lead">Acesse seu painel e aproveite todas as vantagens de ser cliente Fraga Lanches.</p>
             </div>
 
-            <!-- Formulário -->
+            <!-- FormulÃ¡rio -->
             <div class="cad-card">
                 <div class="cad-card-topo">
                     <span class="cad-badge" aria-hidden="true"><svg class="cad-ic"><use href="#i-login" /></svg></span>
                     <div>
                         <h2>Entrar</h2>
-                        <p>É rápido e seguro!</p>
+                        <p>Ã‰ rÃ¡pido e seguro!</p>
                     </div>
                 </div>
 
-                <!-- novalidate: a validação é feita em login.js. Para integrar o backend, veja os comentários [BACKEND] -->
+                <!-- novalidate: a validaÃ§Ã£o Ã© feita em login.js. Para integrar o backend, veja os comentÃ¡rios [BACKEND] -->
                 <form id="form-login" action="#" novalidate>
-                    <p class="cad-legenda"><span class="obrig" aria-hidden="true">*</span> Campos obrigatórios</p>
+                    <p class="cad-legenda"><span class="obrig" aria-hidden="true">*</span> Campos obrigatÃ³rios</p>
 
                     <div class="campo">
                         <label for="email" class="form-label">E-mail <span class="obrig" aria-hidden="true">*</span></label>
@@ -69,7 +69,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <p class="form-help" id="ajuda-senha">A senha é sensível a maiúsculas e minúsculas.</p>
+                        <p class="form-help" id="ajuda-senha">A senha Ã© sensÃ­vel a maiÃºsculas e minÃºsculas.</p>
                         <p class="form-help error" id="erro-senha"></p>
                     </div>
 
@@ -97,13 +97,13 @@
                 </form>
 
                 <div class="divider" style="margin: var(--space-6) 0;">
-                    <span>Não tem uma conta?</span>
+                    <span>NÃ£o tem uma conta?</span>
                 </div>
                 <a class="btn btn-outline btn-block" href="/Cadastro/cadastro.html">Criar conta</a>
-                <a class="btn-link" href="/inicio/index.html" style="display: block; text-align: center; margin-top: var(--space-4);"><span aria-hidden="true">‹</span> Voltar para a página inicial</a>
+                <a class="btn-link" href="/inicio/index.html" style="display: block; text-align: center; margin-top: var(--space-4);"><span aria-hidden="true">â€¹</span> Voltar para a pÃ¡gina inicial</a>
             </div>
 
-            <!-- Benefícios + foto -->
+            <!-- BenefÃ­cios + foto -->
             <div class="cad-extras">
                 <ul class="cad-beneficios">
                     <li><svg class="cad-ic" aria-hidden="true"><use href="#i-truck" /></svg><span>Acompanhe seus pedidos em tempo real</span></li>
@@ -111,7 +111,7 @@
                     <li><svg class="cad-ic" aria-hidden="true"><use href="#i-heart" /></svg><span>Mais praticidade e agilidade na hora de pedir</span></li>
                 </ul>
                 <figure class="cad-foto">
-                    <img src="/img/img_fundo.png" alt="Hambúrguer artesanal de duas carnes com queijo e bacon">
+                    <img src="/img/img_fundo.png" alt="HambÃºrguer artesanal de duas carnes com queijo e bacon">
                 </figure>
             </div>
 
@@ -122,6 +122,16 @@
 
     <script type="module" src="/inicio/js/shared-components.js"></script>
     <script type="module" src="login.js"></script>
+<script src="/pwa.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js")
+            .catch(erro => console.error("Erro ao registrar Service Worker:", erro));
+    });
+}
+</script>
 </body>
 
 </html>

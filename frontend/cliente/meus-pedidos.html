@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Pedidos - Fraga Lanches</title>
+    <link rel="stylesheet" href="design-system.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0c0c0c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches">
+    <link rel="apple-touch-icon" href="/img/icon-192.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Header will be injected by shared-components.js -->
+
+    <!-- Main Content -->
+    <main class="page-main" role="main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-header-inner">
+                    <h1 class="page-title">Meus <span class="accent">Pedidos</span></h1>
+                    <p class="page-subtitle">Acompanhe o histórico e status dos seus pedidos</p>
+                    <div class="yellow-line"></div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="admin-filters" style="flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-4);">
+                <div class="filter-group" style="flex-wrap: wrap; gap: var(--space-3);">
+                    <select id="filtroStatus" class="form-select" aria-label="Filtrar por status" style="min-width: 180px;">
+                        <option value="">Todos os status</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="confirmado">Confirmado</option>
+                        <option value="preparando">Preparando</option>
+                        <option value="saiu_entrega">Saiu para Entrega</option>
+                        <option value="entregue">Entregue</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                    <div class="form-row" style="gap: var(--space-3);">
+                        <div class="form-group" style="flex: 1; min-width: 150px;">
+                            <label for="dataInicio" class="form-label">Data Início</label>
+                            <input type="date" id="dataInicio" class="form-input">
+                        </div>
+                        <div class="form-group" style="flex: 1; min-width: 150px;">
+                            <label for="dataFim" class="form-label">Data Fim</label>
+                            <input type="date" id="dataFim" class="form-input">
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" id="btnLimparFiltros" style="margin-top: var(--space-2);">
+                        <svg class="btn-icon" aria-hidden="true"><use href="#i-refresh" /></svg>
+                        Limpar Filtros
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabela de Pedidos -->
+            <section class="admin-table-section" aria-label="Lista de pedidos">
+                <div class="table-container">
+                    <table class="table" id="tabelaPedidos">
+                        <thead>
+                            <tr>
+                                <th>Pedido</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Itens</th>
+                                <th>Total</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyPedidos">
+                            <tr>
+                                <td colspan="6" class="text-center py-4">Carregando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Estado Vazio -->
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-state-icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <h2 class="empty-state-title">Nenhum pedido encontrado</h2>
+                <p class="empty-state-message">Você ainda não fez nenhum pedido.</p>
+<<<<<<< HEAD
+                <a href="/cliente/cliente/cardapio.html" class="btn btn-primary" style="margin-top: 16px;">
+=======
+                <a href="/cliente/cliente/cardapio.html" class="btn btn-primary" style="margin-top: var(--space-4);">
+>>>>>>> 5f591b814ebbbba10c50793e6296bfaf8ec43682
+                    <svg class="btn-icon" aria-hidden="true"><use href="#i-chevron-left" /></svg>
+                    Fazer um Pedido
+                </a>
+            </div>
+
+            <!-- Paginação -->
+            <nav class="pagination" id="pagination" aria-label="Paginação" style="display: none;"></nav>
+        </div>
+    </main>
+
+    <!-- Footer will be injected by shared-components.js -->
+
+    <!-- Modal Detalhes do Pedido -->
+    <div class="modal-overlay hidden" id="pedidoModal" role="dialog" aria-modal="true" aria-labelledby="pedidoModalTitulo">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h2 class="modal-title" id="pedidoModalTitulo">Detalhes do Pedido</h2>
+                <button class="modal-close" id="pedidoModalClose" aria-label="Fechar modal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-x" /></svg>
+                </button>
+            </div>
+            <div class="modal-body" id="pedidoModalBody">
+                <!-- Conteúdo será inserido via JS -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="pedidoModalFechar">Fechar</button>
+                <button type="button" class="btn btn-primary" id="pedidoModalRastrear" style="display: none;">
+                    <svg class="btn-icon" aria-hidden="true"><use href="#i-map-pin" /></svg>
+                    Rastrear Pedido
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/shared-components.js"></script>
+    <script type="module" src="js/meus-pedidos.js"></script>
+<<<<<<< HEAD
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/service-worker.js')
+            .catch(error => console.error('[SW] Erro no registro:', error));
+        });
+      }
+
+      // Handle image error events securely (instead of inline onerror)
+      document.addEventListener('DOMContentLoaded', () => {
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+          img.addEventListener('error', function() {
+            this.style.display = 'none';
+          });
+        });
+      });
+    </script>
+=======
+>>>>>>> 5f591b814ebbbba10c50793e6296bfaf8ec43682
+<script src="/pwa.js"></script>
+</body>
+
+</html>

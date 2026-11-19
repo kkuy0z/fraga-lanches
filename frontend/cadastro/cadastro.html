@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0c0c0c">
-    <meta name="description" content="Crie sua conta no Fraga Lanches e peça seus hambúrgueres artesanais com mais praticidade.">
+    <meta name="description" content="Crie sua conta no Fraga Lanches e peÃ§a seus hambÃºrgueres artesanais com mais praticidade.">
     <title>Cadastre-se | Fraga Lanches</title>
     <link rel="icon" href="/img/logo.png">
     <link rel="manifest" href="/inicio/manifest.json">
@@ -24,26 +24,26 @@
 
     <main class="cad" style="padding-top: var(--header-height, 72px);">
         <div class="cad-grid">
-            <!-- Apresentação (Lado Esquerdo) -->
+            <!-- ApresentaÃ§Ã£o (Lado Esquerdo) -->
             <div class="cad-intro">
                 <img class="cad-logo" src="/img/logo.png" alt="Logo Fraga Lanches Delivery">
                 <p class="cad-eyebrow">Seja bem-vindo(a)</p>
-                <h1>Junte-se à <span>nossa família!</span></h1>
+                <h1>Junte-se Ã  <span>nossa famÃ­lia!</span></h1>
                 <p class="cad-lead">Crie sua conta e aproveite todas as vantagens de pedir no Fraga Lanches.</p>
             </div>
 
-            <!-- Formulário (Lado Direito) -->
+            <!-- FormulÃ¡rio (Lado Direito) -->
             <div class="cad-card">
                 <div class="cad-card-topo">
                     <span class="cad-badge" aria-hidden="true"><svg class="cad-ic"><use href="#i-user" /></svg></span>
                     <div>
                         <h2>Cadastre-se</h2>
-                        <p>É rápido e fácil!</p>
+                        <p>Ã‰ rÃ¡pido e fÃ¡cil!</p>
                     </div>
                 </div>
 
                 <form id="form-cadastro" novalidate>
-                    <p class="cad-legenda"><span class="obrig" aria-hidden="true">*</span> Campos obrigatórios</p>
+                    <p class="cad-legenda"><span class="obrig" aria-hidden="true">*</span> Campos obrigatÃ³rios</p>
 
                     <div class="campo">
                         <label for="nome" class="form-label">Nome completo <span class="obrig" aria-hidden="true">*</span></label>
@@ -104,7 +104,7 @@
                     <div class="campo campo-termos">
                         <label class="form-check" for="termos">
                             <input id="termos" name="termos" type="checkbox" class="form-check-input" required aria-describedby="erro-termos">
-                            <span class="form-check-label">Li e aceito os <a href="#" data-pendente>Termos de Uso</a> e a <a href="#" data-pendente>Política de Privacidade</a>. <span class="obrig" aria-hidden="true">*</span></span>
+                            <span class="form-check-label">Li e aceito os <a href="#" data-pendente>Termos de Uso</a> e a <a href="#" data-pendente>PolÃ­tica de Privacidade</a>. <span class="obrig" aria-hidden="true">*</span></span>
                         </label>
                         <p class="form-help error" id="erro-termos"></p>
                     </div>
@@ -117,20 +117,20 @@
                     <div class="alert alert-success hidden" id="sucesso" role="status" tabindex="-1">
                         <svg class="alert-icon" aria-hidden="true"><use href="#i-check-circle" /></svg>
                         <div>
-                            <strong>Cadastro Concluído!</strong>
+                            <strong>Cadastro ConcluÃ­do!</strong>
                             <p>Seu cadastro foi efetuado com sucesso!</p>
                         </div>
                     </div>
                 </form>
 
                 <div class="divider" style="margin: var(--space-6) 0;">
-                    <span>Já tem uma conta?</span>
+                    <span>JÃ¡ tem uma conta?</span>
                 </div>
                 <a class="btn btn-outline btn-block" href="/Cadastro/login.html">Entrar</a>
-                <a class="btn-link" href="/inicio/index.html" style="display: block; text-align: center; margin-top: var(--space-4);"><span aria-hidden="true">‹</span> Voltar para a página inicial</a>
+                <a class="btn-link" href="/inicio/index.html" style="display: block; text-align: center; margin-top: var(--space-4);"><span aria-hidden="true">â€¹</span> Voltar para a pÃ¡gina inicial</a>
             </div>
 
-            <!-- Benefícios + Foto (Rodapé) -->
+            <!-- BenefÃ­cios + Foto (RodapÃ©) -->
             <div class="cad-extras">
                 <ul class="cad-beneficios">
                     <li><svg class="cad-ic" aria-hidden="true"><use href="#i-truck" /></svg><span>Acompanhe seus pedidos em tempo real</span></li>
@@ -138,7 +138,7 @@
                     <li><svg class="cad-ic" aria-hidden="true"><use href="#i-heart" /></svg><span>Mais praticidade e agilidade na hora de pedir</span></li>
                 </ul>
                 <figure class="cad-foto">
-                    <img src="/img/img_fundo.png" alt="Hambúrguer artesanal de duas carnes com queijo e bacon">
+                    <img src="/img/img_fundo.png" alt="HambÃºrguer artesanal de duas carnes com queijo e bacon">
                 </figure>
             </div>
         </div>
@@ -148,6 +148,16 @@
 
     <script type="module" src="/inicio/js/shared-components.js"></script>
     <script type="module" src="cadastro.js"></script>
+<script src="/pwa.js"></script>
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js")
+            .catch(erro => console.error("Erro ao registrar Service Worker:", erro));
+    });
+}
+</script>
 </body>
 
 </html>

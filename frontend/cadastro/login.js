@@ -1,92 +1,111 @@
+const formLogin = document.getElementById("form-login");
 
-const API = "http://localhost:8000";
+if (formLogin) {
+    formLogin.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-const form = document.getElementById("form-login");
-const sucesso = document.getElementById("sucesso");
+        limparErrosLogin();
 
-const email = document.getElementById("email");
-const senha = document.getElementById("senha");
+        const email = formLogin.elements.namedItem("email").value.trim();
+        const senha = formLogin.elements.namedItem("senha").value;
+        const lembrar = formLogin.elements.namedItem("lembrar")?.checked || false;
 
-const erroEmail = document.getElementById("erro-email");
-const erroSenha = document.getElementById("erro-senha");
-
-form.addEventListener("submit", async event => {
-    event.preventDefault();
-
-    erroEmail.textContent = "";
-    erroSenha.textContent = "";
-    sucesso.classList.add("hidden");
-
-    let valido = true;
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-        erroEmail.textContent = "Digite um e-mail válido.";
-        valido = false;
-    }
-
-    if (!senha.value) {
-        erroSenha.textContent = "Digite sua senha.";
-        valido = false;
-    }
-
-    if (!valido) return;
-
-    const botao = form.querySelector('button[type="submit"]');
-    const textoOriginal = botao.innerHTML;
-
-    botao.disabled = true;
-    botao.textContent = "Entrando...";
-
-    try {
-        const resposta = await fetch(`${API}/api/auth/login`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email: email.value.trim(),
-                senha: senha.value
-            })
-        });
-
-        const resultado = await resposta.json();
-
-        if (!resposta.ok) {
-            throw new Error(resultado.detail || "Não foi possível entrar.");
+        if (!email) {
+            mostrarErroLogin("erro-email", "Informe seu e-mail.");
+            return;
         }
 
-        sucesso.querySelector("strong").textContent = "Login realizado!";
-        sucesso.querySelector("p").textContent =
-            `Bem-vindo(a), ${resultado.usuario.nome}!`;
+        if (!senha) {
+            mostrarErroLogin("erro-senha", "Informe sua senha.");
+            return;
+        }
 
-        sucesso.classList.remove("hidden");
-        sucesso.focus();
+        const botao = formLogin.querySelector('[type="submit"]');
+        botao.disabled = true;
 
-        setTimeout(() => {
-            window.location.href = "/inicio/index.html";
-        }, 1000);
+        try {
+            const resposta = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "same-origin",
+                body: JSON.stringify({
+                    email,
+                    senha,
+                    lembrar
+                })
+            });
 
-    } catch (erro) {
-        erroSenha.textContent =
-            erro.message || "Não foi possível conectar ao servidor.";
-    } finally {
-        botao.disabled = false;
-        botao.innerHTML = textoOriginal;
-    }
-});
+            const dados = await resposta.json();
 
-// Mostrar e ocultar senha
-document.querySelectorAll("[data-alvo]").forEach(botao => {
-    botao.addEventListener("click", () => {
-        const campo = document.getElementById(botao.dataset.alvo);
-        const mostrar = campo.type === "password";
+            if (!resposta.ok) {
+                mostrarErroLogin(
+                    "erro-senha",
+                    dados.mensagem || "Não foi possível entrar."
+                );
+                return;
+            }
 
-        campo.type = mostrar ? "text" : "password";
-        botao.setAttribute("aria-pressed", String(mostrar));
-        botao.setAttribute(
-            "aria-label",
-            mostrar ? "Ocultar senha" : "Mostrar senha"
-        );
+            const sucesso = document.getElementById("sucesso");
+
+            if (sucesso) {
+                sucesso.textContent = dados.mensagem;
+                sucesso.classList.remove("hidden");
+            }
+
+            const destinos = {
+    cliente: "/cliente/painel.html",
+    cozinha: "/cozinha/painel.html",
+    entregador: "/entregador/painel.html",
+    atendente: "/atendente/painel.html",
+    admin: "/admin/admin-dashboard.html"
+};
+
+const destino = destinos[dados.usuario.tipo];
+
+if (destino) {
+    window.location.href = destino;
+} else {
+    mostrarErroLogin(
+        "erro-email",
+        "Tipo de usuÃ¡rio nÃ£o reconhecido."
+    );
+}
+
+        } catch (erro) {
+            mostrarErroLogin(
+                "erro-email",
+                "Não foi possível conectar ao servidor."
+            );
+        } finally {
+            botao.disabled = false;
+        }
     });
-});
+}
+
+function mostrarErroLogin(id, mensagem) {
+    const elemento = document.getElementById(id);
+
+    if (elemento) {
+        elemento.textContent = mensagem;
+        elemento.classList.remove("hidden");
+    }
+}
+
+function limparErrosLogin() {
+    ["erro-email", "erro-senha", "erro-lembrar"].forEach((id) => {
+        const elemento = document.getElementById(id);
+
+        if (elemento) {
+            elemento.textContent = "";
+            elemento.classList.add("hidden");
+        }
+    });
+
+    const sucesso = document.getElementById("sucesso");
+
+    if (sucesso) {
+        sucesso.classList.add("hidden");
+    }
+}

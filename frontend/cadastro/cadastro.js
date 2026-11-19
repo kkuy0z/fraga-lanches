@@ -1,149 +1,123 @@
+const formCadastro = document.getElementById("form-cadastro");
 
-const API = "http://localhost:8000";
+if (formCadastro) {
+    formCadastro.addEventListener("submit", async (event) => {
+        event.preventDefault();
 
-const form = document.getElementById("form-cadastro");
-const sucesso = document.getElementById("sucesso");
+        limparErros();
 
-const campos = {
-    nome: document.getElementById("nome"),
-    email: document.getElementById("email"),
-    telefone: document.getElementById("telefone"),
-    senha: document.getElementById("senha"),
-    confirmar: document.getElementById("confirmar"),
-    termos: document.getElementById("termos")
-};
+        const nome = formCadastro.elements.namedItem("nome").value.trim();
+        const email = formCadastro.elements.namedItem("email").value.trim();
+        const telefone = formCadastro.elements.namedItem("telefone").value.trim();
+        const senha = formCadastro.elements.namedItem("senha").value;
+        const confirmar = formCadastro.elements.namedItem("confirmarSenha").value;
+        const termos = formCadastro.elements.namedItem("termos").checked;
 
-const erros = {
-    nome: document.getElementById("erro-nome"),
-    email: document.getElementById("erro-email"),
-    telefone: document.getElementById("erro-telefone"),
-    senha: document.getElementById("erro-senha"),
-    confirmar: document.getElementById("erro-confirmar"),
-    termos: document.getElementById("erro-termos")
-};
+        let valido = true;
 
-function mostrarErro(campo, mensagem = "") {
-    erros[campo].textContent = mensagem;
+        if (nome.length < 2) {
+            mostrarErro("erro-nome", "Informe seu nome.");
+            valido = false;
+        }
+
+        if (!email) {
+            mostrarErro("erro-email", "Informe seu e-mail.");
+            valido = false;
+        }
+
+        if (senha.length < 8 || senha.length > 64) {
+            mostrarErro("erro-senha", "A senha deve ter entre 8 e 64 caracteres.");
+            valido = false;
+        }
+
+        if (senha !== confirmar) {
+            mostrarErro("erro-confirmar", "As senhas não são iguais.");
+            valido = false;
+        }
+
+        if (!termos) {
+            mostrarErro("erro-termos", "Você precisa aceitar os termos.");
+            valido = false;
+        }
+
+        if (!valido) return;
+
+        const botao = formCadastro.querySelector('[type="submit"]');
+        botao.disabled = true;
+
+        try {
+            const resposta = await fetch("/api/auth/cadastro", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    nome,
+                    email,
+                    telefone,
+                    senha
+                })
+            });
+
+            const dados = await resposta.json();
+
+            if (!resposta.ok) {
+                mostrarErro("erro-email", dados.mensagem || "Erro ao realizar cadastro.");
+                return;
+            }
+
+            const sucesso = document.getElementById("sucesso");
+
+            if (sucesso) {
+                sucesso.textContent = dados.mensagem;
+                sucesso.classList.remove("hidden");
+            }
+
+            formCadastro.reset();
+
+            setTimeout(() => {
+                window.location.href = "/cadastro/login.html";
+            }, 1500);
+
+        } catch (erro) {
+            mostrarErro("erro-email", "Não foi possível conectar ao servidor.");
+        } finally {
+            botao.disabled = false;
+        }
+    });
+}
+
+function mostrarErro(id, mensagem) {
+    const elemento = document.getElementById(id);
+
+    if (elemento) {
+        elemento.textContent = mensagem;
+        elemento.classList.remove("hidden");
+    }
 }
 
 function limparErros() {
-    Object.keys(erros).forEach(campo => mostrarErro(campo));
-}
+    const ids = [
+        "erro-nome",
+        "erro-email",
+        "erro-telefone",
+        "erro-senha",
+        "erro-confirmar",
+        "erro-termos"
+    ];
 
-function validarFormulario() {
-    limparErros();
+    ids.forEach((id) => {
+        const elemento = document.getElementById(id);
 
-    let valido = true;
-
-    const nome = campos.nome.value.trim();
-    const email = campos.email.value.trim();
-    const telefone = campos.telefone.value.replace(/\D/g, "");
-    const senha = campos.senha.value;
-    const confirmar = campos.confirmar.value;
-
-    if (nome.length < 3) {
-        mostrarErro("nome", "Digite seu nome completo.");
-        valido = false;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        mostrarErro("email", "Digite um e-mail válido.");
-        valido = false;
-    }
-
-    if (![10, 11].includes(telefone.length)) {
-        mostrarErro("telefone", "Digite um telefone válido.");
-        valido = false;
-    }
-
-    if (senha.length < 8) {
-        mostrarErro("senha", "A senha precisa ter pelo menos 8 caracteres.");
-        valido = false;
-    }
-
-    if (senha !== confirmar) {
-        mostrarErro("confirmar", "As senhas não são iguais.");
-        valido = false;
-    }
-
-    if (!campos.termos.checked) {
-        mostrarErro("termos", "Você precisa aceitar os termos.");
-        valido = false;
-    }
-
-    return valido;
-}
-
-form.addEventListener("submit", async event => {
-    event.preventDefault();
-
-    sucesso.classList.add("hidden");
-
-    if (!validarFormulario()) return;
-
-    const botao = form.querySelector('button[type="submit"]');
-    const textoOriginal = botao.innerHTML;
-
-    botao.disabled = true;
-    botao.textContent = "Criando conta...";
-
-    try {
-        const resposta = await fetch(`${API}/api/auth/cadastro`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                nome: campos.nome.value.trim(),
-                email: campos.email.value.trim(),
-                telefone: campos.telefone.value,
-                senha: campos.senha.value,
-                termos: campos.termos.checked
-            })
-        });
-
-        const resultado = await resposta.json();
-
-        if (!resposta.ok) {
-            throw new Error(resultado.detail || "Não foi possível realizar o cadastro.");
+        if (elemento) {
+            elemento.textContent = "";
+            elemento.classList.add("hidden");
         }
-
-        sucesso.querySelector("strong").textContent = "Conta criada!";
-        sucesso.querySelector("p").textContent =
-            "Seu cadastro foi salvo. Agora você já pode entrar na sua conta.";
-
-        sucesso.classList.remove("hidden");
-        sucesso.focus();
-
-        form.reset();
-
-        setTimeout(() => {
-            window.location.href = "/Cadastro/login.html";
-        }, 1800);
-
-    } catch (erro) {
-        if (erro.message.toLowerCase().includes("e-mail")) {
-            mostrarErro("email", erro.message);
-        } else {
-            alert(erro.message || "Não foi possível conectar ao servidor.");
-        }
-    } finally {
-        botao.disabled = false;
-        botao.innerHTML = textoOriginal;
-    }
-});
-
-// Mostrar e ocultar senhas
-document.querySelectorAll("[data-alvo]").forEach(botao => {
-    botao.addEventListener("click", () => {
-        const campo = document.getElementById(botao.dataset.alvo);
-        const mostrar = campo.type === "password";
-
-        campo.type = mostrar ? "text" : "password";
-        botao.setAttribute("aria-pressed", String(mostrar));
-        botao.setAttribute(
-            "aria-label",
-            mostrar ? "Ocultar senha" : "Mostrar senha"
-        );
     });
-});
+
+    const sucesso = document.getElementById("sucesso");
+
+    if (sucesso) {
+        sucesso.classList.add("hidden");
+    }
+}
