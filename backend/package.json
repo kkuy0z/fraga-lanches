@@ -1,8 +1,8 @@
 {
-  "name": "fraga-lanches-backend",
+  "name": "fraga-lanches",
   "version": "1.0.0",
   "private": true,
-  "description": "Backend do sistema Fraga Lanches",
+  "description": "Sistema Fraga Lanches",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
