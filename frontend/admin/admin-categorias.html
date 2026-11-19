@@ -4,189 +4,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categorias - Fraga Lanches Admin</title>
-    <link rel="stylesheet" href="design-system.css">
-    <link rel="manifest" href="manifest.json">
+
+    <title>Categorias | Fraga Lanches Admin</title>
+    <link rel="manifest" href="/manifest.json">
+
+    <link rel="icon" href="/assets/images/icons/logo.png">
+    <link rel="apple-touch-icon" href="/assets/images/icons/logo.png">
+
     <meta name="theme-color" content="#0c0c0c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin">
-    <link rel="apple-touch-icon" href="/img/icon-192.svg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 </head>
 
 <body>
-    <!-- Header will be injected by shared-components.js -->
 
-    <!-- Main Content -->
     <main class="page-main admin-main" role="main">
+
         <div class="container">
-            <!-- Page Header -->
+
+            <!-- Cabeçalho -->
             <div class="page-header">
+
                 <div class="page-header-inner">
-                    <div class="d-flex justify-between align-center" style="flex-wrap: wrap; gap: var(--space-4);">
+
+                    <div class="d-flex justify-between align-center">
+
                         <div>
                             <h1 class="page-title">Categorias</h1>
-                            <p class="page-subtitle">Gerencie as categorias do cardápio</p>
+
+                            <p class="page-subtitle">
+                                Gerencie as categorias do cardápio.
+                            </p>
                         </div>
-                        <button class="btn btn-primary" id="btnNovaCategoria">
-                            <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
+
+                        <button type="button" class="btn btn-primary" id="btnNovaCategoria">
+                            <svg class="btn-icon" aria-hidden="true">
+                                <use href="#i-add"></use>
+                            </svg>
+
                             Nova Categoria
                         </button>
+
                     </div>
+
                     <div class="yellow-line"></div>
+
                 </div>
+
             </div>
 
             <!-- Filtros -->
-            <div class="admin-filters" style="margin-bottom: var(--space-4); flex-wrap: wrap; gap: var(--space-3);">
-                <div class="filter-group" style="flex-wrap: wrap; gap: var(--space-3);">
-                    <input type="text" id="buscaCategoria" class="form-input" placeholder="Buscar por nome..." style="max-width: 300px; flex: 1; min-width: 200px;">
-                    <select id="filtroAtivo" class="form-select" style="max-width: 150px;">
+            <div class="admin-filters">
+
+                <div class="filter-group">
+
+                    <input type="search" id="buscaCategoria" class="form-input" placeholder="Buscar por nome..."
+                        aria-label="Buscar categoria pelo nome">
+
+                    <select id="filtroAtivo" class="form-select" aria-label="Filtrar categorias por status">
                         <option value="">Todas</option>
-                        <option value="true">Ativas</option>
-                        <option value="false">Inativas</option>
+                        <option value="ativo">Ativas</option>
+                        <option value="inativo">Inativas</option>
                     </select>
+
                 </div>
+
             </div>
 
-            <!-- Tabela de Categorias -->
+            <!-- Tabela -->
             <section class="admin-table-section" aria-label="Lista de categorias">
+
                 <div class="table-container">
+
                     <table class="table" id="tabelaCategorias">
+
                         <thead>
                             <tr>
-                                <th>Nome</th>
-                                <th>Descrição</th>
-                                <th>Ordem</th>
-                                <th>Status</th>
-                                <th>Produtos</th>
-                                <th>Ações</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Ações</th>
                             </tr>
                         </thead>
+
                         <tbody id="tbodyCategorias">
+
                             <tr>
-                                <td colspan="6" class="text-center py-4">Carregando...</td>
+                                <td colspan="4" class="text-center py-4">
+                                    Carregando categorias...
+                                </td>
                             </tr>
+
                         </tbody>
+
                     </table>
+
                 </div>
+
             </section>
 
-            <!-- Estado Vazio -->
-            <div class="empty-state hidden" id="emptyState">
-                <div class="empty-state-icon">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                        <line x1="4" y1="7" x2="4" y2="21"></line>
-                        <line x1="4" y1="7" x2="20" y2="7"></line>
-                        <line x1="8" y1="7" x2="8" y2="21"></line>
-                        <line x1="12" y1="7" x2="12" y2="21"></line>
-                        <line x1="16" y1="7" x2="16" y2="21"></line>
-                        <line x1="20" y1="7" x2="20" y2="21"></line>
-                    </svg>
-                </div>
-                <h2 class="empty-state-title">Nenhuma categoria encontrada</h2>
-                <p class="empty-state-message">Comece criando a primeira categoria do cardápio.</p>
-                <button class="btn btn-primary" id="btnPrimeiraCategoria" style="margin-top: var(--space-4);">
-                    <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
-                    Criar Categoria
-                </button>
-            </div>
-
-            <!-- Paginação -->
-            <nav class="pagination" id="pagination" aria-label="Paginação" style="display: none;"></nav>
         </div>
+
     </main>
 
-    <!-- Footer will be injected by shared-components.js -->
+    <!-- Modal cadastrar/editar -->
+    <div class="modal-overlay hidden" id="categoriaModal" role="dialog" aria-modal="true"
+        aria-labelledby="categoriaModalTitulo">
 
-    <!-- Modal Nova/Editar Categoria -->
-    <div class="modal-overlay hidden" id="categoriaModal" role="dialog" aria-modal="true" aria-labelledby="categoriaModalTitulo">
         <div class="modal modal-md">
+
             <div class="modal-header">
-                <h2 class="modal-title" id="categoriaModalTitulo">Nova Categoria</h2>
-                <button class="modal-close" id="categoriaModalClose" aria-label="Fechar modal">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-x" /></svg>
+
+                <h2 class="modal-title" id="categoriaModalTitulo">
+                    Nova Categoria
+                </h2>
+
+                <button type="button" class="modal-close" id="categoriaModalClose" aria-label="Fechar modal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        aria-hidden="true">
+                        <use href="#i-x"></use>
+                    </svg>
                 </button>
+
             </div>
+
             <form id="categoriaForm" class="modal-body" novalidate>
+
                 <input type="hidden" id="categoriaId" name="id">
 
                 <div class="form-group">
-                    <label for="categoriaNome" class="form-label">Nome *</label>
-                    <input type="text" id="categoriaNome" name="nome" class="form-input" required maxlength="80" placeholder="Ex: Hambúrgueres, Bebidas, Sobremesas">
+
+                    <label for="categoriaNome" class="form-label">
+                        Nome *
+                    </label>
+
+                    <input type="text" id="categoriaNome" name="nome" class="form-input" required maxlength="80"
+                        placeholder="Ex: Hambúrgueres, Bebidas, Sobremesas">
+
                 </div>
 
                 <div class="form-group">
-                    <label for="categoriaDescricao" class="form-label">Descrição</label>
-                    <textarea id="categoriaDescricao" name="descricao" class="form-textarea" rows="3" maxlength="255" placeholder="Descrição breve da categoria"></textarea>
+
+                    <label for="categoriaDescricao" class="form-label">
+                        Descrição
+                    </label>
+
+                    <textarea id="categoriaDescricao" name="descricao" class="form-textarea" rows="3" maxlength="255"
+                        placeholder="Descrição breve da categoria"></textarea>
+
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group" style="flex: 1;">
-                        <label for="categoriaOrdem" class="form-label">Ordem de Exibição</label>
-                        <input type="number" id="categoriaOrdem" name="ordem_exibicao" class="form-input" min="0" value="0" placeholder="0">
-                    </div>
-                </div>
+                <div class="form-check">
 
-                <div class="form-check" style="margin-top: var(--space-4);">
                     <input type="checkbox" id="categoriaAtivo" name="ativo" class="form-check-input" checked>
-                    <label for="categoriaAtivo" class="form-check-label">Categoria ativa (visível no cardápio)</label>
+
+                    <label for="categoriaAtivo" class="form-check-label">
+                        Categoria ativa (visível no cardápio)
+                    </label>
+
                 </div>
+
             </form>
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="btnCancelarCategoria">Cancelar</button>
+
+                <button type="button" class="btn btn-secondary" id="btnCancelarCategoria">
+                    Cancelar
+                </button>
+
                 <button type="submit" form="categoriaForm" class="btn btn-primary" id="btnSalvarCategoria">
-                    <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
+                    <svg class="btn-icon" aria-hidden="true">
+                        <use href="#i-save"></use>
+                    </svg>
+
                     Salvar Categoria
                 </button>
+
             </div>
+
         </div>
+
     </div>
 
-    <!-- Modal Confirmar Exclusão -->
-    <div class="modal-overlay hidden" id="deleteCategoriaModal" role="dialog" aria-modal="true" aria-labelledby="deleteCategoriaModalTitulo">
+    <!-- Modal de exclusão -->
+    <div class="modal-overlay hidden" id="deleteCategoriaModal" role="dialog" aria-modal="true"
+        aria-labelledby="deleteCategoriaModalTitulo">
+
         <div class="modal modal-sm">
+
             <div class="modal-header">
-                <h2 class="modal-title" id="deleteCategoriaModalTitulo">Confirmar Exclusão</h2>
+
+                <h2 class="modal-title" id="deleteCategoriaModalTitulo">
+                    Confirmar Exclusão
+                </h2>
+
             </div>
+
             <div class="modal-body">
-                <p>Tem certeza que deseja excluir a categoria <strong id="deleteCategoriaNome"></strong>?</p>
-                <p class="form-help">Esta ação não pode ser desfeita. Produtos vinculados ficarão sem categoria.</p>
+
+                <p>
+                    Tem certeza que deseja excluir a categoria
+                    <strong id="deleteCategoriaNome"></strong>?
+                </p>
+
+                <p class="form-help">
+                    Categorias que possuem produtos vinculados não podem
+                    ser excluídas. Nesse caso, desative a categoria.
+                </p>
+
             </div>
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="btnCancelarDeleteCategoria">Cancelar</button>
+
+                <button type="button" class="btn btn-secondary" id="btnCancelarDeleteCategoria">
+                    Cancelar
+                </button>
+
                 <button type="button" class="btn btn-danger" id="btnConfirmarDeleteCategoria">
-                    <svg class="btn-icon" aria-hidden="true"><use href="#i-trash" /></svg>
+                    <svg class="btn-icon" aria-hidden="true">
+                        <use href="#i-trash"></use>
+                    </svg>
+
                     Excluir
                 </button>
+
             </div>
+
         </div>
+
     </div>
 
-    <script type="module" src="js/shared-components.js"></script>
-    <script type="module" src="js/admin-categorias.js"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .catch(error => console.error('[SW] Erro no registro:', error));
-        });
-      }
-
-      // Handle image error events securely (instead of inline onerror)
-      document.addEventListener('DOMContentLoaded', () => {
-        const images = document.querySelectorAll('img');
-        images.forEach(img => {
-          img.addEventListener('error', function() {
-            this.style.display = 'none';
-          });
-        });
-      });
-    </script>
-<script src="/pwa.js"></script>
+    <script src="/admin/admin-categorias.js" defer></script>
 </body>
 
 </html>

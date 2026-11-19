@@ -4,88 +4,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CardÃ¡pio - Fraga Lanches</title>
-    <link rel="stylesheet" href="design-system.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0c0c0c">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Fraga Lanches">
-    <link rel="apple-touch-icon" href="/img/icon-192.svg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Cardápio - Fraga Lanches</title>
+    <link rel="icon" type="image/png" href="/assets/images/icons/logo.png">
+    <link rel="apple-touch-icon" href="/assets/images/icons/logo.png">
+    <link rel="manifest" href="/manifest.json">
 </head>
 
 <body>
-    <!-- Header will be injected by shared-components.js -->
-
-    <!-- Banner Fechado -->
     <div id="closedBanner" class="closed-banner hidden" role="alert" aria-live="assertive">
         <div class="closed-banner-content">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-clock" /></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                aria-hidden="true">
+                <use href="#i-clock"></use>
+            </svg>
+
             <div class="closed-banner-text">
                 <strong>ESTABELECIMENTO FECHADO</strong>
-                <span id="closedBannerMessage">Carregando horÃ¡rio de funcionamento...</span>
+                <span id="closedBannerMessage">
+                    Carregando horário de funcionamento...
+                </span>
             </div>
         </div>
     </div>
 
-    <!-- Hero da PÃ¡gina -->
     <section class="page-header">
         <div class="page-header-inner">
-            <h1 class="page-title">NOSSO <span class="accent">CARDÃPIO</span></h1>
-            <p class="page-subtitle">HambÃºrgueres artesanais, marmitas, porÃ§Ãµes e bebidas preparados com ingredientes selecionados</p>
+            <h1 class="page-title">
+                NOSSO <span class="accent">CARDÁPIO</span>
+            </h1>
+
+            <p class="page-subtitle">
+                Hambúrgueres artesanais, marmitas, porções e bebidas preparados com ingredientes selecionados
+            </p>
+
             <div class="yellow-line"></div>
         </div>
     </section>
 
-    <!-- Filtro de Categorias -->
     <section class="categorias-filtro" aria-label="Filtrar por categoria">
         <div class="container">
-            <div class="categorias-scroll" id="categoriasFiltro" role="tablist" aria-label="Categorias do cardÃ¡pio">
-                <!-- Categorias serÃ£o inseridas via JS -->
+            <div class="categorias-scroll" id="categoriasFiltro" role="tablist" aria-label="Categorias do cardápio">
             </div>
         </div>
     </section>
 
-    <!-- Grid de Produtos -->
     <main class="cardapio-main" role="main">
         <div class="container">
-            <div class="cardapio-grid" id="cardapioGrid" role="list" aria-label="Produtos do cardÃ¡pio">
-                <!-- Produtos serÃ£o inseridos via JS -->
+
+            <div class="cardapio-grid" id="cardapioGrid" role="list" aria-label="Produtos do cardápio">
             </div>
 
-            <!-- Estado vazio -->
             <div class="empty-state hidden" id="emptyState">
                 <div class="empty-state-icon">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><use href="#i-search" /></svg>
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        aria-hidden="true">
+                        <use href="#i-search"></use>
+                    </svg>
                 </div>
-                <h2 class="empty-state-title">Nenhum produto encontrado</h2>
-                <p class="empty-state-message">NÃ£o hÃ¡ produtos disponÃ­veis nesta categoria no momento.</p>
+
+                <h2 class="empty-state-title">
+                    Nenhum produto encontrado
+                </h2>
+
+                <p class="empty-state-message">
+                    Não há produtos disponíveis nesta categoria no momento.
+                </p>
             </div>
 
-            <!-- PaginaÃ§Ã£o -->
-            <nav class="pagination" id="pagination" aria-label="PaginaÃ§Ã£o do cardÃ¡pio" style="display: none;">
-                <!-- BotÃµes de paginaÃ§Ã£o serÃ£o inseridos via JS -->
+            <nav class="pagination" id="pagination" aria-label="Paginação do cardápio" hidden>
             </nav>
+
         </div>
     </main>
 
-    <!-- Footer will be injected by shared-components.js -->
+    <script src="/cliente/cardapio.js" defer></script>
 
-    <script type="module" src="js/shared-components.js"></script>
-    <script type="module" src="js/cardapio.js"></script>
-<script src="/pwa.js"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("/sw.js")
+                    .catch(erro => console.error(
+                        "Erro ao registrar Service Worker:", erro
+                    ));
+            });
+        }
+    </script>
 
-<script>
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js")
-            .catch(erro => console.error("Erro ao registrar Service Worker:", erro));
-    });
-}
-</script>
 </body>
 
 </html>

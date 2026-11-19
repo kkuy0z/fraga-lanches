@@ -4,52 +4,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Admin - Fraga Lanches</title>
-    <link rel="stylesheet" href="design-system.css">
-    <link rel="manifest" href="manifest.json">
+
+    <title>Login Administrativo | Fraga Lanches</title>
+
+    <link rel="stylesheet" href="/design-system.css">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/assets/images/icons/logo.png">
+    <link rel="apple-touch-icon" href="/assets/images/icons/logo.png">
+
     <meta name="theme-color" content="#0c0c0c">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin">
-    <link rel="apple-touch-icon" href="/img/icon-192.svg">
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self';">
-    <!-- Referrer Policy -->
+
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self';">
+
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <!-- Permissions Policy -->
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+
+    <script src="/admin/admin-login.js" defer></script>
 </head>
 
 <body>
-    <main class="page-main" style="min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: var(--space-6) var(--container-padding);">
-        <div class="container" style="max-width: 420px; width: 100%;">
-            <!-- Logo -->
-            <div class="text-center" style="margin-bottom: var(--space-8);">
-                <a href="/inicio/index.html" style="display: inline-block;">
-                    <img src="/img/logo.png" alt="Fraga Lanches" style="height: 60px;" class="logo-img">
-                    <span style="display: none; font-size: 28px; font-weight: 700; color: var(--primary);">Fraga Lanches</span>
+
+    <main class="page-main">
+
+        <div class="container">
+
+            <div class="text-center">
+                <a href="/inicio.html">
+                    <img src="/assets/images/icons/logo.png" alt="Fraga Lanches" class="logo-img">
                 </a>
             </div>
 
-            <!-- Card de Login -->
-            <article class="card" style="padding: var(--space-8);">
-                <header style="text-align: center; margin-bottom: var(--space-6);">
-                    <h1 class="card-title" style="margin-bottom: var(--space-2);">Painel Administrativo</h1>
-                    <p style="color: var(--color-text-muted);">Faça login para acessar o painel de controle</p>
+            <article class="card">
+
+                <header class="text-center">
+                    <h1 class="card-title">
+                        Painel Administrativo
+                    </h1>
+
+                    <p>
+                        Faça login para acessar o painel de controle.
+                    </p>
                 </header>
 
                 <form id="formLogin" novalidate>
+
                     <div class="form-group">
-                        <label for="email" class="form-label">E-mail *</label>
-                        <input type="email" id="email" name="email" class="form-input" required autocomplete="email" placeholder="admin@fragalanches.com">
+                        <label for="email" class="form-label">
+                            E-mail *
+                        </label>
+
+                        <input type="email" id="email" name="email" class="form-input" required autocomplete="username"
+                            placeholder="admin@fragalanches.com">
                     </div>
 
                     <div class="form-group">
-                        <label for="senha" class="form-label">Senha *</label>
+                        <label for="senha" class="form-label">
+                            Senha *
+                        </label>
+
                         <div class="input-with-icon">
-                            <input type="password" id="senha" name="senha" class="form-input" required autocomplete="current-password" placeholder="Digite sua senha">
-                            <button type="button" class="input-icon-btn" id="toggleSenha" aria-label="Mostrar/ocultar senha">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <input type="password" id="senha" name="senha" class="form-input" required
+                                autocomplete="current-password" placeholder="Digite sua senha">
+
+                            <button type="button" class="input-icon-btn" id="toggleSenha" aria-label="Mostrar senha">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" aria-hidden="true">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
@@ -57,108 +80,42 @@
                         </div>
                     </div>
 
-                    <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2);">
-                        <label class="form-check" style="margin: 0; cursor: pointer;">
+                    <div class="form-group">
+                        <label class="form-check">
                             <input type="checkbox" id="lembrar" name="lembrar" class="form-check-input">
-                            <span class="form-check-label">Lembrar-me</span>
+
+                            <span class="form-check-label">
+                                Lembrar-me
+                            </span>
                         </label>
-                        <a href="#" class="btn-link" style="font-size: var(--fs-sm);" data-pendente>Esqueci a senha</a>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: var(--space-6);" id="btnLogin">
-                        <svg class="btn-icon" aria-hidden="true"><use href="#i-login" /></svg>
+                    <p id="mensagemLogin" role="alert" aria-live="polite"></p>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="btnLogin">
                         Entrar
                     </button>
+
                 </form>
 
-                <div class="text-center" style="margin-top: var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--color-border);">
-                    <p style="color: var(--color-text-muted); margin-bottom: var(--space-3);">Não é administrador?</p>
-                    <a href="/inicio/index.html" class="btn btn-outline btn-block">Voltar ao site</a>
+                <div class="text-center">
+                    <p>Não é administrador?</p>
+
+                    <a href="/inicio.html" class="btn btn-outline btn-block">
+                        Voltar ao site
+                    </a>
                 </div>
+
             </article>
 
-            <p class="text-center" style="margin-top: var(--space-6); color: var(--color-text-muted); font-size: var(--fs-xs);">
+            <p class="text-center">
                 © 2026 Fraga Lanches - Todos os direitos reservados.
             </p>
+
         </div>
+
     </main>
 
-    <!-- Modal Alterar Senha (Primeiro Acesso) -->
-    <div class="modal-overlay hidden" id="alterarSenhaModal" role="dialog" aria-modal="true" aria-labelledby="alterarSenhaModalTitulo">
-        <div class="modal modal-md">
-            <div class="modal-header">
-                <h2 class="modal-title" id="alterarSenhaModalTitulo">Alterar Senha Obrigatória</h2>
-                <button class="modal-close" id="alterarSenhaModalClose" aria-label="Fechar">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-x" /></svg>
-                </button>
-            </div>
-            <form id="alterarSenhaForm" class="modal-body" novalidate>
-                <p style="color: var(--color-text-muted); margin-bottom: var(--space-5); font-size: var(--fs-sm);">Este é seu primeiro acesso. Por segurança, você deve definir uma nova senha.</p>
-                <div class="form-group">
-                    <label for="senhaAtual" class="form-label">Senha Atual *</label>
-                    <div class="input-with-icon">
-                        <input type="password" id="senhaAtual" name="senhaAtual" class="form-input" required autocomplete="current-password" placeholder="Digite a senha atual">
-                        <button type="button" class="input-icon-btn" id="toggleSenhaAtual" aria-label="Mostrar/ocultar senha">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="novaSenha" class="form-label">Nova Senha *</label>
-                    <div class="input-with-icon">
-                        <input type="password" id="novaSenha" name="novaSenha" class="form-input" required autocomplete="new-password" placeholder="Mínimo 8 caracteres" minlength="8">
-                        <button type="button" class="input-icon-btn" id="toggleNovaSenha" aria-label="Mostrar/ocultar senha">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="confirmarNovaSenha" class="form-label">Confirmar Nova Senha *</label>
-                    <div class="input-with-icon">
-                        <input type="password" id="confirmarNovaSenha" name="confirmarNovaSenha" class="form-input" required autocomplete="new-password" placeholder="Confirme a nova senha">
-                        <button type="button" class="input-icon-btn" id="toggleConfirmarNovaSenha" aria-label="Mostrar/ocultar senha">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: var(--space-6);" id="btnConfirmarAlterarSenha">
-                    <svg class="btn-icon" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Alterar Senha
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <script type="module" src="js/shared-components.js"></script>
-    <script type="module" src="js/admin-login.js"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .catch(error => console.error('[SW] Erro no registro:', error));
-        });
-      }
-
-      // Handle image error events securely (instead of inline onerror)
-      document.addEventListener('DOMContentLoaded', () => {
-        const images = document.querySelectorAll('img');
-        images.forEach(img => {
-          img.addEventListener('error', function() {
-            this.style.display = 'none';
-          });
-        });
-      });
-    </script>
-<script src="/pwa.js"></script>
 </body>
 
 </html>

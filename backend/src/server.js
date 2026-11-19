@@ -13,6 +13,9 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
 
 const db = require("./database");
 const authRoutes = require("./routes/auth");
+const cardapioRoutes = require("./routes/cardapio");
+const adminCategoriasRoutes = require("./routes/adminCategorias");
+const adminProdutosRoutes = require("./routes/adminProdutos");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +26,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/cardapio", cardapioRoutes);
+app.use("/api/admin/categorias", adminCategoriasRoutes);
+app.use("/api/admin/produtos", adminProdutosRoutes);
 
 app.get("/api/status", async (req, res) => {
     try {
