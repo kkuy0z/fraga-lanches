@@ -1,7 +1,5 @@
 ﻿const TIPO_PERMITIDO = "cliente";
 
-const TIPO_PERMITIDO = "cliente";
-
 const formatarMoeda = (valor) =>
   Number(valor || 0).toLocaleString("pt-BR", {
     style: "currency",
