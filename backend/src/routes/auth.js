@@ -243,4 +243,7 @@ router.post("/logout", (req, res) => {
     });
 });
 
+router.autenticar = autenticar;
+router.configurarCookie = configurarCookie;
+
 module.exports = router;

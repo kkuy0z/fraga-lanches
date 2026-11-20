@@ -1,96 +1,125 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+  <head>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1a1a1a" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1a" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cardápio - Fraga Lanches</title>
-    <link rel="icon" type="image/png" href="/frontend/imagens/logo.png">
-    <link rel="apple-touch-icon" href="/frontend/imagens/logo.png">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="/design-system.css">
-</head>
+    <link rel="icon" type="image/png" href="/frontend/imagens/logo.png" />
+    <link rel="apple-touch-icon" href="/frontend/imagens/logo.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" href="/design-system.css" />
+  </head>
 
-<body>
-    <div id="closedBanner" class="closed-banner hidden" role="alert" aria-live="assertive">
-        <div class="closed-banner-content">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                aria-hidden="true">
-                <use href="#i-clock"></use>
-            </svg>
+  <body>
+    <div
+      id="closedBanner"
+      class="closed-banner hidden"
+      role="alert"
+      aria-live="assertive"
+    >
+      <div class="closed-banner-content">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
+          <use href="#i-clock"></use>
+        </svg>
 
-            <div class="closed-banner-text">
-                <strong>ESTABELECIMENTO FECHADO</strong>
-                <span id="closedBannerMessage">
-                    Carregando horário de funcionamento...
-                </span>
-            </div>
+        <div class="closed-banner-text">
+          <strong>ESTABELECIMENTO FECHADO</strong>
+          <span id="closedBannerMessage">
+            Carregando horário de funcionamento...
+          </span>
         </div>
+      </div>
     </div>
 
     <section class="page-header">
-        <div class="page-header-inner">
-            <h1 class="page-title">
-                NOSSO <span class="accent">CARDÁPIO</span>
-            </h1>
+      <div class="page-header-inner">
+        <h1 class="page-title">NOSSO <span class="accent">CARDÁPIO</span></h1>
 
-            <p class="page-subtitle">
-                Hambúrgueres artesanais, marmitas, porções e bebidas preparados com ingredientes selecionados
-            </p>
+        <p class="page-subtitle">
+          Hambúrgueres artesanais, marmitas, porções e bebidas preparados com
+          ingredientes selecionados
+        </p>
 
-            <div class="yellow-line"></div>
-        </div>
+        <div class="yellow-line"></div>
+      </div>
     </section>
 
     <section class="categorias-filtro" aria-label="Filtrar por categoria">
-        <div class="container">
-            <div class="categorias-scroll" id="categoriasFiltro" role="tablist" aria-label="Categorias do cardápio">
-            </div>
-        </div>
+      <div class="container">
+        <div
+          class="categorias-scroll"
+          id="categoriasFiltro"
+          role="tablist"
+          aria-label="Categorias do cardápio"
+        ></div>
+      </div>
     </section>
 
     <main class="cardapio-main" role="main">
-        <div class="container">
+      <div class="container">
+        <div
+          class="cardapio-grid"
+          id="cardapioGrid"
+          role="list"
+          aria-label="Produtos do cardápio"
+        ></div>
 
-            <div class="cardapio-grid" id="cardapioGrid" role="list" aria-label="Produtos do cardápio">
-            </div>
+        <div class="empty-state hidden" id="emptyState">
+          <div class="empty-state-icon">
+            <svg
+              width="36"
+              height="36"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              aria-hidden="true"
+            >
+              <use href="#i-search"></use>
+            </svg>
+          </div>
 
-            <div class="empty-state hidden" id="emptyState">
-                <div class="empty-state-icon">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                        aria-hidden="true">
-                        <use href="#i-search"></use>
-                    </svg>
-                </div>
+          <h2 class="empty-state-title">Nenhum produto encontrado</h2>
 
-                <h2 class="empty-state-title">
-                    Nenhum produto encontrado
-                </h2>
-
-                <p class="empty-state-message">
-                    Não há produtos disponíveis nesta categoria no momento.
-                </p>
-            </div>
-
-            <nav class="pagination" id="pagination" aria-label="Paginação do cardápio" hidden>
-            </nav>
-
+          <p class="empty-state-message">
+            Não há produtos disponíveis nesta categoria no momento.
+          </p>
         </div>
+
+        <nav
+          class="pagination"
+          id="pagination"
+          aria-label="Paginação do cardápio"
+          hidden
+        ></nav>
+      </div>
     </main>
 
     <script src="/cliente/cardapio.js" defer></script>
 
     <script>
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("/sw.js")
-                    .catch(erro => console.error(
-                        "Erro ao registrar Service Worker:", erro
-                    ));
-            });
-        }
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .catch((erro) =>
+              console.error("Erro ao registrar Service Worker:", erro),
+            );
+        });
+      }
     </script>
-
-</body>
-
+  </body>
 </html>

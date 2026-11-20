@@ -161,6 +161,34 @@ CREATE TABLE avaliacoes (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
+CREATE TABLE carrinhos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL UNIQUE,
+    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE itens_carrinho (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    carrinho_id INT NOT NULL,
+    produto_id INT NOT NULL,
+    quantidade INT NOT NULL DEFAULT 1,
+
+    FOREIGN KEY (carrinho_id)
+        REFERENCES carrinhos(id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (produto_id)
+        REFERENCES produtos(id),
+
+    UNIQUE (carrinho_id, produto_id)
+);
+
 -- HORÁRIOS DE FUNCIONAMENTO
 CREATE TABLE horarios_funcionamento (
     id INT AUTO_INCREMENT PRIMARY KEY,

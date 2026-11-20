@@ -1,208 +1,284 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Checkout - Fraga Lanches</title>
-    <link rel="stylesheet" href="/design-system.css">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0c0c0c">
-    <link rel="icon" href="/assets/images/icons/logo.png">
-</head>
+    <link rel="stylesheet" href="/design-system.css" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0c0c0c" />
+    <link rel="icon" href="/assets/images/icons/logo.png" />
+  </head>
 
-<body>
+  <body>
     <section class="checkout-progress">
-        <div class="progress-steps">
-            <div class="progress-step active" data-step="1">
-                <div class="progress-step-circle">1</div>
-                <span class="progress-step-label">Entrega</span>
-            </div>
-            <div class="progress-line"></div>
-            <div class="progress-step" data-step="2">
-                <div class="progress-step-circle">2</div>
-                <span class="progress-step-label">Pagamento</span>
-            </div>
-            <div class="progress-line"></div>
-            <div class="progress-step" data-step="3">
-                <div class="progress-step-circle">3</div>
-                <span class="progress-step-label">Confirmação</span>
-            </div>
+      <div class="progress-steps">
+        <div class="progress-step active" data-step="1">
+          <div class="progress-step-circle">1</div>
+          <span class="progress-step-label">Entrega</span>
         </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="2">
+          <div class="progress-step-circle">2</div>
+          <span class="progress-step-label">Pagamento</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="3">
+          <div class="progress-step-circle">3</div>
+          <span class="progress-step-label">Confirmação</span>
+        </div>
+      </div>
     </section>
 
     <section class="page-header">
-        <div class="page-header-inner">
-            <h1 class="page-title">FINALIZAR <span class="accent">PEDIDO</span></h1>
-            <p class="page-subtitle">Preencha os dados para concluir seu pedido</p>
-            <div class="yellow-line"></div>
-        </div>
+      <div class="page-header-inner">
+        <h1 class="page-title">FINALIZAR <span class="accent">PEDIDO</span></h1>
+        <p class="page-subtitle">Preencha os dados para concluir seu pedido</p>
+        <div class="yellow-line"></div>
+      </div>
     </section>
 
     <main class="checkout-main">
-        <div class="container">
-            <form id="checkoutForm" novalidate>
-                <div class="checkout-layout"
-                     style="display:grid;grid-template-columns:1fr 400px;gap:32px;">
+      <div class="container">
+        <form id="checkoutForm" novalidate>
+          <div
+            class="checkout-layout"
+            style="display: grid; grid-template-columns: 1fr 400px; gap: 32px"
+          >
+            <section class="checkout-form-section">
+              <fieldset class="checkout-step" id="step1">
+                <legend class="step-title">Entrega ou Retirada</legend>
 
-                    <section class="checkout-form-section">
-
-                        <fieldset class="checkout-step" id="step1">
-                            <legend class="step-title">Entrega ou Retirada</legend>
-
-                            <div class="form-group">
-                                <label class="form-label" for="tipoEntrega">Tipo de pedido</label>
-                                <select id="tipoEntrega" name="tipoEntrega" class="form-select" required>
-                                    <option value="entrega">Entrega</option>
-                                    <option value="retirada">Retirar no estabelecimento</option>
-                                </select>
-                            </div>
-
-                            <div id="enderecoCampos">
-                                <div class="form-group">
-                                    <label class="form-label" for="cep">CEP</label>
-                                    <div style="display:flex;gap:10px;">
-                                        <input type="text" id="cep" class="form-input"
-                                               placeholder="00000-000" maxlength="9">
-                                        <button type="button" id="btnBuscarCep"
-                                                class="btn btn-secondary">Buscar</button>
-                                    </div>
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label class="form-label" for="rua">Rua</label>
-                                        <input type="text" id="rua" class="form-input" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label" for="numero">Número</label>
-                                        <input type="text" id="numero" class="form-input" required>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label" for="complemento">Complemento</label>
-                                    <input type="text" id="complemento" class="form-input">
-                                </div>
-
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label class="form-label" for="bairro">Bairro</label>
-                                        <input type="text" id="bairro" class="form-input" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="form-label" for="cidade">Cidade</label>
-                                        <input type="text" id="cidade" class="form-input" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="referencia">Ponto de referência</label>
-                                <input type="text" id="referencia" class="form-input">
-                            </div>
-
-                            <div class="step-actions">
-                                <button type="button" class="btn btn-primary" id="btnProximo1">
-                                    Próximo: Pagamento
-                                </button>
-                            </div>
-                        </fieldset>
-
-                        <fieldset class="checkout-step hidden" id="step2">
-                            <legend class="step-title">Forma de Pagamento</legend>
-
-                            <div class="form-group">
-                                <label class="form-label" for="formaPagamento">Forma de pagamento</label>
-                                <select id="formaPagamento" class="form-select" required>
-                                    <option value="">Selecione</option>
-                                    <option value="pix">PIX</option>
-                                    <option value="cartao">Cartão</option>
-                                    <option value="dinheiro">Dinheiro</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group hidden" id="trocoGroup">
-                                <label class="form-label" for="troco">Troco para quanto?</label>
-                                <input type="number" id="troco" class="form-input"
-                                       min="0" step="0.01" placeholder="Ex.: 50.00">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="observacao">Observações</label>
-                                <textarea id="observacao" class="form-textarea"
-                                          rows="3"></textarea>
-                            </div>
-
-                            <div class="step-actions">
-                                <button type="button" class="btn btn-secondary" id="btnVoltar2">
-                                    Voltar
-                                </button>
-                                <button type="button" class="btn btn-primary" id="btnProximo2">
-                                    Próximo: Confirmar
-                                </button>
-                            </div>
-                        </fieldset>
-
-                        <fieldset class="checkout-step hidden" id="step3">
-                            <legend class="step-title">Confirmar Pedido</legend>
-
-                            <div id="confirmacaoItens"></div>
-
-                            <h3>Endereço / Retirada</h3>
-                            <p id="confEnderecoTexto"></p>
-
-                            <h3>Pagamento</h3>
-                            <p id="confPagamentoTexto"></p>
-
-                            <h3>Total</h3>
-                            <p id="confTotal">R$ 0,00</p>
-
-                            <div class="step-actions">
-                                <button type="button" class="btn btn-secondary" id="btnVoltar3">
-                                    Voltar
-                                </button>
-                                <button type="submit" class="btn btn-primary btn-lg"
-                                        id="btnFinalizarPedido">
-                                    Confirmar Pedido
-                                </button>
-                            </div>
-                        </fieldset>
-
-                    </section>
-
-                    <aside class="checkout-resumo">
-                        <div class="card">
-                            <div class="card-content">
-                                <h3 class="card-title">Resumo do Pedido</h3>
-                                <div id="checkoutItens"></div>
-
-                                <p>Subtotal: <strong id="checkoutSubtotal">R$ 0,00</strong></p>
-                                <p>Entrega: <strong id="checkoutTaxaEntrega">R$ 0,00</strong></p>
-                                <p>Total: <strong id="checkoutTotal">R$ 0,00</strong></p>
-                            </div>
-                        </div>
-                    </aside>
-
+                <div class="form-group">
+                  <label class="form-label" for="tipoEntrega"
+                    >Tipo de pedido</label
+                  >
+                  <select
+                    id="tipoEntrega"
+                    name="tipoEntrega"
+                    class="form-select"
+                    required
+                  >
+                    <option value="entrega">Entrega</option>
+                    <option value="retirada">Retirar no estabelecimento</option>
+                  </select>
                 </div>
-            </form>
-        </div>
+
+                <div id="enderecoCampos">
+                  <div class="form-group">
+                    <label class="form-label" for="cep">CEP</label>
+                    <div style="display: flex; gap: 10px">
+                      <input
+                        type="text"
+                        id="cep"
+                        class="form-input"
+                        placeholder="00000-000"
+                        maxlength="9"
+                      />
+                      <button
+                        type="button"
+                        id="btnBuscarCep"
+                        class="btn btn-secondary"
+                      >
+                        Buscar
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label" for="rua">Rua</label>
+                      <input type="text" id="rua" class="form-input" required />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="numero">Número</label>
+                      <input
+                        type="text"
+                        id="numero"
+                        class="form-input"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="complemento"
+                      >Complemento</label
+                    >
+                    <input type="text" id="complemento" class="form-input" />
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label" for="bairro">Bairro</label>
+                      <input
+                        type="text"
+                        id="bairro"
+                        class="form-input"
+                        required
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" for="cidade">Cidade</label>
+                      <input
+                        type="text"
+                        id="cidade"
+                        class="form-input"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="referencia"
+                    >Ponto de referência</label
+                  >
+                  <input type="text" id="referencia" class="form-input" />
+                </div>
+
+                <div class="step-actions">
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnProximo1"
+                  >
+                    Próximo: Pagamento
+                  </button>
+                </div>
+              </fieldset>
+
+              <fieldset class="checkout-step hidden" id="step2">
+                <legend class="step-title">Forma de Pagamento</legend>
+
+                <div class="form-group">
+                  <label class="form-label" for="formaPagamento"
+                    >Forma de pagamento</label
+                  >
+                  <select id="formaPagamento" class="form-select" required>
+                    <option value="">Selecione</option>
+                    <option value="pix">PIX</option>
+                    <option value="cartao">Cartão</option>
+                    <option value="dinheiro">Dinheiro</option>
+                  </select>
+                </div>
+
+                <div class="form-group hidden" id="trocoGroup">
+                  <label class="form-label" for="troco"
+                    >Troco para quanto?</label
+                  >
+                  <input
+                    type="number"
+                    id="troco"
+                    class="form-input"
+                    min="0"
+                    step="0.01"
+                    placeholder="Ex.: 50.00"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="observacao">Observações</label>
+                  <textarea
+                    id="observacao"
+                    class="form-textarea"
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <div class="step-actions">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="btnVoltar2"
+                  >
+                    Voltar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnProximo2"
+                  >
+                    Próximo: Confirmar
+                  </button>
+                </div>
+              </fieldset>
+
+              <fieldset class="checkout-step hidden" id="step3">
+                <legend class="step-title">Confirmar Pedido</legend>
+
+                <div id="confirmacaoItens"></div>
+
+                <h3>Endereço / Retirada</h3>
+                <p id="confEnderecoTexto"></p>
+
+                <h3>Pagamento</h3>
+                <p id="confPagamentoTexto"></p>
+
+                <h3>Total</h3>
+                <p id="confTotal">R$ 0,00</p>
+
+                <div class="step-actions">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="btnVoltar3"
+                  >
+                    Voltar
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-lg"
+                    id="btnFinalizarPedido"
+                  >
+                    Confirmar Pedido
+                  </button>
+                </div>
+              </fieldset>
+            </section>
+
+            <aside class="checkout-resumo">
+              <div class="card">
+                <div class="card-content">
+                  <h3 class="card-title">Resumo do Pedido</h3>
+                  <div id="checkoutItens"></div>
+
+                  <p>
+                    Subtotal: <strong id="checkoutSubtotal">R$ 0,00</strong>
+                  </p>
+                  <p>
+                    Entrega: <strong id="checkoutTaxaEntrega">R$ 0,00</strong>
+                  </p>
+                  <p>Total: <strong id="checkoutTotal">R$ 0,00</strong></p>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </form>
+      </div>
     </main>
 
-    <div class="modal-overlay hidden" id="sucessoModal"
-         role="dialog" aria-modal="true">
-        <div class="modal modal-sm">
-            <div class="modal-body">
-                <h2>Pedido registrado!</h2>
-                <p>Seu pedido foi recebido.</p>
-                <p id="pedidoNumero"></p>
-                <a href="/cliente/meus-pedidos.html" class="btn btn-primary btn-block">
-                    Ver Meus Pedidos
-                </a>
-            </div>
+    <div
+      class="modal-overlay hidden"
+      id="sucessoModal"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="modal modal-sm">
+        <div class="modal-body">
+          <h2>Pedido registrado!</h2>
+          <p>Seu pedido foi recebido.</p>
+          <p id="pedidoNumero"></p>
+          <a
+            href="/cliente/meus-pedidos.html"
+            class="btn btn-primary btn-block"
+          >
+            Ver Meus Pedidos
+          </a>
         </div>
+      </div>
     </div>
 
     <script src="/cliente/checkout.js" defer></script>
-</body>
+  </body>
 </html>

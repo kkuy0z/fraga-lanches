@@ -1,0 +1,1205 @@
+/* =========================================================
+   FRAGA LANCHES — CARDÁPIO
+   Estilos exclusivos da página de cardápio
+   Compatível com design-system.css e cardapio.js
+   ========================================================= */
+
+/* =========================================================
+   1. CONFIGURAÇÕES GERAIS
+   ========================================================= */
+
+.pagina-cardapio {
+  --cardapio-bg: #0c0c0c;
+  --cardapio-bg-secondary: #141414;
+  --cardapio-bg-card: #191919;
+  --cardapio-border: rgba(255, 255, 255, 0.09);
+  --cardapio-text: #f5f5f5;
+  --cardapio-muted: #a3a3a3;
+  --cardapio-yellow: #ffc107;
+  --cardapio-yellow-hover: #e5ad00;
+
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--cardapio-bg);
+  color: var(--cardapio-text);
+  overflow-x: hidden;
+}
+
+/* Impede que as regras globais de section ocupem a tela inteira. */
+
+.pagina-cardapio > section {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  height: auto;
+  display: block;
+  align-items: initial;
+  justify-content: initial;
+  overflow: visible;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+
+/* Container */
+
+.pagina-cardapio .container {
+  width: min(100% - 48px, 1200px);
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+/* Elementos ocultos */
+
+.pagina-cardapio .hidden,
+.pagina-cardapio [hidden] {
+  display: none !important;
+}
+
+/* =========================================================
+   2. CABEÇALHO
+   ========================================================= */
+
+.cardapio-header {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  min-height: 76px;
+  background: #101010;
+  border-bottom: 1px solid var(--cardapio-border);
+}
+
+.cardapio-header-inner {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.cardapio-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.cardapio-logo img {
+  display: block;
+  width: auto;
+  height: 52px;
+  max-width: 180px;
+  object-fit: contain;
+}
+
+.cardapio-header-label {
+  color: var(--cardapio-yellow);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+/* =========================================================
+   3. CABEÇALHO DO CARDÁPIO
+   ========================================================= */
+
+.pagina-cardapio .page-header {
+  width: 100%;
+  min-height: 0;
+  padding: 72px 24px 58px;
+  display: block;
+  text-align: center;
+  background:
+    radial-gradient(
+      ellipse at center top,
+      rgba(255, 193, 7, 0.09),
+      transparent 65%
+    ),
+    #0c0c0c;
+  border-bottom: 1px solid var(--cardapio-border);
+}
+
+.page-header-inner {
+  width: 100%;
+  max-width: 850px;
+  margin-inline: auto;
+}
+
+.cardapio-eyebrow {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: var(--cardapio-yellow);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+}
+
+.pagina-cardapio .page-title {
+  margin: 0;
+  color: #fff;
+  font-family: "Anton", sans-serif;
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.025em;
+}
+
+.pagina-cardapio .page-title .accent {
+  color: var(--cardapio-yellow);
+}
+
+.pagina-cardapio .page-subtitle {
+  max-width: 650px;
+  margin: 20px auto 0;
+  color: var(--cardapio-muted);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+.yellow-line {
+  width: 65px;
+  height: 4px;
+  margin: 28px auto 0;
+  border-radius: 10px;
+  background: var(--cardapio-yellow);
+}
+
+/* =========================================================
+   4. AVISO DE ESTABELECIMENTO FECHADO
+   ========================================================= */
+
+.closed-banner {
+  width: min(100% - 48px, 1200px);
+  margin: 24px auto 0;
+  padding: 18px 22px;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  border-left: 4px solid var(--cardapio-yellow);
+  border-radius: 10px;
+  background: rgba(255, 193, 7, 0.08);
+}
+
+.closed-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.closed-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.closed-banner-text strong {
+  color: var(--cardapio-yellow);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.closed-banner-text span {
+  color: #d0d0d0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   5. FILTROS DE CATEGORIA
+   ========================================================= */
+
+.pagina-cardapio > .categorias-filtro {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  min-height: 0;
+  padding: 22px 0;
+  background: #111;
+  border-bottom: 1px solid var(--cardapio-border);
+}
+
+.categorias-filtro .container {
+  display: block;
+}
+
+.categorias-scroll {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 3px 2px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #555 transparent;
+}
+
+.categorias-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.categorias-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.categorias-scroll::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 10px;
+}
+
+.categoria-btn {
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 0 22px;
+  border: 1px solid var(--cardapio-border);
+  border-radius: 30px;
+  background: #1a1a1a;
+  color: #ccc;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.categoria-btn:hover {
+  border-color: var(--cardapio-yellow);
+  color: var(--cardapio-yellow);
+  transform: translateY(-2px);
+}
+
+.categoria-btn.ativo {
+  border-color: var(--cardapio-yellow);
+  background: var(--cardapio-yellow);
+  color: #111;
+  font-weight: 800;
+}
+
+/* =========================================================
+   6. CONTEÚDO PRINCIPAL
+   ========================================================= */
+
+.cardapio-main {
+  flex: 1;
+  width: 100%;
+  min-height: 300px;
+  padding: 42px 0 80px;
+  background: var(--cardapio-bg);
+}
+
+.cardapio-main > .container {
+  display: block;
+}
+
+/* =========================================================
+   7. STATUS DE CARREGAMENTO
+   ========================================================= */
+
+.cardapio-status {
+  width: 100%;
+  padding: 35px 20px;
+  color: var(--cardapio-muted);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.cardapio-status:not(.hidden)::before {
+  content: "";
+  display: block;
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 15px;
+  border: 3px solid rgba(255, 193, 7, 0.2);
+  border-top-color: var(--cardapio-yellow);
+  border-radius: 50%;
+  animation: cardapio-loading 0.8s linear infinite;
+}
+
+@keyframes cardapio-loading {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   8. GRADE DE PRODUTOS
+   ========================================================= */
+
+.cardapio-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 26px;
+}
+
+/* =========================================================
+   9. CARD DO PRODUTO
+   ========================================================= */
+
+.produto-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--cardapio-border);
+  border-radius: 14px;
+  background: var(--cardapio-bg-card);
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.produto-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 193, 7, 0.45);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.3);
+}
+
+/* Imagem */
+
+.produto-card-imagem {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  flex: 0 0 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle, rgba(255, 193, 7, 0.08), transparent 70%), #202020;
+}
+
+.produto-card-imagem img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.produto-card:hover .produto-card-imagem img {
+  transform: scale(1.05);
+}
+
+.produto-card-imagem.sem-imagem {
+  color: var(--cardapio-yellow);
+  font-size: 4rem;
+}
+
+/* Conteúdo */
+
+.produto-card-conteudo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 21px;
+}
+
+.produto-card-categoria {
+  align-self: flex-start;
+  margin-bottom: 11px;
+  padding: 6px 10px;
+  border-radius: 5px;
+  background: rgba(255, 193, 7, 0.12);
+  color: var(--cardapio-yellow);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.produto-card-nome {
+  margin: 0 0 10px;
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.produto-card-descricao {
+  flex: 1;
+  margin: 0 0 22px;
+  color: var(--cardapio-muted);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+/* Rodapé do card */
+
+.produto-card-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--cardapio-border);
+}
+
+.produto-card-preco {
+  color: var(--cardapio-yellow);
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+/* Botão adicionar */
+
+.produto-card-adicionar {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--cardapio-yellow);
+  color: #111;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.produto-card-adicionar:hover:not(:disabled) {
+  background: var(--cardapio-yellow-hover);
+  transform: translateY(-2px);
+}
+
+.produto-card-adicionar:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   10. ESTADO VAZIO
+   ========================================================= */
+
+.empty-state {
+  width: 100%;
+  padding: 65px 20px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  margin-bottom: 18px;
+  font-size: 3rem;
+}
+
+.empty-state-title {
+  margin: 0 0 12px;
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.empty-state-message {
+  max-width: 450px;
+  margin: 0 auto;
+  color: var(--cardapio-muted);
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   11. ERRO DO CARDÁPIO
+   ========================================================= */
+
+.cardapio-erro {
+  width: 100%;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.cardapio-erro p {
+  margin: 0 0 18px;
+  color: #ff7777;
+  font-size: 0.9rem;
+}
+
+.cardapio-erro .btn {
+  min-height: 44px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--cardapio-yellow);
+  color: #111;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* =========================================================
+   12. RODAPÉ
+   ========================================================= */
+
+.cardapio-footer {
+  width: 100%;
+  padding: 30px 0;
+  border-top: 1px solid var(--cardapio-border);
+  background: #101010;
+  text-align: center;
+}
+
+.cardapio-footer .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.cardapio-footer p {
+  margin: 0;
+  color: var(--cardapio-yellow);
+  font-family: "Cinzel", serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.cardapio-footer span {
+  color: var(--cardapio-muted);
+  font-size: 0.75rem;
+}
+
+/* =========================================================
+   13. CARRINHO FLUTUANTE
+   ========================================================= */
+
+/*
+   IMPORTANTE:
+   O JavaScript cria o carrinho como uma SECTION.
+   Estes seletores anulam o estilo global de section.
+*/
+
+#fragaCarrinhoWidget.fraga-carrinho-widget {
+  position: fixed !important;
+  z-index: 9999 !important;
+  right: 24px !important;
+  bottom: 20px !important;
+  left: auto !important;
+  top: auto !important;
+
+  width: min(420px, calc(100vw - 32px)) !important;
+  max-width: 420px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: calc(100vh - 40px) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+
+  pointer-events: none;
+}
+
+/* Barra inferior */
+
+.fraga-carrinho-barra {
+  width: 100%;
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  border-radius: 12px;
+  background: #171717;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
+}
+
+.fraga-carrinho-resumo {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.fraga-carrinho-icone {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255, 193, 7, 0.13);
+  font-size: 1.3rem;
+}
+
+.fraga-carrinho-informacoes {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fraga-carrinho-titulo {
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.fraga-carrinho-quantidade {
+  color: #aaa;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.7rem;
+}
+
+.fraga-carrinho-total {
+  flex: 0 0 auto;
+  color: var(--cardapio-yellow);
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.fraga-carrinho-abrir {
+  min-height: 40px;
+  flex: 0 0 auto;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--cardapio-yellow);
+  color: #111;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.fraga-carrinho-abrir:hover {
+  background: var(--cardapio-yellow-hover);
+}
+
+/* Painel expandido */
+
+.fraga-carrinho-painel {
+  width: 100%;
+  max-height: min(480px, calc(100vh - 125px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 193, 7, 0.25);
+  border-radius: 12px;
+  background: #171717;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+  pointer-events: auto;
+}
+
+.fraga-carrinho-painel[hidden] {
+  display: none !important;
+}
+
+.fraga-carrinho-painel-cabecalho {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--cardapio-border);
+}
+
+.fraga-carrinho-painel-cabecalho h2 {
+  margin: 0;
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.fraga-carrinho-fechar {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: #292929;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.fraga-carrinho-fechar:hover {
+  background: #3a3a3a;
+}
+
+/* Lista de itens */
+
+.fraga-carrinho-lista {
+  flex: 1;
+  min-height: 80px;
+  padding: 12px 16px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #555 transparent;
+}
+
+.fraga-carrinho-lista::-webkit-scrollbar {
+  width: 5px;
+}
+
+.fraga-carrinho-lista::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+
+/* Carrinho vazio */
+
+.fraga-carrinho-vazio {
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+.fraga-carrinho-vazio > span {
+  font-size: 2rem;
+}
+
+.fraga-carrinho-vazio strong {
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.85rem;
+}
+
+.fraga-carrinho-vazio p {
+  max-width: 250px;
+  margin: 0;
+  color: #999;
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+/* Item individual */
+
+.fraga-carrinho-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--cardapio-border);
+}
+
+.fraga-carrinho-item:first-child {
+  padding-top: 4px;
+}
+
+.fraga-carrinho-item-dados {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fraga-carrinho-item-nome {
+  color: #fff;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.fraga-carrinho-item-preco {
+  color: var(--cardapio-yellow);
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* Controles de quantidade */
+
+.fraga-carrinho-controles {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.fraga-carrinho-quantidade-btn {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #242424;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.fraga-carrinho-quantidade-btn:hover:not(:disabled) {
+  border-color: var(--cardapio-yellow);
+  color: var(--cardapio-yellow);
+}
+
+.fraga-carrinho-quantidade-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fraga-carrinho-item-quantidade {
+  min-width: 18px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.fraga-carrinho-remover {
+  margin-left: auto;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 90, 90, 0.25);
+  border-radius: 6px;
+  background: rgba(255, 90, 90, 0.08);
+  color: #ff7777;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.fraga-carrinho-remover:hover {
+  background: rgba(255, 90, 90, 0.16);
+}
+
+.fraga-carrinho-remover:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Total do painel */
+
+.fraga-carrinho-painel-rodape {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--cardapio-border);
+  background: #202020;
+}
+
+.fraga-carrinho-painel-rodape span {
+  color: #ccc;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.fraga-carrinho-painel-rodape strong {
+  color: var(--cardapio-yellow);
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+/* Botão finalizar compra */
+
+.fraga-carrinho-finalizar {
+  width: 100%;
+  min-height: 46px;
+  border: none;
+  border-radius: 7px;
+  background: #ffc107;
+  color: #111;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.fraga-carrinho-finalizar:hover {
+  background: #e5ad00;
+  transform: translateY(-2px);
+}
+
+.fraga-carrinho-finalizar:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   14. ACESSIBILIDADE E INTERAÇÕES
+   ========================================================= */
+
+.pagina-cardapio button:focus-visible,
+.pagina-cardapio a:focus-visible {
+  outline: 2px solid var(--cardapio-yellow);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagina-cardapio *,
+  .pagina-cardapio *::before,
+  .pagina-cardapio *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =========================================================
+   15. RESPONSIVIDADE — NOTEBOOK E TABLET
+   ========================================================= */
+
+@media (max-width: 1024px) {
+  .cardapio-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .produto-card-imagem {
+    height: 210px;
+    flex-basis: 210px;
+  }
+
+  .pagina-cardapio .page-header {
+    padding-top: 60px;
+    padding-bottom: 48px;
+  }
+}
+
+/* =========================================================
+   16. RESPONSIVIDADE — CELULAR
+   ========================================================= */
+
+@media (max-width: 640px) {
+  .pagina-cardapio .container {
+    width: calc(100% - 32px);
+  }
+
+  .cardapio-header,
+  .cardapio-header-inner {
+    min-height: 65px;
+  }
+
+  .cardapio-logo img {
+    height: 43px;
+  }
+
+  .cardapio-header-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+  }
+
+  .pagina-cardapio .page-header {
+    padding: 48px 16px 40px;
+  }
+
+  .cardapio-eyebrow {
+    font-size: 0.65rem;
+  }
+
+  .pagina-cardapio .page-title {
+    font-size: clamp(2.5rem, 12vw, 3.7rem);
+  }
+
+  .pagina-cardapio .page-subtitle {
+    margin-top: 15px;
+    font-size: 0.82rem;
+  }
+
+  .yellow-line {
+    margin-top: 22px;
+  }
+
+  .pagina-cardapio > .categorias-filtro {
+    padding: 16px 0;
+  }
+
+  .categorias-scroll {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .categoria-btn {
+    min-height: 38px;
+    padding: 0 16px;
+    font-size: 0.72rem;
+  }
+
+  .cardapio-main {
+    padding: 28px 0 110px;
+  }
+
+  .cardapio-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .produto-card {
+    border-radius: 12px;
+  }
+
+  .produto-card-imagem {
+    height: 220px;
+    flex-basis: 220px;
+  }
+
+  .produto-card-conteudo {
+    padding: 18px;
+  }
+
+  .produto-card-nome {
+    font-size: 1rem;
+  }
+
+  .produto-card-descricao {
+    font-size: 0.78rem;
+  }
+
+  .produto-card-rodape {
+    align-items: center;
+  }
+
+  .produto-card-preco {
+    font-size: 1rem;
+  }
+
+  .produto-card-adicionar {
+    min-height: 40px;
+    padding-inline: 12px;
+    font-size: 0.67rem;
+  }
+
+  .closed-banner {
+    width: calc(100% - 32px);
+    margin-top: 16px;
+    padding: 15px;
+  }
+
+  /* Carrinho no celular */
+
+  #fragaCarrinhoWidget.fraga-carrinho-widget {
+    right: 12px !important;
+    bottom: 12px !important;
+    width: calc(100vw - 24px) !important;
+    max-width: none !important;
+  }
+
+  .fraga-carrinho-barra {
+    min-height: 68px;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .fraga-carrinho-icone {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    font-size: 1.1rem;
+  }
+
+  .fraga-carrinho-titulo {
+    font-size: 0.72rem;
+  }
+
+  .fraga-carrinho-quantidade {
+    font-size: 0.65rem;
+  }
+
+  .fraga-carrinho-total {
+    font-size: 0.78rem;
+  }
+
+  .fraga-carrinho-abrir {
+    min-height: 38px;
+    padding-inline: 10px;
+    font-size: 0.65rem;
+  }
+
+  .fraga-carrinho-painel {
+    max-height: min(420px, calc(100vh - 110px));
+  }
+
+  .cardapio-footer {
+    padding: 24px 0;
+  }
+}
+
+/* =========================================================
+   17. CELULARES PEQUENOS
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .cardapio-header-label {
+    font-size: 0.55rem;
+  }
+
+  .fraga-carrinho-barra {
+    gap: 6px;
+    padding: 9px;
+  }
+
+  .fraga-carrinho-resumo {
+    gap: 7px;
+  }
+
+  .fraga-carrinho-total {
+    font-size: 0.7rem;
+  }
+
+  .fraga-carrinho-abrir {
+    padding-inline: 8px;
+    font-size: 0.6rem;
+  }
+
+  .produto-card-rodape {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .produto-card-adicionar {
+    width: 100%;
+  }
+}

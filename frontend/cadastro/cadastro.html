@@ -2,10 +2,17 @@
 <html lang="pt-BR">
 
 <head>
+    <link rel="manifest" href="/manifest.json">
+ <meta name=theme-color content=#1a1a1a>
+
+ <meta name=theme-color content=#1a1a1a>
+
+
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0c0c0c">
-    <meta name="description" content="Crie sua conta no Fraga Lanches e peÃ§a seus hambÃºrgueres artesanais com mais praticidade.">
+<meta name="description" content="Crie sua conta no Fraga Lanches e peÃ§a seus hambÃºrgueres artesanais com mais praticidade.">
     <title>Cadastre-se | Fraga Lanches</title>
     <link rel="icon" href="/frontend/imagens/logo.png">
     <link rel="manifest" href="/inicio/manifest.json">
@@ -17,10 +24,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="/assets/images/icons/logo.png">
+<link rel="apple-touch-icon" href="/assets/images/icons/logo.png">
 </head>
 
 <body class="pg-cadastro">
-    <!-- Header will be injected by shared-components.js -->
 
     <main class="cad" style="padding-top: var(--header-height, 72px);">
         <div class="cad-grid">
@@ -126,8 +134,8 @@
                 <div class="divider" style="margin: var(--space-6) 0;">
                     <span>JÃ¡ tem uma conta?</span>
                 </div>
-                <a class="btn btn-outline btn-block" href="/Cadastro/login.html">Entrar</a>
-                <a class="btn-link" href="/inicio/index.html" style="display: block; text-align: center; margin-top: var(--space-4);"><span aria-hidden="true">â€¹</span> Voltar para a pÃ¡gina inicial</a>
+                <a class="btn btn-outline btn-block" href="/cadastro/login.html">Entrar</a>
+                <a class="btn-link" href="/" style="display: block; text-align: center; margin-top: var(--space-4);"><span aria-hidden="true">â€¹</span> Voltar para a pÃ¡gina inicial</a>
             </div>
 
             <!-- BenefÃ­cios + Foto (RodapÃ©) -->
@@ -137,18 +145,12 @@
                     <li><svg class="cad-ic" aria-hidden="true"><use href="#i-star" /></svg><span>Receba ofertas exclusivas e descontos especiais</span></li>
                     <li><svg class="cad-ic" aria-hidden="true"><use href="#i-heart" /></svg><span>Mais praticidade e agilidade na hora de pedir</span></li>
                 </ul>
-                <figure class="cad-foto">
-                    <img src="/img/img_fundo.png" alt="HambÃºrguer artesanal de duas carnes com queijo e bacon">
-                </figure>
             </div>
         </div>
     </main>
 
-    <!-- Footer will be injected by shared-components.js -->
 
-    <script type="module" src="/inicio/js/shared-components.js"></script>
     <script type="module" src="cadastro.js"></script>
-<script src="/pwa.js"></script>
 
 <script>
 if ("serviceWorker" in navigator) {

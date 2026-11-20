@@ -1,4 +1,3 @@
-
 const API = "/api/admin/categorias";
 
 // ELEMENTOS
@@ -23,62 +22,64 @@ const btnCancelar = document.getElementById("btnCancelarCategoria");
 const modalDelete = document.getElementById("deleteCategoriaModal");
 const deleteNome = document.getElementById("deleteCategoriaNome");
 const btnCancelarDelete = document.getElementById("btnCancelarDeleteCategoria");
-const btnConfirmarDelete = document.getElementById("btnConfirmarDeleteCategoria");
+const btnConfirmarDelete = document.getElementById(
+  "btnConfirmarDeleteCategoria",
+);
 
 let categorias = [];
 let categoriaParaExcluir = null;
 
 // REQUISIÇÕES
 async function requisicao(url, opcoes = {}) {
-    const resposta = await fetch(url, {
-        ...opcoes,
-        credentials: "same-origin",
-        headers: {
-            "Content-Type": "application/json",
-            ...(opcoes.headers || {})
-        }
-    });
+  const resposta = await fetch(url, {
+    ...opcoes,
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+      ...(opcoes.headers || {}),
+    },
+  });
 
-    const dados = await resposta.json().catch(() => ({}));
+  const dados = await resposta.json().catch(() => ({}));
 
-    if (resposta.status === 401 || resposta.status === 403) {
-        alert("Sua sessão expirou ou você não tem permissão de administrador.");
-        window.location.href = "/admin/admin-login.html";
-        throw new Error("Acesso não autorizado.");
-    }
+  if (resposta.status === 401 || resposta.status === 403) {
+    alert("Sua sessão expirou ou você não tem permissão de administrador.");
+    window.location.href = "/admin/admin-login.html";
+    throw new Error("Acesso não autorizado.");
+  }
 
-    if (!resposta.ok) {
-        throw new Error(dados.mensagem || "Não foi possível concluir a operação.");
-    }
+  if (!resposta.ok) {
+    throw new Error(dados.mensagem || "Não foi possível concluir a operação.");
+  }
 
-    return dados;
+  return dados;
 }
 
 // UTILITÁRIOS
 function categoriaEstaAtiva(valor) {
-    return valor === true || valor === 1 || valor === "1";
+  return valor === true || valor === 1 || valor === "1";
 }
 
 function abrirModal() {
-    modal.classList.remove("hidden");
+  modal.classList.remove("hidden");
 }
 
 function fecharModal() {
-    modal.classList.add("hidden");
-    form.reset();
-    campoId.value = "";
-    campoAtivo.checked = true;
+  modal.classList.add("hidden");
+  form.reset();
+  campoId.value = "";
+  campoAtivo.checked = true;
 }
 
 function fecharModalDelete() {
-    modalDelete.classList.add("hidden");
-    categoriaParaExcluir = null;
+  modalDelete.classList.add("hidden");
+  categoriaParaExcluir = null;
 }
 
 // CARREGAR CATEGORIAS
 async function carregarCategorias() {
-    try {
-        tabela.innerHTML = `
+  try {
+    tabela.innerHTML = `
             <tr>
                 <td colspan="4" class="text-center py-4">
                     Carregando categorias...
@@ -86,205 +87,196 @@ async function carregarCategorias() {
             </tr>
         `;
 
-        categorias = await requisicao(API);
+    categorias = await requisicao(API);
 
-        renderizarCategorias();
+    renderizarCategorias();
+  } catch (erro) {
+    console.error("Erro ao carregar categorias:", erro);
 
-    } catch (erro) {
-        console.error("Erro ao carregar categorias:", erro);
-
-        tabela.innerHTML = `
+    tabela.innerHTML = `
             <tr>
                 <td colspan="4" class="text-center py-4">
                     ${erro.message}
                 </td>
             </tr>
         `;
-    }
+  }
 }
 
 // RENDERIZAR TABELA
 function renderizarCategorias() {
-    const termo = busca.value.trim().toLowerCase();
-    const status = filtro.value;
+  const termo = busca.value.trim().toLowerCase();
+  const status = filtro.value;
 
-    const filtradas = categorias.filter(categoria => {
-        const nome = categoria.nome.toLowerCase();
-        const ativa = categoriaEstaAtiva(categoria.ativo);
+  const filtradas = categorias.filter((categoria) => {
+    const nome = categoria.nome.toLowerCase();
+    const ativa = categoriaEstaAtiva(categoria.ativo);
 
-        const correspondeNome = nome.includes(termo);
+    const correspondeNome = nome.includes(termo);
 
-        const correspondeStatus =
-            status === "" ||
-            (status === "ativo" && ativa) ||
-            (status === "inativo" && !ativa);
+    const correspondeStatus =
+      status === "" ||
+      (status === "ativo" && ativa) ||
+      (status === "inativo" && !ativa);
 
-        return correspondeNome && correspondeStatus;
-    });
+    return correspondeNome && correspondeStatus;
+  });
 
-    if (filtradas.length === 0) {
-        tabela.innerHTML = `
+  if (filtradas.length === 0) {
+    tabela.innerHTML = `
             <tr>
                 <td colspan="4" class="text-center py-4">
                     Nenhuma categoria encontrada.
                 </td>
             </tr>
         `;
-        return;
-    }
+    return;
+  }
 
-    tabela.innerHTML = "";
+  tabela.innerHTML = "";
 
-    filtradas.forEach(categoria => {
-        const linha = document.createElement("tr");
+  filtradas.forEach((categoria) => {
+    const linha = document.createElement("tr");
 
-        const celulaNome = document.createElement("td");
-        celulaNome.textContent = categoria.nome;
+    const celulaNome = document.createElement("td");
+    celulaNome.textContent = categoria.nome;
 
-        const celulaDescricao = document.createElement("td");
-        celulaDescricao.textContent = categoria.descricao || "Sem descrição";
+    const celulaDescricao = document.createElement("td");
+    celulaDescricao.textContent = categoria.descricao || "Sem descrição";
 
-        const celulaStatus = document.createElement("td");
-        celulaStatus.textContent = categoriaEstaAtiva(categoria.ativo)
-            ? "Ativa"
-            : "Inativa";
+    const celulaStatus = document.createElement("td");
+    celulaStatus.textContent = categoriaEstaAtiva(categoria.ativo)
+      ? "Ativa"
+      : "Inativa";
 
-        const celulaAcoes = document.createElement("td");
+    const celulaAcoes = document.createElement("td");
 
-        const btnEditar = document.createElement("button");
-        btnEditar.type = "button";
-        btnEditar.className = "btn btn-secondary";
-        btnEditar.textContent = "Editar";
-        btnEditar.addEventListener("click", () => editarCategoria(categoria));
+    const btnEditar = document.createElement("button");
+    btnEditar.type = "button";
+    btnEditar.className = "btn btn-secondary";
+    btnEditar.textContent = "Editar";
+    btnEditar.addEventListener("click", () => editarCategoria(categoria));
 
-        const btnExcluir = document.createElement("button");
-        btnExcluir.type = "button";
-        btnExcluir.className = "btn btn-danger";
-        btnExcluir.textContent = "Excluir";
-        btnExcluir.addEventListener("click", () => prepararExclusao(categoria));
+    const btnExcluir = document.createElement("button");
+    btnExcluir.type = "button";
+    btnExcluir.className = "btn btn-danger";
+    btnExcluir.textContent = "Excluir";
+    btnExcluir.addEventListener("click", () => prepararExclusao(categoria));
 
-        celulaAcoes.append(btnEditar, btnExcluir);
+    celulaAcoes.append(btnEditar, btnExcluir);
 
-        linha.append(
-            celulaNome,
-            celulaDescricao,
-            celulaStatus,
-            celulaAcoes
-        );
+    linha.append(celulaNome, celulaDescricao, celulaStatus, celulaAcoes);
 
-        tabela.appendChild(linha);
-    });
+    tabela.appendChild(linha);
+  });
 }
 
 // NOVA CATEGORIA
 btnNova.addEventListener("click", () => {
-    form.reset();
+  form.reset();
 
-    campoId.value = "";
-    campoAtivo.checked = true;
+  campoId.value = "";
+  campoAtivo.checked = true;
 
-    modalTitulo.textContent = "Nova Categoria";
-    btnSalvar.textContent = "Salvar Categoria";
+  modalTitulo.textContent = "Nova Categoria";
+  btnSalvar.textContent = "Salvar Categoria";
 
-    abrirModal();
+  abrirModal();
 });
 
 // EDITAR CATEGORIA
 function editarCategoria(categoria) {
-    campoId.value = categoria.id;
-    campoNome.value = categoria.nome;
-    campoDescricao.value = categoria.descricao || "";
-    campoAtivo.checked = categoriaEstaAtiva(categoria.ativo);
+  campoId.value = categoria.id;
+  campoNome.value = categoria.nome;
+  campoDescricao.value = categoria.descricao || "";
+  campoAtivo.checked = categoriaEstaAtiva(categoria.ativo);
 
-    modalTitulo.textContent = "Editar Categoria";
-    btnSalvar.textContent = "Salvar Alterações";
+  modalTitulo.textContent = "Editar Categoria";
+  btnSalvar.textContent = "Salvar Alterações";
 
-    abrirModal();
+  abrirModal();
 }
 
 // SALVAR CATEGORIA
-form.addEventListener("submit", async event => {
-    event.preventDefault();
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-    const nome = campoNome.value.trim();
-    const descricao = campoDescricao.value.trim();
+  const nome = campoNome.value.trim();
+  const descricao = campoDescricao.value.trim();
 
-    if (!nome) {
-        alert("Informe o nome da categoria.");
-        campoNome.focus();
-        return;
+  if (!nome) {
+    alert("Informe o nome da categoria.");
+    campoNome.focus();
+    return;
+  }
+
+  const dados = {
+    nome,
+    descricao,
+    ativo: campoAtivo.checked,
+  };
+
+  const id = campoId.value;
+
+  btnSalvar.disabled = true;
+
+  try {
+    if (id) {
+      await requisicao(`${API}/${encodeURIComponent(id)}`, {
+        method: "PUT",
+        body: JSON.stringify(dados),
+      });
+    } else {
+      await requisicao(API, {
+        method: "POST",
+        body: JSON.stringify(dados),
+      });
     }
 
-    const dados = {
-        nome,
-        descricao,
-        ativo: campoAtivo.checked
-    };
+    fecharModal();
+    await carregarCategorias();
 
-    const id = campoId.value;
-
-    btnSalvar.disabled = true;
-
-    try {
-        if (id) {
-            await requisicao(`${API}/${encodeURIComponent(id)}`, {
-                method: "PUT",
-                body: JSON.stringify(dados)
-            });
-        } else {
-            await requisicao(API, {
-                method: "POST",
-                body: JSON.stringify(dados)
-            });
-        }
-
-        fecharModal();
-        await carregarCategorias();
-
-        alert(id
-            ? "Categoria atualizada com sucesso!"
-            : "Categoria cadastrada com sucesso!");
-
-    } catch (erro) {
-        console.error("Erro ao salvar categoria:", erro);
-        alert(erro.message);
-
-    } finally {
-        btnSalvar.disabled = false;
-    }
+    alert(
+      id
+        ? "Categoria atualizada com sucesso!"
+        : "Categoria cadastrada com sucesso!",
+    );
+  } catch (erro) {
+    console.error("Erro ao salvar categoria:", erro);
+    alert(erro.message);
+  } finally {
+    btnSalvar.disabled = false;
+  }
 });
 
 // EXCLUIR CATEGORIA
 function prepararExclusao(categoria) {
-    categoriaParaExcluir = categoria;
+  categoriaParaExcluir = categoria;
 
-    deleteNome.textContent = categoria.nome;
-    modalDelete.classList.remove("hidden");
+  deleteNome.textContent = categoria.nome;
+  modalDelete.classList.remove("hidden");
 }
 
 btnConfirmarDelete.addEventListener("click", async () => {
-    if (!categoriaParaExcluir) return;
+  if (!categoriaParaExcluir) return;
 
-    btnConfirmarDelete.disabled = true;
+  btnConfirmarDelete.disabled = true;
 
-    try {
-        await requisicao(
-            `${API}/${encodeURIComponent(categoriaParaExcluir.id)}`,
-            { method: "DELETE" }
-        );
+  try {
+    await requisicao(`${API}/${encodeURIComponent(categoriaParaExcluir.id)}`, {
+      method: "DELETE",
+    });
 
-        fecharModalDelete();
-        await carregarCategorias();
+    fecharModalDelete();
+    await carregarCategorias();
 
-        alert("Categoria excluída com sucesso!");
-
-    } catch (erro) {
-        console.error("Erro ao excluir categoria:", erro);
-        alert(erro.message);
-
-    } finally {
-        btnConfirmarDelete.disabled = false;
-    }
+    alert("Categoria excluída com sucesso!");
+  } catch (erro) {
+    console.error("Erro ao excluir categoria:", erro);
+    alert(erro.message);
+  } finally {
+    btnConfirmarDelete.disabled = false;
+  }
 });
 
 // FECHAR MODAIS
@@ -292,12 +284,12 @@ btnFechar.addEventListener("click", fecharModal);
 btnCancelar.addEventListener("click", fecharModal);
 btnCancelarDelete.addEventListener("click", fecharModalDelete);
 
-modal.addEventListener("click", event => {
-    if (event.target === modal) fecharModal();
+modal.addEventListener("click", (event) => {
+  if (event.target === modal) fecharModal();
 });
 
-modalDelete.addEventListener("click", event => {
-    if (event.target === modalDelete) fecharModalDelete();
+modalDelete.addEventListener("click", (event) => {
+  if (event.target === modalDelete) fecharModalDelete();
 });
 
 // PESQUISA E FILTRO

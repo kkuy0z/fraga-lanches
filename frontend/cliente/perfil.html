@@ -1,9 +1,14 @@
 ﻿<!DOCTYPE html>
 <html lang="pt-BR">
+  <head>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1a1a1a" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1a" />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Meu Perfil - Fraga Lanches</title>
     <link rel="stylesheet" href="/design-system.css">
     <link rel="manifest" href="manifest.json">
@@ -68,6 +73,78 @@
                 <a href="/inicio/admin-login.html" class="btn btn-outline btn-sm" style="display: none;" id="adminLink">Painel Admin</a>
             </div>
         </div>
+
+        <nav
+          class="admin-nav cliente-nav"
+          id="clienteNav"
+          role="navigation"
+          aria-label="Navegação do cliente"
+        >
+          <a href="/cliente/painel.html">
+            <span>⌂</span>
+            Painel
+          </a>
+
+          <a href="/cliente/cardapio.html">
+            <span>☰</span>
+            Cardápio
+          </a>
+
+          <a href="/cliente/carrinho.html">
+            <span>🛒</span>
+            Carrinho
+          </a>
+
+          <a href="/cliente/meus-pedidos.html">
+            <span>▤</span>
+            Meus pedidos
+          </a>
+        </nav>
+
+        <div class="header-actions">
+          <div class="user-menu" id="userMenu">
+            <button
+              class="user-button"
+              id="userButton"
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-label="Menu do usuário"
+              type="button"
+            >
+              <div class="user-avatar" id="userAvatar">?</div>
+
+              <span id="userName">Cliente</span>
+            </button>
+
+            <div class="user-dropdown" id="userDropdown" role="menu" hidden>
+              <div class="user-dropdown-header">
+                <span id="dropdownUserName">Cliente</span>
+                <span class="badge badge-info">Cliente</span>
+              </div>
+
+              <div class="user-dropdown-divider"></div>
+
+              <a
+                href="/cliente/perfil.html"
+                class="user-dropdown-item"
+                role="menuitem"
+              >
+                Meu perfil
+              </a>
+
+              <button
+                class="user-dropdown-item btn-logout"
+                id="logoutBtn"
+                type="button"
+                role="menuitem"
+              >
+                <span>↪</span>
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -206,9 +283,369 @@
                 </form>
             </div>
         </div>
+
+        <!-- ABAS -->
+        <nav
+          class="tabs"
+          id="perfilTabs"
+          role="tablist"
+          aria-label="Seções do perfil"
+        >
+          <button
+            type="button"
+            role="tab"
+            class="tab-btn active"
+            aria-selected="true"
+            aria-controls="tab-dados"
+            id="tab-btn-dados"
+            data-tab="dados"
+          >
+            Dados Pessoais
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            class="tab-btn"
+            aria-selected="false"
+            aria-controls="tab-enderecos"
+            id="tab-btn-enderecos"
+            data-tab="enderecos"
+          >
+            Endereços
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            class="tab-btn"
+            aria-selected="false"
+            aria-controls="tab-seguranca"
+            id="tab-btn-seguranca"
+            data-tab="seguranca"
+          >
+            Segurança
+          </button>
+        </nav>
+
+        <!-- ABA: DADOS PESSOAIS -->
+        <div
+          role="tabpanel"
+          id="tab-dados"
+          class="tab-panel active"
+          aria-labelledby="tab-btn-dados"
+        >
+          <form
+            id="formDadosPessoais"
+            class="card"
+            style="padding: var(--space-6)"
+            novalidate
+          >
+            <h3 class="card-title" style="margin-bottom: var(--space-6)">
+              Informações Pessoais
+            </h3>
+
+            <div class="form-row">
+              <div class="form-group" style="flex: 1">
+                <label for="perfilNome" class="form-label">
+                  Nome Completo *
+                </label>
+
+                <input
+                  type="text"
+                  id="perfilNome"
+                  name="nome"
+                  class="form-input"
+                  required
+                  maxlength="100"
+                />
+              </div>
+
+              <div class="form-group" style="flex: 1">
+                <label for="perfilEmail" class="form-label"> E-mail * </label>
+
+                <input
+                  type="email"
+                  id="perfilEmail"
+                  name="email"
+                  class="form-input"
+                  required
+                  readonly
+                  maxlength="120"
+                />
+
+                <p class="form-help">
+                  Você pode atualizar seu endereço de e-mail.
+                </p>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group" style="flex: 1">
+                <label for="perfilTelefone" class="form-label">
+                  Telefone
+                </label>
+
+                <input
+                  type="tel"
+                  id="perfilTelefone"
+                  name="telefone"
+                  class="form-input"
+                  maxlength="20"
+                  placeholder="(31) 99999-9999"
+                />
+              </div>
+            </div>
+
+            <div
+              class="d-flex justify-end gap-2"
+              style="margin-top: var(--space-6)"
+            >
+              <button type="submit" class="btn btn-primary">
+                <svg class="btn-icon" aria-hidden="true">
+                  <use href="#i-save" />
+                </svg>
+
+                Salvar Alterações
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ABA: ENDEREÇOS -->
+        <div
+          role="tabpanel"
+          id="tab-enderecos"
+          class="tab-panel hidden"
+          aria-labelledby="tab-btn-enderecos"
+        >
+          <div
+            class="d-flex justify-between align-center"
+            style="
+              margin-bottom: var(--space-6);
+              flex-wrap: wrap;
+              gap: var(--space-3);
+            "
+          >
+            <h3 class="card-title" style="margin: 0">Meus Endereços</h3>
+
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="btnNovoEndereco"
+              aria-label="Adicionar novo endereço"
+            >
+              <svg class="btn-icon" aria-hidden="true">
+                <use href="#i-add" />
+              </svg>
+
+              Novo Endereço
+            </button>
+          </div>
+
+          <div id="enderecosList" class="enderecos-grid">
+            <!-- Endereços carregados pelo JavaScript -->
+          </div>
+
+          <div
+            class="empty-state hidden"
+            id="enderecosEmptyState"
+            style="grid-column: 1 / -1"
+          >
+            <div class="empty-state-icon">
+              <svg
+                width="36"
+                height="36"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                aria-hidden="true"
+              >
+                <use href="#i-map-marker" />
+              </svg>
+            </div>
+
+            <h2 class="empty-state-title">Nenhum endereço cadastrado</h2>
+
+            <p class="empty-state-message">
+              Adicione um endereço para agilizar seus pedidos.
+            </p>
+          </div>
+        </div>
+
+        <!-- ABA: SEGURANÇA -->
+        <div
+          role="tabpanel"
+          id="tab-seguranca"
+          class="tab-panel hidden"
+          aria-labelledby="tab-btn-seguranca"
+        >
+          <form
+            id="formAlterarSenha"
+            class="card"
+            style="padding: var(--space-6); max-width: 500px"
+            novalidate
+          >
+            <h3 class="card-title" style="margin-bottom: var(--space-2)">
+              Alterar Senha
+            </h3>
+
+            <p class="form-help" style="margin-bottom: var(--space-6)">
+              Sua senha deve ter entre 8 e 64 caracteres.
+            </p>
+
+            <div class="form-group">
+              <label for="senhaAtual" class="form-label"> Senha Atual * </label>
+
+              <div class="input-with-icon">
+                <input
+                  type="password"
+                  id="senhaAtual"
+                  name="senha_atual"
+                  class="form-input"
+                  required
+                  placeholder="Digite sua senha atual"
+                  autocomplete="current-password"
+                />
+
+                <button
+                  type="button"
+                  class="input-icon-btn"
+                  id="toggleSenhaAtual"
+                  aria-label="Mostrar/ocultar senha"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="senhaNova" class="form-label"> Nova Senha * </label>
+
+              <div class="input-with-icon">
+                <input
+                  type="password"
+                  id="senhaNova"
+                  name="senha_nova"
+                  class="form-input"
+                  required
+                  placeholder="Mínimo 8 caracteres"
+                  autocomplete="new-password"
+                  minlength="8"
+                  maxlength="64"
+                  aria-describedby="senhaNovaHelp"
+                />
+
+                <button
+                  type="button"
+                  class="input-icon-btn"
+                  id="toggleSenhaNova"
+                  aria-label="Mostrar/ocultar senha"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+
+              <p class="form-help" id="senhaNovaHelp">Mínimo 8 caracteres</p>
+            </div>
+
+            <div class="form-group">
+              <label for="senhaConfirmar" class="form-label">
+                Confirmar Nova Senha *
+              </label>
+
+              <div class="input-with-icon">
+                <input
+                  type="password"
+                  id="senhaConfirmar"
+                  name="senha_confirmar"
+                  class="form-input"
+                  required
+                  placeholder="Confirme a nova senha"
+                  autocomplete="new-password"
+                  minlength="8"
+                  maxlength="64"
+                />
+
+                <button
+                  type="button"
+                  class="input-icon-btn"
+                  id="toggleSenhaConfirmar"
+                  aria-label="Mostrar/ocultar senha"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="d-flex justify-end gap-2"
+              style="margin-top: var(--space-6)"
+            >
+              <button type="submit" class="btn btn-primary">
+                <svg class="btn-icon" aria-hidden="true">
+                  <use href="#i-save" />
+                </svg>
+
+                Alterar Senha
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </main>
 
-    <!-- Footer will be injected by shared-components.js -->
+    <!-- MODAL: NOVO / EDITAR ENDEREÇO -->
+    <div
+      class="modal-overlay hidden"
+      id="enderecoModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="enderecoModalTitulo"
+    >
+      <div class="modal modal-md">
+        <div class="modal-header">
+          <h2 class="modal-title" id="enderecoModalTitulo">Novo Endereço</h2>
 
     <!-- Modal Novo/Editar EndereÃ§o -->
     <div class="modal-overlay hidden" id="enderecoModal" role="dialog" aria-modal="true" aria-labelledby="enderecoModalTitulo">
@@ -269,6 +706,155 @@
                 </button>
             </div>
         </div>
+
+        <form id="enderecoForm" class="modal-body" novalidate>
+          <input type="hidden" id="enderecoId" name="id" />
+
+          <!-- CEP -->
+          <div class="form-group">
+            <label for="enderecoCep" class="form-label"> CEP </label>
+
+            <div class="input-with-icon">
+              <input
+                type="text"
+                id="enderecoCep"
+                name="cep"
+                class="form-input"
+                placeholder="00000-000"
+                maxlength="9"
+                inputmode="numeric"
+                aria-describedby="cepHelp"
+              />
+
+              <button
+                type="button"
+                class="input-icon-btn"
+                id="btnBuscarCep"
+                aria-label="Buscar endereço pelo CEP"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  aria-hidden="true"
+                >
+                  <use href="#i-search" />
+                </svg>
+              </button>
+            </div>
+
+            <p class="form-help" id="cepHelp">
+              Informe o CEP e utilize a busca para preencher o endereço
+              automaticamente. O CEP não é armazenado no cadastro atual.
+            </p>
+          </div>
+
+          <!-- RUA E NÚMERO -->
+          <div class="form-row">
+            <div class="form-group" style="flex: 1">
+              <label for="enderecoLogradouro" class="form-label">
+                Logradouro *
+              </label>
+
+              <input
+                type="text"
+                id="enderecoLogradouro"
+                name="logradouro"
+                class="form-input"
+                required
+                maxlength="150"
+                placeholder="Rua, Avenida, etc."
+              />
+            </div>
+
+            <div class="form-group" style="flex: 0 0 110px">
+              <label for="enderecoNumero" class="form-label"> Número * </label>
+
+              <input
+                type="text"
+                id="enderecoNumero"
+                name="numero"
+                class="form-input"
+                required
+                maxlength="20"
+                placeholder="Nº"
+              />
+            </div>
+          </div>
+
+          <!-- BAIRRO -->
+          <div class="form-group">
+            <label for="enderecoBairro" class="form-label"> Bairro * </label>
+
+            <input
+              type="text"
+              id="enderecoBairro"
+              name="bairro"
+              class="form-input"
+              required
+              maxlength="100"
+              placeholder="Bairro"
+            />
+          </div>
+
+          <!-- CIDADE -->
+          <div class="form-group">
+            <label for="enderecoCidade" class="form-label"> Cidade * </label>
+
+            <input
+              type="text"
+              id="enderecoCidade"
+              name="cidade"
+              class="form-input"
+              required
+              maxlength="100"
+              placeholder="Cidade"
+            />
+          </div>
+
+          <!-- COMPLEMENTO -->
+          <div class="form-group">
+            <label for="enderecoComplemento" class="form-label">
+              Complemento
+            </label>
+
+            <input
+              type="text"
+              id="enderecoComplemento"
+              name="complemento"
+              class="form-input"
+              maxlength="100"
+              placeholder="Apto, Bloco, Casa, etc. (opcional)"
+            />
+          </div>
+        </form>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="btnCancelarEnderecoModal"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            form="enderecoForm"
+            class="btn btn-primary"
+            id="btnSalvarEndereco"
+          >
+            <svg class="btn-icon" aria-hidden="true">
+              <use href="#i-save" />
+            </svg>
+
+            Salvar Endereço
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Modal Confirmar ExclusÃ£o EndereÃ§o -->
@@ -289,28 +875,57 @@
                 </button>
             </div>
         </div>
+
+        <div class="modal-body">
+          <p>Tem certeza que deseja excluir este endereço?</p>
+
+          <p class="form-help">Esta ação não pode ser desfeita.</p>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="btnCancelarDeleteEndereco"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-danger"
+            id="btnConfirmarDeleteEndereco"
+          >
+            <svg class="btn-icon" aria-hidden="true">
+              <use href="#i-trash" />
+            </svg>
+
+            Excluir
+          </button>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="js/shared-components.js"></script>
     <script type="module" src="js/perfil.js"></script>
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .catch(error => console.error('[SW] Erro no registro:', error));
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js").catch((error) => {
+            console.error("[SW] Erro no registro:", error);
+          });
         });
       }
 
-      // Handle image error events securely (instead of inline onerror)
-      document.addEventListener('DOMContentLoaded', () => {
-        const images = document.querySelectorAll('img');
-        images.forEach(img => {
-          img.addEventListener('error', function() {
-            this.style.display = 'none';
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("img").forEach((img) => {
+          img.addEventListener("error", function () {
+            this.style.display = "none";
           });
         });
       });
     </script>
 </body>
+</html>
 
 </html>
