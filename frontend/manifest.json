@@ -4,12 +4,12 @@
   "description": "Delivery de hambúrgueres artesanais, marmitas e porções - Fraga Lanches",
   "start_url": "/inicio.html",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#1a1a1a",
+  "background_color": "#0c0c0c",
+  "theme_color": "#0c0c0c",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/frontend/imagens/logo.png",
+      "src": "/imagens/logo.png",
       "sizes": "any",
       "type": "image/png",
       "purpose": "any"
@@ -28,7 +28,7 @@
       "url": "/cliente/cardapio.html",
       "icons": [
         {
-          "src": "/frontend/imagens/logo.png",
+          "src": "/imagens/logo.png",
           "sizes": "any",
           "type": "image/png"
         }
@@ -41,7 +41,7 @@
       "url": "/cliente/meus-pedidos.html",
       "icons": [
         {
-          "src": "/frontend/imagens/logo.png",
+          "src": "/imagens/logo.png",
           "sizes": "any",
           "type": "image/png"
         }
@@ -54,7 +54,7 @@
       "url": "/cliente/carrinho.html",
       "icons": [
         {
-          "src": "/frontend/imagens/logo.png",
+          "src": "/imagens/logo.png",
           "sizes": "any",
           "type": "image/png"
         }

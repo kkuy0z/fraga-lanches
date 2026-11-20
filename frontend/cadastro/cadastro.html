@@ -1,166 +1,1105 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="pt-BR">
-
-<head>
-    <link rel="manifest" href="/manifest.json">
- <meta name=theme-color content=#1a1a1a>
-
- <meta name=theme-color content=#1a1a1a>
-
-
-
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Crie sua conta no Fraga Lanches e peÃ§a seus hambÃºrgueres artesanais com mais praticidade.">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Crie sua conta no Fraga Lanches e peça seus hambúrgueres artesanais com mais praticidade."
+    />
     <title>Cadastre-se | Fraga Lanches</title>
-    <link rel="icon" href="/frontend/imagens/logo.png">
-    <link rel="manifest" href="/inicio/manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Fraga Lanches">
-    <link rel="apple-touch-icon" href="/img/icon-192.svg">
-    <link rel="stylesheet" href="/design-system.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="/assets/images/icons/logo.png">
-<link rel="apple-touch-icon" href="/assets/images/icons/logo.png">
-</head>
 
-<body class="pg-cadastro">
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#1a1a1a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches" />
 
-    <main class="cad" style="padding-top: var(--header-height, 72px);">
-        <div class="cad-grid">
-            <!-- ApresentaÃ§Ã£o (Lado Esquerdo) -->
-            <div class="cad-intro">
-                <img class="cad-logo" src="/frontend/imagens/logo.png" alt="Logo Fraga Lanches Delivery">
-                <p class="cad-eyebrow">Seja bem-vindo(a)</p>
-                <h1>Junte-se Ã  <span>nossa famÃ­lia!</span></h1>
-                <p class="cad-lead">Crie sua conta e aproveite todas as vantagens de pedir no Fraga Lanches.</p>
+    <link rel="icon" type="image/png" href="/imagens/logo.png" />
+    <link rel="apple-touch-icon" href="/imagens/logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/design-system.css" />
+
+    <style>
+      /* =====================================================
+         FRAGA LANCHES — CADASTRO (IDENTIDADE & LAYOUT)
+         ===================================================== */
+
+      :root {
+        --cad-bg: #0c0c0c;
+        --cad-card: #191919;
+        --cad-card-alt: #131313;
+        --cad-border: rgba(255, 255, 255, 0.09);
+        --cad-yellow: #f5c542;
+        --cad-yellow-hover: #ffda65;
+        --cad-text: #f5f5f5;
+        --cad-muted: #a5a5a5;
+        --cad-input: #111111;
+        --cad-error: #ff6b6b;
+        --cad-success: #5fd38a;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: clip;
+        scroll-behavior: smooth;
+      }
+
+      body.pg-cadastro {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 32px 24px;
+        overflow-x: clip;
+        background:
+          radial-gradient(
+            circle at 18% 20%,
+            rgba(245, 197, 66, 0.08),
+            transparent 42%
+          ),
+          radial-gradient(
+            circle at 85% 80%,
+            rgba(245, 197, 66, 0.05),
+            transparent 40%
+          ),
+          var(--cad-bg);
+        color: var(--cad-text);
+        font-family: "Montserrat", sans-serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      main.cad {
+        width: 100%;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      .cad-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+        grid-template-areas:
+          "intro card"
+          "extras card";
+        align-items: start;
+        gap: 24px 48px;
+      }
+
+      /* =====================================================
+         COLUNA ESQUERDA: APRESENTAÇÃO + BENEFÍCIOS
+         ===================================================== */
+
+      .cad-intro {
+        grid-area: intro;
+        padding-top: 8px;
+      }
+
+      .cad-logo-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 24px;
+        text-decoration: none;
+      }
+
+      .cad-logo {
+        width: 72px;
+        height: 72px;
+        object-fit: cover;
+        border-radius: 50%;
+        background: #161616;
+        border: 2px solid rgba(245, 197, 66, 0.45);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      }
+
+      .cad-brand-tag {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .cad-brand-tag strong {
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .cad-brand-tag span {
+        color: var(--cad-yellow);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .cad-eyebrow {
+        display: inline-block;
+        margin: 0 0 10px;
+        padding: 5px 12px;
+        border: 1px solid rgba(245, 197, 66, 0.3);
+        border-radius: 999px;
+        background: rgba(245, 197, 66, 0.08);
+        color: var(--cad-yellow);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .cad-intro h1 {
+        margin: 0 0 14px;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(38px, 4.6vw, 56px);
+        font-weight: 400;
+        line-height: 1.04;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .cad-intro h1 span {
+        color: var(--cad-yellow);
+      }
+
+      .cad-lead {
+        max-width: 440px;
+        margin: 0;
+        color: var(--cad-muted);
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .cad-yellow-line {
+        width: 64px;
+        height: 3px;
+        margin-top: 20px;
+        border-radius: 999px;
+        background-color: var(--cad-yellow);
+      }
+
+      /* Benefícios */
+      .cad-extras {
+        grid-area: extras;
+      }
+
+      .cad-beneficios {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .cad-beneficios li {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        border: 1px solid var(--cad-border);
+        border-radius: 10px;
+        background-color: var(--cad-card-alt);
+        color: #e4e4e4;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.45;
+        transition:
+          border-color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .cad-beneficios li:hover {
+        border-color: rgba(245, 197, 66, 0.35);
+        transform: translateX(3px);
+      }
+
+      .cad-beneficio-icon {
+        display: inline-flex;
+        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: rgba(245, 197, 66, 0.12);
+        border: 1px solid rgba(245, 197, 66, 0.28);
+        color: var(--cad-yellow);
+      }
+
+      .cad-ic {
+        width: 18px;
+        height: 18px;
+        display: block;
+      }
+
+      /* =====================================================
+         COLUNA DIREITA: CARD DO FORMULÁRIO
+         ===================================================== */
+
+      .cad-card {
+        grid-area: card;
+        width: 100%;
+        padding: 30px 32px;
+        border: 1px solid #2e2e2e;
+        border-radius: 14px;
+        background-color: var(--cad-card);
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+      }
+
+      .cad-card-topo {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 20px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--cad-border);
+      }
+
+      .cad-badge {
+        display: inline-flex;
+        flex-shrink: 0;
+        width: 46px;
+        height: 46px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(245, 197, 66, 0.12);
+        border: 1px solid rgba(245, 197, 66, 0.35);
+        color: var(--cad-yellow);
+      }
+
+      .cad-badge .cad-ic {
+        width: 22px;
+        height: 22px;
+      }
+
+      .cad-card-topo h2 {
+        margin: 0 0 2px;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: 26px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .cad-card-topo p {
+        margin: 0;
+        color: var(--cad-muted);
+        font-size: 12px;
+      }
+
+      .cad-legenda {
+        margin: 0 0 16px;
+        color: var(--cad-muted);
+        font-size: 11px;
+      }
+
+      .obrig {
+        color: var(--cad-yellow);
+        font-weight: 700;
+      }
+
+      /* Campos */
+      .campo {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+
+      .form-label {
+        display: block;
+        color: #e4e4e4;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .input-with-icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      .form-input {
+        display: block;
+        width: 100%;
+        min-height: 44px;
+        padding: 11px 42px 11px 14px;
+        border: 1px solid #363636;
+        border-radius: 8px;
+        outline: none;
+        background-color: var(--cad-input);
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 500;
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease,
+          background-color 0.2s ease;
+      }
+
+      .form-input::placeholder {
+        color: #6f6f6f;
+        opacity: 1;
+      }
+
+      .form-input:hover {
+        border-color: #525252;
+      }
+
+      .form-input:focus {
+        border-color: var(--cad-yellow);
+        background-color: #141414;
+        box-shadow: 0 0 0 3px rgba(245, 197, 66, 0.12);
+      }
+
+      .form-input[aria-invalid="true"],
+      .form-input.is-invalid {
+        border-color: var(--cad-error);
+        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.12);
+      }
+
+      .input-icon {
+        position: absolute;
+        right: 13px;
+        width: 18px;
+        height: 18px;
+        color: #777777;
+        pointer-events: none;
+        transition: color 0.2s ease;
+      }
+
+      .input-with-icon:focus-within .input-icon {
+        color: var(--cad-yellow);
+      }
+
+      .input-icon-btn {
+        position: absolute;
+        right: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: #888888;
+        cursor: pointer;
+        transition:
+          color 0.2s ease,
+          background-color 0.2s ease;
+      }
+
+      .input-icon-btn:hover {
+        color: var(--cad-yellow);
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      .form-help {
+        margin: 0;
+        color: #8e8e8e;
+        font-size: 11px;
+        line-height: 1.4;
+      }
+
+      .form-help.error {
+        color: var(--cad-error);
+        font-weight: 600;
+      }
+
+      .form-help.error:empty {
+        display: none;
+      }
+
+      /* Termos */
+      .campo-termos {
+        margin: 16px 0 20px;
+      }
+
+      .form-check {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        cursor: pointer;
+      }
+
+      .form-check-input {
+        flex-shrink: 0;
+        width: 17px;
+        height: 17px;
+        margin-top: 2px;
+        accent-color: var(--cad-yellow);
+        cursor: pointer;
+      }
+
+      .form-check-label {
+        color: #cccccc;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .form-check-label a {
+        color: var(--cad-yellow);
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      .form-check-label a:hover {
+        color: var(--cad-yellow-hover);
+      }
+
+      /* Botões */
+      .cad-card .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 46px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .cad-card .btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .cad-card .btn-block {
+        width: 100%;
+      }
+
+      .cad-card .btn-primary {
+        border: 1px solid var(--cad-yellow);
+        background-color: var(--cad-yellow);
+        color: #141414;
+      }
+
+      .cad-card .btn-primary:hover {
+        border-color: var(--cad-yellow-hover);
+        background-color: var(--cad-yellow-hover);
+      }
+
+      .cad-card .btn-outline {
+        border: 1px solid #3f3f3f;
+        background-color: #141414;
+        color: #f0f0f0;
+      }
+
+      .cad-card .btn-outline:hover {
+        border-color: var(--cad-yellow);
+        background-color: rgba(245, 197, 66, 0.08);
+        color: var(--cad-yellow);
+      }
+
+      .btn-icon {
+        width: 17px;
+        height: 17px;
+      }
+
+      /* Alerta de Sucesso */
+      .alert.alert-success {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-top: 16px;
+        padding: 14px 16px;
+        border: 1px solid rgba(95, 211, 138, 0.45);
+        border-radius: 8px;
+        background: rgba(95, 211, 138, 0.12);
+        color: #e9fff1;
+      }
+
+      .alert.alert-success.hidden {
+        display: none;
+      }
+
+      .alert-icon {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        margin-top: 1px;
+        color: var(--cad-success);
+      }
+
+      .alert.alert-success strong {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--cad-success);
+        font-size: 13px;
+      }
+
+      .alert.alert-success p {
+        margin: 0;
+        color: #d8f5e2;
+        font-size: 12px;
+      }
+
+      /* Divisor e Links */
+      .divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 22px 0 16px;
+        color: #888888;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background-color: var(--cad-border);
+      }
+
+      .btn-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: 100%;
+        margin-top: 16px;
+        color: var(--cad-muted);
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+
+      .btn-link:hover {
+        color: var(--cad-yellow);
+      }
+
+      /* =====================================================
+         RESPONSIVIDADE
+         ===================================================== */
+
+      @media (max-width: 960px) {
+        body.pg-cadastro {
+          padding: 24px 18px;
+        }
+
+        .cad-grid {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-areas:
+            "intro"
+            "card"
+            "extras";
+          gap: 22px;
+          max-width: 560px;
+          margin: 0 auto;
+        }
+
+        .cad-intro {
+          text-align: center;
+          padding-top: 0;
+        }
+
+        .cad-logo-wrap {
+          justify-content: center;
+          margin-bottom: 16px;
+        }
+
+        .cad-lead {
+          margin: 0 auto;
+        }
+
+        .cad-yellow-line {
+          margin: 16px auto 0;
+        }
+      }
+
+      @media (max-width: 520px) {
+        body.pg-cadastro {
+          padding: 18px 12px 28px;
+        }
+
+        .cad-card {
+          padding: 22px 18px;
+          border-radius: 12px;
+        }
+
+        .cad-card-topo h2 {
+          font-size: 23px;
+        }
+
+        .cad-beneficios li {
+          padding: 12px 14px;
+          font-size: 12px;
+        }
+      }
+
+      /* =====================================================
+         ACESSIBILIDADE
+         ===================================================== */
+
+      a:focus-visible,
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid var(--cad-yellow);
+        outline-offset: 2px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto;
+          transition-duration: 0.01ms;
+          animation-duration: 0.01ms;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="pg-cadastro">
+    <main class="cad">
+      <div class="cad-grid">
+        <!-- Apresentação (Lado Esquerdo) -->
+        <div class="cad-intro">
+          <a
+            href="/"
+            class="cad-logo-wrap"
+            aria-label="Ir para a página inicial"
+          >
+            <img class="cad-logo" src="/imagens/logo.png" />
+            <div class="cad-brand-tag">
+              <strong>Fraga Lanches</strong>
+              <span>Hambúrgueres Artesanais</span>
             </div>
+          </a>
 
-            <!-- FormulÃ¡rio (Lado Direito) -->
-            <div class="cad-card">
-                <div class="cad-card-topo">
-                    <span class="cad-badge" aria-hidden="true"><svg class="cad-ic"><use href="#i-user" /></svg></span>
-                    <div>
-                        <h2>Cadastre-se</h2>
-                        <p>Ã‰ rÃ¡pido e fÃ¡cil!</p>
-                    </div>
-                </div>
-
-                <form id="form-cadastro" novalidate>
-                    <p class="cad-legenda"><span class="obrig" aria-hidden="true">*</span> Campos obrigatÃ³rios</p>
-
-                    <div class="campo">
-                        <label for="nome" class="form-label">Nome completo <span class="obrig" aria-hidden="true">*</span></label>
-                        <div class="input-with-icon">
-                            <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Digite seu nome completo" maxlength="80" required aria-describedby="erro-nome" class="form-input">
-                            <svg class="input-icon" aria-hidden="true"><use href="#i-user" /></svg>
-                        </div>
-                        <p class="form-help error" id="erro-nome"></p>
-                    </div>
-
-                    <div class="campo">
-                        <label for="email" class="form-label">E-mail <span class="obrig" aria-hidden="true">*</span></label>
-                        <div class="input-with-icon">
-                            <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="exemplo@seuemail.com" maxlength="120" required aria-describedby="erro-email" class="form-input">
-                            <svg class="input-icon" aria-hidden="true"><use href="#i-mail" /></svg>
-                        </div>
-                        <p class="form-help error" id="erro-email"></p>
-                    </div>
-
-                    <div class="campo">
-                        <label for="telefone" class="form-label">Telefone / WhatsApp <span class="obrig" aria-hidden="true">*</span></label>
-                        <div class="input-with-icon">
-                            <input id="telefone" name="telefone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(31) 98767-7197" maxlength="15" required aria-describedby="erro-telefone" class="form-input">
-                            <svg class="input-icon" aria-hidden="true"><use href="#i-zap" /></svg>
-                        </div>
-                        <p class="form-help error" id="erro-telefone"></p>
-                    </div>
-
-                    <div class="campo">
-                        <label for="senha" class="form-label">Senha <span class="obrig" aria-hidden="true">*</span></label>
-                        <div class="input-with-icon">
-                            <input id="senha" name="senha" type="password" autocomplete="new-password" placeholder="Digite sua senha" maxlength="64" required aria-describedby="ajuda-senha erro-senha" class="form-input">
-                            <button type="button" class="input-icon-btn" data-alvo="senha" aria-label="Mostrar senha" aria-pressed="false">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                        <p class="form-help" id="ajuda-senha">Use pelo menos 8 caracteres.</p>
-                        <p class="form-help error" id="erro-senha"></p>
-                    </div>
-
-                    <div class="campo">
-                        <label for="confirmar" class="form-label">Confirmar senha <span class="obrig" aria-hidden="true">*</span></label>
-                        <div class="input-with-icon">
-                            <input id="confirmar" name="confirmarSenha" type="password" autocomplete="new-password" placeholder="Confirme sua senha" maxlength="64" required aria-describedby="erro-confirmar" class="form-input">
-                            <button type="button" class="input-icon-btn" data-alvo="confirmar" aria-label="Mostrar senha" aria-pressed="false">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                        <p class="form-help error" id="erro-confirmar"></p>
-                    </div>
-
-                    <div class="campo campo-termos">
-                        <label class="form-check" for="termos">
-                            <input id="termos" name="termos" type="checkbox" class="form-check-input" required aria-describedby="erro-termos">
-                            <span class="form-check-label">Li e aceito os <a href="#" data-pendente>Termos de Uso</a> e a <a href="#" data-pendente>PolÃ­tica de Privacidade</a>. <span class="obrig" aria-hidden="true">*</span></span>
-                        </label>
-                        <p class="form-help error" id="erro-termos"></p>
-                    </div>
-
-                    <button class="btn btn-primary btn-block btn-lg" type="submit">
-                        <svg class="btn-icon" aria-hidden="true"><use href="#i-user" /></svg>
-                        Criar conta
-                    </button>
-
-                    <div class="alert alert-success hidden" id="sucesso" role="status" tabindex="-1">
-                        <svg class="alert-icon" aria-hidden="true"><use href="#i-check-circle" /></svg>
-                        <div>
-                            <strong>Cadastro ConcluÃ­do!</strong>
-                            <p>Seu cadastro foi efetuado com sucesso!</p>
-                        </div>
-                    </div>
-                </form>
-
-                <div class="divider" style="margin: var(--space-6) 0;">
-                    <span>JÃ¡ tem uma conta?</span>
-                </div>
-                <a class="btn btn-outline btn-block" href="/cadastro/login.html">Entrar</a>
-                <a class="btn-link" href="/" style="display: block; text-align: center; margin-top: var(--space-4);"><span aria-hidden="true">â€¹</span> Voltar para a pÃ¡gina inicial</a>
-            </div>
-
-            <!-- BenefÃ­cios + Foto (RodapÃ©) -->
-            <div class="cad-extras">
-                <ul class="cad-beneficios">
-                    <li><svg class="cad-ic" aria-hidden="true"><use href="#i-truck" /></svg><span>Acompanhe seus pedidos em tempo real</span></li>
-                    <li><svg class="cad-ic" aria-hidden="true"><use href="#i-star" /></svg><span>Receba ofertas exclusivas e descontos especiais</span></li>
-                    <li><svg class="cad-ic" aria-hidden="true"><use href="#i-heart" /></svg><span>Mais praticidade e agilidade na hora de pedir</span></li>
-                </ul>
-            </div>
+          <h1>Junte-se à <span>nossa família!</span></h1>
+          <p class="cad-lead">
+            Crie sua conta e aproveite todas as vantagens de pedir no Fraga
+            Lanches com mais rapidez e praticidade.
+          </p>
+          <div class="cad-yellow-line"></div>
         </div>
-    </main>
 
+        <!-- Formulário (Lado Direito) -->
+        <div class="cad-card">
+          <div class="cad-card-topo">
+            <span class="cad-badge" aria-hidden="true">
+              <svg
+                class="cad-ic"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <div>
+              <h2>Cadastre-se</h2>
+              <p>É rápido e fácil!</p>
+            </div>
+          </div>
+
+          <form id="form-cadastro" novalidate>
+            <p class="cad-legenda">
+              <span class="obrig" aria-hidden="true">*</span> Campos
+              obrigatórios
+            </p>
+
+            <div class="campo">
+              <label for="nome" class="form-label">
+                Nome completo <span class="obrig" aria-hidden="true">*</span>
+              </label>
+              <div class="input-with-icon">
+                <input
+                  id="nome"
+                  name="nome"
+                  type="text"
+                  autocomplete="name"
+                  placeholder="Digite seu nome completo"
+                  maxlength="80"
+                  required
+                  aria-describedby="erro-nome"
+                  class="form-input"
+                />
+                <svg
+                  class="input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <p class="form-help error" id="erro-nome"></p>
+            </div>
+
+            <div class="campo">
+              <label for="email" class="form-label">
+                E-mail <span class="obrig" aria-hidden="true">*</span>
+              </label>
+              <div class="input-with-icon">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  inputmode="email"
+                  autocomplete="email"
+                  placeholder="exemplo@seuemail.com"
+                  maxlength="120"
+                  required
+                  aria-describedby="erro-email"
+                  class="form-input"
+                />
+                <svg
+                  class="input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <rect width="20" height="16" x="2" y="4" rx="2" />
+                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                </svg>
+              </div>
+              <p class="form-help error" id="erro-email"></p>
+            </div>
+
+            <div class="campo">
+              <label for="telefone" class="form-label">
+                Telefone / WhatsApp
+                <span class="obrig" aria-hidden="true">*</span>
+              </label>
+              <div class="input-with-icon">
+                <input
+                  id="telefone"
+                  name="telefone"
+                  type="tel"
+                  inputmode="tel"
+                  autocomplete="tel-national"
+                  placeholder="(31) 98767-7197"
+                  maxlength="15"
+                  required
+                  aria-describedby="erro-telefone"
+                  class="form-input"
+                />
+                <svg
+                  class="input-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                  />
+                </svg>
+              </div>
+              <p class="form-help error" id="erro-telefone"></p>
+            </div>
+
+            <div class="campo">
+              <label for="senha" class="form-label">
+                Senha <span class="obrig" aria-hidden="true">*</span>
+              </label>
+              <div class="input-with-icon">
+                <input
+                  id="senha"
+                  name="senha"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="Digite sua senha"
+                  maxlength="64"
+                  required
+                  aria-describedby="ajuda-senha erro-senha"
+                  class="form-input"
+                />
+                <button
+                  type="button"
+                  class="input-icon-btn"
+                  data-alvo="senha"
+                  aria-label="Mostrar senha"
+                  aria-pressed="false"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+              <p class="form-help" id="ajuda-senha">
+                Use pelo menos 8 caracteres.
+              </p>
+              <p class="form-help error" id="erro-senha"></p>
+            </div>
+
+            <div class="campo">
+              <label for="confirmar" class="form-label">
+                Confirmar senha <span class="obrig" aria-hidden="true">*</span>
+              </label>
+              <div class="input-with-icon">
+                <input
+                  id="confirmar"
+                  name="confirmarSenha"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="Confirme sua senha"
+                  maxlength="64"
+                  required
+                  aria-describedby="erro-confirmar"
+                  class="form-input"
+                />
+                <button
+                  type="button"
+                  class="input-icon-btn"
+                  data-alvo="confirmar"
+                  aria-label="Mostrar senha"
+                  aria-pressed="false"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+              <p class="form-help error" id="erro-confirmar"></p>
+            </div>
+
+            <div class="campo campo-termos">
+              <label class="form-check" for="termos">
+                <input
+                  id="termos"
+                  name="termos"
+                  type="checkbox"
+                  class="form-check-input"
+                  required
+                  aria-describedby="erro-termos"
+                />
+                <span class="form-check-label">
+                  Li e aceito os
+                  <a href="#" data-pendente>Termos de Uso</a> e a
+                  <a href="#" data-pendente>Política de Privacidade</a>.
+                  <span class="obrig" aria-hidden="true">*</span>
+                </span>
+              </label>
+              <p class="form-help error" id="erro-termos"></p>
+            </div>
+
+            <button class="btn btn-primary btn-block btn-lg" type="submit">
+              <svg
+                class="btn-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <line x1="19" y1="8" x2="19" y2="14" />
+                <line x1="22" y1="11" x2="16" y2="11" />
+              </svg>
+              Criar conta
+            </button>
+
+            <div
+              class="alert alert-success hidden"
+              id="sucesso"
+              role="status"
+              tabindex="-1"
+            >
+              <svg
+                class="alert-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+              <div>
+                <strong>Cadastro Concluído!</strong>
+                <p>Seu cadastro foi efetuado com sucesso!</p>
+              </div>
+            </div>
+          </form>
+
+          <div class="divider">
+            <span>Já tem uma conta?</span>
+          </div>
+
+          <a class="btn btn-outline btn-block" href="/cadastro/login.html">
+            Entrar
+          </a>
+
+          <a class="btn-link" href="/">
+            <span aria-hidden="true">&lsaquo;</span> Voltar para a página
+            inicial
+          </a>
+        </div>
+
+        <!-- Benefícios (Rodapé da coluna esquerda) -->
+        <div class="cad-extras">
+          <ul class="cad-beneficios">
+            <li>
+              <span class="cad-beneficio-icon" aria-hidden="true">
+                <svg
+                  class="cad-ic"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="1" y="3" width="15" height="13" />
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                  <circle cx="5.5" cy="18.5" r="2.5" />
+                  <circle cx="18.5" cy="18.5" r="2.5" />
+                </svg>
+              </span>
+              <span>Acompanhe seus pedidos em tempo real</span>
+            </li>
+            <li>
+              <span class="cad-beneficio-icon" aria-hidden="true">
+                <svg
+                  class="cad-ic"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  />
+                </svg>
+              </span>
+              <span>Receba ofertas exclusivas e descontos especiais</span>
+            </li>
+            <li>
+              <span class="cad-beneficio-icon" aria-hidden="true">
+                <svg
+                  class="cad-ic"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  />
+                </svg>
+              </span>
+              <span>Mais praticidade e agilidade na hora de pedir</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </main>
 
     <script type="module" src="cadastro.js"></script>
 
-<script>
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js")
-            .catch(erro => console.error("Erro ao registrar Service Worker:", erro));
-    });
-}
-</script>
-</body>
-
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .catch((erro) =>
+              console.error("Erro ao registrar Service Worker:", erro),
+            );
+        });
+      }
+    </script>
+  </body>
 </html>
-

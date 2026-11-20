@@ -4,62 +4,669 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0c0c0c" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches" />
     <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/imagens/logo.png" />
+    <link rel="apple-touch-icon" href="/imagens/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/design-system.css" />
     <title>Painel do Cliente | Fraga Lanches</title>
+
+    <style>
+      /* =====================================================
+         FRAGA LANCHES — PAINEL DO CLIENTE
+         ===================================================== */
+
+      :root {
+        --pnl-bg: #0c0c0c;
+        --pnl-card: #191919;
+        --pnl-card-hover: #1e1e1e;
+        --pnl-border: rgba(255, 255, 255, 0.09);
+        --pnl-yellow: #f5c542;
+        --pnl-yellow-hover: #ffda65;
+        --pnl-text: #f5f5f5;
+        --pnl-muted: #a5a5a5;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: clip;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 0;
+        overflow-x: clip;
+        background:
+          radial-gradient(
+            circle at 15% 10%,
+            rgba(245, 197, 66, 0.08),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 88% 85%,
+            rgba(245, 197, 66, 0.05),
+            transparent 40%
+          ),
+          var(--pnl-bg);
+        color: var(--pnl-text);
+        font-family: "Montserrat", sans-serif;
+      }
+
+      /* Anula min-height: 100vh de section do design-system.css */
+      body section {
+        position: static;
+        min-height: 0;
+        height: auto;
+      }
+
+      button,
+      a {
+        font: inherit;
+      }
+
+      /* =====================================================
+         CABECALHO E NAVEGACAO
+         ===================================================== */
+
+      .pnl-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        width: 100%;
+        background-color: rgba(12, 12, 12, 0.94);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--pnl-border);
+      }
+
+      .pnl-header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        width: 100%;
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 12px 24px;
+      }
+
+      .pnl-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+
+      .pnl-logo {
+        width: 44px;
+        height: 44px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 1.5px solid rgba(245, 197, 66, 0.45);
+        background-color: #161616;
+      }
+
+      .pnl-brand-title {
+        margin: 0;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: 22px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        line-height: 1;
+      }
+
+      .pnl-nav {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .pnl-nav a {
+        padding: 8px 13px;
+        border-radius: 7px;
+        color: #d6d6d6;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+          color 0.2s ease,
+          background-color 0.2s ease;
+      }
+
+      .pnl-nav a:hover {
+        color: var(--pnl-yellow);
+        background-color: rgba(255, 255, 255, 0.04);
+      }
+
+      .pnl-nav a.active {
+        color: var(--pnl-yellow);
+        background-color: rgba(245, 197, 66, 0.12);
+      }
+
+      .pnl-btn-sair {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 14px;
+        border: 1px solid rgba(255, 107, 107, 0.35);
+        border-radius: 7px;
+        background-color: rgba(255, 107, 107, 0.1);
+        color: #ff8b8b;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .pnl-btn-sair:hover {
+        background-color: rgba(255, 107, 107, 0.2);
+        border-color: #ff6b6b;
+        color: #ffffff;
+      }
+
+      /* =====================================================
+         CONTEUDO PRINCIPAL
+         ===================================================== */
+
+      .pnl-main {
+        flex: 1 0 auto;
+        width: 100%;
+        max-width: 1160px;
+        margin: 0 auto;
+        padding: 28px 24px 48px;
+      }
+
+      .pnl-hero {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 24px;
+        padding: 26px 30px;
+        border: 1px solid #2e2e2e;
+        border-radius: 14px;
+        background-color: var(--pnl-card);
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+      }
+
+      .pnl-hero h2 {
+        display: block;
+        width: 100%;
+        margin: 0 0 12px;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(32px, 4.2vw, 46px);
+        font-weight: 400;
+        line-height: 1.08;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .pnl-hero h2 #nome-usuario {
+        color: var(--pnl-yellow);
+      }
+
+      .pnl-hero p {
+        display: block;
+        width: 100%;
+        max-width: 640px;
+        margin: 0;
+        color: var(--pnl-muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .pnl-yellow-line {
+        display: block;
+        flex-shrink: 0;
+        width: 60px;
+        height: 3px;
+        margin-top: 14px;
+        border-radius: 999px;
+        background-color: var(--pnl-yellow);
+      }
+
+      /* Grade de atalhos */
+      .pnl-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .pnl-card {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 24px 26px;
+        border: 1px solid #2c2c2c;
+        border-radius: 12px;
+        background-color: var(--pnl-card);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+        transition:
+          border-color 0.2s ease,
+          background-color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .pnl-card:hover {
+        border-color: rgba(245, 197, 66, 0.45);
+        background-color: var(--pnl-card-hover);
+        transform: translateY(-2px);
+      }
+
+      .pnl-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 14px;
+        width: 100%;
+        text-align: left;
+      }
+
+      .pnl-card-icon {
+        display: inline-flex;
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background-color: rgba(245, 197, 66, 0.12);
+        border: 1px solid rgba(245, 197, 66, 0.32);
+        color: var(--pnl-yellow);
+      }
+
+      .pnl-card h2 {
+        margin: 0 0 6px;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: 24px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        text-align: left;
+      }
+
+      .pnl-card p {
+        margin: 0;
+        color: var(--pnl-muted);
+        font-size: 13px;
+        line-height: 1.55;
+        text-align: left;
+      }
+
+      .pnl-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        align-self: flex-start;
+        width: auto;
+        min-height: 42px;
+        padding: 10px 18px;
+        border: 1px solid var(--pnl-yellow);
+        border-radius: 8px;
+        background-color: var(--pnl-yellow);
+        color: #141414;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .pnl-btn:hover {
+        border-color: var(--pnl-yellow-hover);
+        background-color: var(--pnl-yellow-hover);
+        transform: translateY(-1px);
+      }
+
+      /* =====================================================
+         RODAPE
+         ===================================================== */
+
+      .pnl-footer {
+        width: 100%;
+        padding: 18px 24px;
+        border-top: 1px solid var(--pnl-border);
+        background-color: #090909;
+        text-align: center;
+      }
+
+      .pnl-footer p {
+        margin: 0;
+        color: #888888;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      /* =====================================================
+         RESPONSIVIDADE
+         ===================================================== */
+
+      @media (max-width: 820px) {
+        .pnl-header-inner {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 12px;
+          padding: 12px 16px;
+        }
+
+        .pnl-brand {
+          justify-content: center;
+        }
+
+        .pnl-nav {
+          justify-content: center;
+          gap: 6px;
+        }
+
+        .pnl-nav a {
+          padding: 7px 10px;
+          font-size: 11px;
+        }
+
+        .pnl-btn-sair {
+          padding: 7px 12px;
+          font-size: 11px;
+        }
+
+        .pnl-main {
+          padding: 20px 16px 36px;
+        }
+
+        .pnl-hero {
+          padding: 22px 20px;
+        }
+
+        .pnl-grid {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 14px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .pnl-card {
+          padding: 20px 18px;
+        }
+      }
+
+      /* =====================================================
+         ACESSIBILIDADE
+         ===================================================== */
+
+      a:focus-visible,
+      button:focus-visible {
+        outline: 2px solid var(--pnl-yellow);
+        outline-offset: 2px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto;
+          transition-duration: 0.01ms;
+          animation-duration: 0.01ms;
+        }
+      }
+    </style>
   </head>
 
   <body>
-    <header>
-      <h1>Fraga Lanches</h1>
+    <header class="pnl-header">
+      <div class="pnl-header-inner">
+        <a href="/cliente/painel.html" class="pnl-brand">
+          <img
+            class="pnl-logo"
+            src="/imagens/logo.png"
+            alt="Logo Fraga Lanches"
+            onerror="
+              if (!this.dataset.t1) {
+                this.dataset.t1 = '1';
+                this.src = '/frontend/imagens/logo.png';
+              } else if (!this.dataset.t2) {
+                this.dataset.t2 = '1';
+                this.src = '../imagens/logo.png';
+              } else {
+                this.style.display = 'none';
+              }
+            "
+          />
+          <h1 class="pnl-brand-title">Fraga Lanches</h1>
+        </a>
 
-      <nav>
-        <a href="/cliente/painel.html">Início</a>
-        <a href="/cliente/cardapio.html">Cardápio</a>
-        <a href="/cliente/meus-pedidos.html">Meus pedidos</a>
-        <a href="/cliente/perfil.html">Minha conta</a>
-        <button type="button" id="btn-sair">Sair</button>
-      </nav>
+        <nav class="pnl-nav" aria-label="Navegação do cliente">
+          <a href="/cliente/painel.html" class="active">Início</a>
+          <a href="/cliente/cardapio.html">Cardápio</a>
+          <a href="/cliente/meus-pedidos.html">Meus pedidos</a>
+          <a href="/cliente/perfil.html">Minha conta</a>
+          <button type="button" id="btn-sair" class="pnl-btn-sair">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Sair
+          </button>
+        </nav>
+      </div>
     </header>
 
-    <main>
-      <section>
+    <main class="pnl-main">
+      <section class="pnl-hero" aria-label="Boas-vindas">
         <h2>Bem-vindo, <span id="nome-usuario">Cliente</span>!</h2>
         <p>Faça seus pedidos e acompanhe suas compras pelo Fraga Lanches.</p>
+        <div class="pnl-yellow-line"></div>
       </section>
 
-      <section>
-        <h2>Cardápio</h2>
-        <p>Confira nossos hambúrgueres, porções, marmitas e bebidas.</p>
-        <a href="/cliente/cardapio.html">Ver cardápio</a>
-      </section>
+      <div class="pnl-grid">
+        <section class="pnl-card">
+          <div class="pnl-card-top">
+            <span class="pnl-card-icon" aria-hidden="true">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 11h18" />
+                <path d="M5 11a7 7 0 0 1 14 0" />
+                <path d="M4 15h16a2 2 0 0 1 2 2v1H2v-1a2 2 0 0 1 2-2z" />
+              </svg>
+            </span>
+            <div>
+              <h2>Cardápio</h2>
+              <p>Confira nossos hambúrgueres, porções, marmitas e bebidas.</p>
+            </div>
+          </div>
+          <a href="/cliente/cardapio.html" class="pnl-btn">Ver cardápio</a>
+        </section>
 
-      <section>
-        <h2>Meus pedidos</h2>
-        <p>Acompanhe seus pedidos e consulte seu histórico.</p>
-        <a href="/cliente/meus-pedidos.html">Acompanhar pedidos</a>
-      </section>
+        <section class="pnl-card">
+          <div class="pnl-card-top">
+            <span class="pnl-card-icon" aria-hidden="true">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
+            </span>
+            <div>
+              <h2>Meus pedidos</h2>
+              <p>Acompanhe seus pedidos e consulte seu histórico.</p>
+            </div>
+          </div>
+          <a href="/cliente/meus-pedidos.html" class="pnl-btn"
+            >Acompanhar pedidos</a
+          >
+        </section>
 
-      <section>
-        <h2>Minha conta</h2>
-        <p>Consulte seus dados pessoais e endereços.</p>
-        <a href="/cliente/perfil.html">Acessar perfil</a>
-      </section>
+        <section class="pnl-card">
+          <div class="pnl-card-top">
+            <span class="pnl-card-icon" aria-hidden="true">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <div>
+              <h2>Minha conta</h2>
+              <p>Consulte seus dados pessoais e endereços.</p>
+            </div>
+          </div>
+          <a href="/cliente/perfil.html" class="pnl-btn">Acessar perfil</a>
+        </section>
 
-      <section>
-        <h2>Carrinho</h2>
-        <p>Confira os produtos que você selecionou.</p>
-        <a href="/cliente/carrinho.html">Ver carrinho</a>
-      </section>
+        <section class="pnl-card">
+          <div class="pnl-card-top">
+            <span class="pnl-card-icon" aria-hidden="true">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path
+                  d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+                />
+              </svg>
+            </span>
+            <div>
+              <h2>Carrinho</h2>
+              <p>Confira os produtos que você selecionou.</p>
+            </div>
+          </div>
+          <a href="/cliente/carrinho.html" class="pnl-btn">Ver carrinho</a>
+        </section>
+      </div>
     </main>
 
-    <footer>
+    <footer class="pnl-footer">
       <p>Fraga Lanches</p>
     </footer>
 
     <script src="/cliente/painel.js"></script>
 
     <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const elNome = document.getElementById("nome-usuario");
+        if (!elNome) return;
+        const atual = elNome.textContent.trim();
+        if (atual && atual !== "Cliente") return;
+
+        const chaves = [
+          "usuario",
+          "cliente",
+          "user",
+          "usuarioLogado",
+          "clienteLogado",
+        ];
+        for (const chave of chaves) {
+          const bruto =
+            localStorage.getItem(chave) || sessionStorage.getItem(chave);
+          if (!bruto) continue;
+          try {
+            const parsed = JSON.parse(bruto);
+            const nome =
+              parsed?.nome ||
+              parsed?.name ||
+              parsed?.usuario?.nome ||
+              parsed?.cliente?.nome;
+            if (nome && typeof nome === "string" && nome.trim()) {
+              elNome.textContent = nome.trim();
+              return;
+            }
+          } catch {
+            if (bruto.trim()) {
+              elNome.textContent = bruto.trim();
+              return;
+            }
+          }
+        }
+      });
+
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
           navigator.serviceWorker
@@ -68,5 +675,6 @@
         });
       }
     </script>
+    <script src="/cliente/carrinho-widget.js" defer></script>
   </body>
 </html>

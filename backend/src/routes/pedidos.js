@@ -1,3 +1,5 @@
+"use strict";
+
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const db = require("../database");
@@ -6,6 +8,57 @@ const router = express.Router();
 
 const STATUS_PEDIDO = "novo";
 const STATUS_PAGAMENTO = "pendente";
+
+// ======================================================
+// TAXAS DE ENTREGA
+// ======================================================
+
+const TAXA_PADRAO_CENTAVOS = 600;
+
+const TAXAS_POR_BAIRRO_CENTAVOS = {
+  marimba: 0,
+  centro: 500,
+  industrial: 600,
+  eldorado: 700,
+  alterosa: 700,
+  petropolis: 800,
+  imbirucu: 800,
+  "jardim alterosa": 850,
+  "nossa senhora das gracas": 750,
+};
+
+function normalizarTexto(valor) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+function calcularTaxaEntrega(bairro) {
+  const bairroNormalizado = normalizarTexto(bairro);
+
+  return TAXAS_POR_BAIRRO_CENTAVOS[bairroNormalizado] ?? TAXA_PADRAO_CENTAVOS;
+}
+
+// ======================================================
+// FUNÇÕES GERAIS
+// ======================================================
+
+function criarErroValidacao(mensagem) {
+  const erro = new Error(mensagem);
+  erro.statusCode = 400;
+  return erro;
+}
+
+function converterCentavos(valor) {
+  return Math.round(Number(valor) * 100);
+}
+
+function formatarDecimal(centavos) {
+  return (centavos / 100).toFixed(2);
+}
 
 function lerCookie(req, nome) {
   const cookies = req.headers.cookie || "";
@@ -24,7 +77,10 @@ function lerCookie(req, nome) {
   }
 }
 
-// Autenticação exclusiva para clientes
+// ======================================================
+// AUTENTICAÇÃO
+// ======================================================
+
 async function autenticarCliente(req, res, next) {
   const token = lerCookie(req, "fraga_session");
 
@@ -45,9 +101,9 @@ async function autenticarCliente(req, res, next) {
 
     const [usuarios] = await db.query(
       `SELECT id, nome, email, ativo
-             FROM usuarios
-             WHERE id = ?
-             LIMIT 1`,
+       FROM usuarios
+       WHERE id = ?
+       LIMIT 1`,
       [usuario.id],
     );
 
@@ -59,7 +115,7 @@ async function autenticarCliente(req, res, next) {
 
     req.usuario = usuarios[0];
 
-    next();
+    return next();
   } catch (erro) {
     if (
       erro.name === "JsonWebTokenError" ||
@@ -80,17 +136,89 @@ async function autenticarCliente(req, res, next) {
 
 router.use(autenticarCliente);
 
-function converterCentavos(valor) {
-  return Math.round(Number(valor) * 100);
+// ======================================================
+// PIX - BR CODE COM VALOR DO PEDIDO
+// ======================================================
+
+// Código PIX estático fornecido pelo titular da chave.
+// Mantenha os dados do recebedor exatamente como foram
+// fornecidos pelo banco.
+//
+// Este código-base não possui valor definido.
+
+const PIX_BASE =
+  "00020101021126580014br.gov.bcb.pix013619acfdc1-3340-4dfe-9e2b-6aebdb372b945204000053039865802BR5925SAMUEL WELINGTON DE OLIVE6009SAO PAULO622905251M7X3KK0N171P4KK4YQ4MVA5X6304C1D3";
+
+// ======================================================
+// CRC16 - PADRÃO PIX
+// ======================================================
+
+function calcularCRC16(texto) {
+  let crc = 0xffff;
+
+  for (const byte of Buffer.from(texto, "utf8")) {
+    crc ^= byte << 8;
+
+    for (let i = 0; i < 8; i++) {
+      if (crc & 0x8000) {
+        crc = ((crc << 1) ^ 0x1021) & 0xffff;
+      } else {
+        crc = (crc << 1) & 0xffff;
+      }
+    }
+  }
+
+  return crc.toString(16).toUpperCase().padStart(4, "0");
 }
 
-function formatarDecimal(centavos) {
-  return (centavos / 100).toFixed(2);
+// ======================================================
+// GERAR PIX COM VALOR
+// ======================================================
+
+function gerarPixComValor(valorCentavos) {
+  if (!Number.isSafeInteger(valorCentavos) || valorCentavos <= 0) {
+    throw new Error("Valor inválido para geração do PIX.");
+  }
+
+  // Remove o CRC anterior.
+  let payload = PIX_BASE.slice(0, -8);
+
+  // Confere se o código-base possui o campo de valor.
+  if (payload.includes("54")) {
+    throw new Error("O QR Code base já possui campo de valor.");
+  }
+
+  // Formata o valor em reais.
+  const valor = formatarDecimal(valorCentavos);
+
+  // Campo 54: valor da transação.
+  const campoValor = `54${String(valor.length).padStart(2, "0")}${valor}`;
+
+  // O campo 54 deve ser inserido antes do campo 58 (país).
+  const posicaoPais = payload.indexOf("5802BR");
+
+  if (posicaoPais === -1) {
+    throw new Error("QR Code PIX base inválido.");
+  }
+
+  payload =
+    payload.slice(0, posicaoPais) + campoValor + payload.slice(posicaoPais);
+
+  // Recalcula o CRC16.
+  const payloadParaCRC = `${payload}6304`;
+  const crc = calcularCRC16(payloadParaCRC);
+
+  return `${payloadParaCRC}${crc}`;
 }
 
-// Criar pedido
+// ======================================================
+// CRIAR PEDIDO
+// ======================================================
+
 router.post("/", async (req, res) => {
   let conexao;
+  let transacaoIniciada = false;
+  let transacaoFinalizada = false;
 
   try {
     const {
@@ -102,48 +230,47 @@ router.post("/", async (req, res) => {
       itens,
     } = req.body;
 
-    // Validar tipo de entrega
+    // ==================================================
+    // VALIDAR TIPO DE ENTREGA
+    // ==================================================
+
     if (!["entrega", "retirada"].includes(tipo_entrega)) {
-      return res.status(400).json({
-        mensagem: "Tipo de entrega inválido.",
-      });
+      throw criarErroValidacao("Tipo de entrega inválido.");
     }
 
-    // Validar pagamento
+    // ==================================================
+    // VALIDAR PAGAMENTO
+    // ==================================================
+
     if (!["pix", "cartao", "dinheiro"].includes(forma_pagamento)) {
-      return res.status(400).json({
-        mensagem: "Forma de pagamento inválida.",
-      });
+      throw criarErroValidacao("Forma de pagamento inválida.");
     }
 
-    // Validar itens
+    // ==================================================
+    // VALIDAR ITENS
+    // ==================================================
+
     if (!Array.isArray(itens) || itens.length === 0) {
-      return res.status(400).json({
-        mensagem: "O pedido precisa ter pelo menos um produto.",
-      });
+      throw criarErroValidacao("O pedido precisa ter pelo menos um produto.");
     }
 
     if (itens.length > 50) {
-      return res.status(400).json({
-        mensagem: "Quantidade máxima de itens excedida.",
-      });
+      throw criarErroValidacao("Quantidade máxima de itens excedida.");
     }
 
-    // Validar endereço
+    // ==================================================
+    // VALIDAR ENDEREÇO E CALCULAR TAXA
+    // ==================================================
+
+    let enderecoValidado = null;
+    let taxaCentavos = 0;
+
     if (tipo_entrega === "entrega") {
-      if (
-        !endereco ||
-        !endereco.rua ||
-        !endereco.numero ||
-        !endereco.bairro ||
-        !endereco.cidade
-      ) {
-        return res.status(400).json({
-          mensagem: "Preencha todos os campos obrigatórios do endereço.",
-        });
+      if (!endereco || typeof endereco !== "object") {
+        throw criarErroValidacao("Endereço de entrega inválido.");
       }
 
-      const camposEndereco = [
+      const camposObrigatorios = [
         endereco.rua,
         endereco.numero,
         endereco.bairro,
@@ -151,57 +278,80 @@ router.post("/", async (req, res) => {
       ];
 
       if (
-        camposEndereco.some(
+        camposObrigatorios.some(
           (campo) => typeof campo !== "string" || !campo.trim(),
         )
       ) {
-        return res.status(400).json({
-          mensagem: "Os dados do endereço são inválidos.",
-        });
+        throw criarErroValidacao(
+          "Preencha todos os campos obrigatórios do endereço.",
+        );
       }
+
+      enderecoValidado = {
+        rua: endereco.rua.trim(),
+        numero: endereco.numero.trim(),
+        bairro: endereco.bairro.trim(),
+        cidade: endereco.cidade.trim(),
+
+        complemento:
+          typeof endereco.complemento === "string"
+            ? endereco.complemento.trim()
+            : null,
+      };
+
+      // A taxa é calculada exclusivamente no backend.
+      taxaCentavos = calcularTaxaEntrega(enderecoValidado.bairro);
     }
 
-    // Validar taxa de entrega configurada no servidor
-    const taxaConfigurada = Number(process.env.TAXA_ENTREGA ?? 0);
-
-    if (!Number.isFinite(taxaConfigurada) || taxaConfigurada < 0) {
-      throw new Error("TAXA_ENTREGA inválida no arquivo .env.");
-    }
-
-    const taxaCentavos =
-      tipo_entrega === "entrega" ? converterCentavos(taxaConfigurada) : 0;
+    // ==================================================
+    // INICIAR TRANSAÇÃO
+    // ==================================================
 
     conexao = await db.getConnection();
 
     await conexao.beginTransaction();
 
+    transacaoIniciada = true;
+
     let enderecoId = null;
 
-    // Salvar endereço
+    // ==================================================
+    // SALVAR ENDEREÇO
+    // ==================================================
+
     if (tipo_entrega === "entrega") {
       const [resultadoEndereco] = await conexao.query(
         `INSERT INTO enderecos
-                    (usuario_id, rua, numero, bairro, cidade, complemento)
-                 VALUES (?, ?, ?, ?, ?, ?)`,
+          (
+            usuario_id,
+            rua,
+            numero,
+            bairro,
+            cidade,
+            complemento
+          )
+         VALUES (?, ?, ?, ?, ?, ?)`,
         [
           req.usuario.id,
-          endereco.rua.trim(),
-          endereco.numero.trim(),
-          endereco.bairro.trim(),
-          endereco.cidade.trim(),
-          typeof endereco.complemento === "string"
-            ? endereco.complemento.trim()
-            : null,
+          enderecoValidado.rua,
+          enderecoValidado.numero,
+          enderecoValidado.bairro,
+          enderecoValidado.cidade,
+          enderecoValidado.complemento,
         ],
       );
 
       enderecoId = resultadoEndereco.insertId;
     }
 
+    // ==================================================
+    // VALIDAR PRODUTOS E ADICIONAIS
+    // ==================================================
+
     let subtotalCentavos = 0;
+
     const itensValidados = [];
 
-    // Validar e recalcular cada produto
     for (const item of itens) {
       const produtoId = Number(item.produto_id);
       const quantidade = Number(item.quantidade);
@@ -213,19 +363,22 @@ router.post("/", async (req, res) => {
         quantidade <= 0 ||
         quantidade > 50
       ) {
-        throw new Error("Um dos produtos possui dados inválidos.");
+        throw criarErroValidacao("Um dos produtos possui dados inválidos.");
       }
 
       const [produtos] = await conexao.query(
         `SELECT id, nome, preco
-                 FROM produtos
-                 WHERE id = ? AND disponivel = TRUE
-                 FOR UPDATE`,
+         FROM produtos
+         WHERE id = ?
+           AND disponivel = TRUE
+         FOR UPDATE`,
         [produtoId],
       );
 
       if (!produtos.length) {
-        throw new Error(`O produto de ID ${produtoId} não está disponível.`);
+        throw criarErroValidacao(
+          `O produto de ID ${produtoId} não está disponível.`,
+        );
       }
 
       const produto = produtos[0];
@@ -233,11 +386,11 @@ router.post("/", async (req, res) => {
       const adicionaisRecebidos = item.adicionais || [];
 
       if (!Array.isArray(adicionaisRecebidos)) {
-        throw new Error("Lista de adicionais inválida.");
+        throw criarErroValidacao("Lista de adicionais inválida.");
       }
 
       if (adicionaisRecebidos.length > 30) {
-        throw new Error("Quantidade de adicionais excedida.");
+        throw criarErroValidacao("Quantidade de adicionais excedida.");
       }
 
       const idsAdicionais = adicionaisRecebidos.map(Number);
@@ -246,7 +399,9 @@ router.post("/", async (req, res) => {
         idsAdicionais.some((id) => !Number.isInteger(id) || id <= 0) ||
         new Set(idsAdicionais).size !== idsAdicionais.length
       ) {
-        throw new Error("Um dos adicionais possui ID inválido ou repetido.");
+        throw criarErroValidacao(
+          "Um dos adicionais possui ID inválido ou repetido.",
+        );
       }
 
       let adicionaisValidados = [];
@@ -256,19 +411,22 @@ router.post("/", async (req, res) => {
         const placeholders = idsAdicionais.map(() => "?").join(",");
 
         const [adicionais] = await conexao.query(
-          `SELECT a.id, a.nome, a.preco
-                     FROM adicionais a
-                     INNER JOIN produto_adicionais pa
-                        ON pa.adicional_id = a.id
-                     WHERE pa.produto_id = ?
-                       AND a.id IN (${placeholders})
-                       AND a.disponivel = TRUE
-                     FOR UPDATE`,
+          `SELECT
+             a.id,
+             a.nome,
+             a.preco
+           FROM adicionais a
+           INNER JOIN produto_adicionais pa
+             ON pa.adicional_id = a.id
+           WHERE pa.produto_id = ?
+             AND a.id IN (${placeholders})
+             AND a.disponivel = TRUE
+           FOR UPDATE`,
           [produtoId, ...idsAdicionais],
         );
 
         if (adicionais.length !== idsAdicionais.length) {
-          throw new Error(
+          throw criarErroValidacao(
             `Existem adicionais indisponíveis para ${produto.nome}.`,
           );
         }
@@ -287,10 +445,24 @@ router.post("/", async (req, res) => {
 
       const precoProdutoCentavos = converterCentavos(produto.preco);
 
+      if (
+        !Number.isSafeInteger(precoProdutoCentavos) ||
+        precoProdutoCentavos < 0 ||
+        !Number.isSafeInteger(totalAdicionaisCentavos)
+      ) {
+        throw criarErroValidacao(
+          "O preço de um produto ou adicional é inválido.",
+        );
+      }
+
       const precoUnitarioCentavos =
         precoProdutoCentavos + totalAdicionaisCentavos;
 
       const totalItemCentavos = precoUnitarioCentavos * quantidade;
+
+      if (!Number.isSafeInteger(totalItemCentavos) || totalItemCentavos <= 0) {
+        throw criarErroValidacao("O valor de um dos itens é inválido.");
+      }
 
       subtotalCentavos += totalItemCentavos;
 
@@ -304,15 +476,26 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // Limite de segurança para o valor do pedido
+    // ==================================================
+    // CALCULAR TOTAL
+    // ==================================================
+
     if (!Number.isSafeInteger(subtotalCentavos) || subtotalCentavos <= 0) {
-      throw new Error("Valor total do pedido inválido.");
+      throw criarErroValidacao("Valor total do pedido inválido.");
     }
 
     const descontoCentavos = 0;
+
     const totalCentavos = subtotalCentavos + taxaCentavos - descontoCentavos;
 
-    // Validar troco
+    if (!Number.isSafeInteger(totalCentavos) || totalCentavos <= 0) {
+      throw criarErroValidacao("Valor final do pedido inválido.");
+    }
+
+    // ==================================================
+    // VALIDAR TROCO
+    // ==================================================
+
     let trocoTexto = "";
 
     if (
@@ -321,14 +504,16 @@ router.post("/", async (req, res) => {
       troco_para !== undefined &&
       troco_para !== ""
     ) {
-      const trocoCentavos = converterCentavos(Number(troco_para));
+      const valorTroco = Number(troco_para);
+
+      const trocoCentavos = converterCentavos(valorTroco);
 
       if (
-        !Number.isFinite(Number(troco_para)) ||
+        !Number.isFinite(valorTroco) ||
         !Number.isSafeInteger(trocoCentavos) ||
         trocoCentavos < totalCentavos
       ) {
-        throw new Error(
+        throw criarErroValidacao(
           "O valor informado para troco precisa ser igual ou superior ao total.",
         );
       }
@@ -336,11 +521,17 @@ router.post("/", async (req, res) => {
       trocoTexto = `Troco para: R$ ${formatarDecimal(trocoCentavos)}.`;
     }
 
+    // ==================================================
+    // OBSERVAÇÕES
+    // ==================================================
+
     let observacoesFinais =
       typeof observacoes === "string" ? observacoes.trim() : "";
 
     if (observacoesFinais.length > 1000) {
-      throw new Error("As observações ultrapassam o limite permitido.");
+      throw criarErroValidacao(
+        "As observações ultrapassam o limite permitido.",
+      );
     }
 
     if (trocoTexto) {
@@ -349,19 +540,22 @@ router.post("/", async (req, res) => {
         : trocoTexto;
     }
 
-    // Criar pedido
+    // ==================================================
+    // INSERIR PEDIDO
+    // ==================================================
+
     const [resultadoPedido] = await conexao.query(
       `INSERT INTO pedidos (
-                usuario_id,
-                endereco_id,
-                status,
-                tipo_entrega,
-                subtotal,
-                taxa_entrega,
-                desconto,
-                total,
-                observacoes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        usuario_id,
+        endereco_id,
+        status,
+        tipo_entrega,
+        subtotal,
+        taxa_entrega,
+        desconto,
+        total,
+        observacoes
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         req.usuario.id,
         enderecoId,
@@ -377,21 +571,24 @@ router.post("/", async (req, res) => {
 
     const pedidoId = resultadoPedido.insertId;
 
-    // Inserir itens do pedido
+    // ==================================================
+    // INSERIR ITENS DO PEDIDO
+    // ==================================================
+
     for (const item of itensValidados) {
       const personalizacao =
         item.adicionais.length > 0 ? JSON.stringify(item.adicionais) : null;
 
       await conexao.query(
         `INSERT INTO itens_pedido (
-                    pedido_id,
-                    produto_id,
-                    nome_produto,
-                    quantidade,
-                    preco_unitario,
-                    subtotal,
-                    personalizacao
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          pedido_id,
+          produto_id,
+          nome_produto,
+          quantidade,
+          preco_unitario,
+          subtotal,
+          personalizacao
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
           pedidoId,
           item.produtoId,
@@ -404,16 +601,19 @@ router.post("/", async (req, res) => {
       );
     }
 
-    // Registrar pagamento pendente
+    // ==================================================
+    // REGISTRAR PAGAMENTO
+    // ==================================================
+
     await conexao.query(
       `INSERT INTO pagamentos (
-                pedido_id,
-                forma_pagamento,
-                valor,
-                status,
-                codigo_transacao,
-                data_pagamento
-            ) VALUES (?, ?, ?, ?, NULL, NULL)`,
+        pedido_id,
+        forma_pagamento,
+        valor,
+        status,
+        codigo_transacao,
+        data_pagamento
+      ) VALUES (?, ?, ?, ?, NULL, NULL)`,
       [
         pedidoId,
         forma_pagamento,
@@ -422,19 +622,51 @@ router.post("/", async (req, res) => {
       ],
     );
 
-    // Registrar histórico inicial
+    // ==================================================
+    // REGISTRAR HISTÓRICO
+    // ==================================================
+
     await conexao.query(
       `INSERT INTO historico_pedidos (
-                pedido_id,
-                usuario_id,
-                status_anterior,
-                status_novo,
-                data_alteracao
-            ) VALUES (?, ?, NULL, ?, NOW())`,
+        pedido_id,
+        usuario_id,
+        status_anterior,
+        status_novo,
+        data_alteracao
+      ) VALUES (?, ?, NULL, ?, NOW())`,
       [pedidoId, req.usuario.id, STATUS_PEDIDO],
     );
 
+    // ==================================================
+    // GERAR PIX COM O VALOR DO PEDIDO
+    // ==================================================
+
+    let pixCopiaECola = null;
+
+    if (forma_pagamento === "pix") {
+      pixCopiaECola = gerarPixComValor(totalCentavos);
+    }
+
+    // ==================================================
+    // CONFIRMAR TRANSAÇÃO
+    // ==================================================
+
     await conexao.commit();
+
+    transacaoFinalizada = true;
+
+    console.log("Pedido registrado:", {
+      pedidoId,
+      usuarioId: req.usuario.id,
+      subtotal: formatarDecimal(subtotalCentavos),
+      taxaEntrega: formatarDecimal(taxaCentavos),
+      total: formatarDecimal(totalCentavos),
+      formaPagamento: forma_pagamento,
+    });
+
+    // ==================================================
+    // RESPOSTA
+    // ==================================================
 
     return res.status(201).json({
       mensagem: "Pedido registrado com sucesso.",
@@ -442,41 +674,34 @@ router.post("/", async (req, res) => {
       status: STATUS_PEDIDO,
       pagamento: STATUS_PAGAMENTO,
       formaPagamento: forma_pagamento,
+
       subtotal: formatarDecimal(subtotalCentavos),
       taxaEntrega: formatarDecimal(taxaCentavos),
+      desconto: formatarDecimal(descontoCentavos),
       total: formatarDecimal(totalCentavos),
+
+      pixCopiaECola,
+      pixValor:
+        forma_pagamento === "pix" ? formatarDecimal(totalCentavos) : null,
     });
   } catch (erro) {
-    if (conexao) {
-      await conexao.rollback();
+    if (conexao && transacaoIniciada && !transacaoFinalizada) {
+      try {
+        await conexao.rollback();
+      } catch (erroRollback) {
+        console.error("Erro ao desfazer transação:", erroRollback);
+      }
     }
 
     console.error("Erro ao criar pedido:", erro);
 
-    const mensagem = erro.message || "Erro ao registrar pedido.";
+    const statusCode = erro.statusCode === 400 ? 400 : 500;
 
-    const errosValidacao = [
-      "inválido",
-      "inválida",
-      "indisponível",
-      "disponíveis",
-      "disponíveis.",
-      "precisa",
-      "Preencha",
-      "Existem",
-      "Quantidade",
-      "O produto",
-      "As observações",
-      "Lista de",
-      "Um dos",
-    ];
-
-    const erroCliente = errosValidacao.some((texto) =>
-      mensagem.toLowerCase().includes(texto.toLowerCase()),
-    );
-
-    return res.status(erroCliente ? 400 : 500).json({
-      mensagem: erroCliente ? mensagem : "Não foi possível registrar o pedido.",
+    return res.status(statusCode).json({
+      mensagem:
+        statusCode === 400
+          ? erro.message
+          : "Não foi possível registrar o pedido.",
     });
   } finally {
     if (conexao) {
@@ -485,25 +710,29 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Listar pedidos do cliente autenticado
+// ======================================================
+// LISTAR PEDIDOS DO CLIENTE
+// ======================================================
+
 router.get("/meus", async (req, res) => {
   try {
     const [pedidos] = await db.query(
       `SELECT
-                p.id,
-                p.data_pedido,
-                p.status,
-                p.tipo_entrega,
-                p.subtotal,
-                p.taxa_entrega,
-                p.desconto,
-                p.total,
-                pg.forma_pagamento,
-                pg.status AS status_pagamento
-             FROM pedidos p
-             LEFT JOIN pagamentos pg ON pg.pedido_id = p.id
-             WHERE p.usuario_id = ?
-             ORDER BY p.data_pedido DESC`,
+        p.id,
+        p.data_pedido,
+        p.status,
+        p.tipo_entrega,
+        p.subtotal,
+        p.taxa_entrega,
+        p.desconto,
+        p.total,
+        pg.forma_pagamento,
+        pg.status AS status_pagamento
+      FROM pedidos p
+      LEFT JOIN pagamentos pg
+        ON pg.pedido_id = p.id
+      WHERE p.usuario_id = ?
+      ORDER BY p.data_pedido DESC`,
       [req.usuario.id],
     );
 
@@ -517,7 +746,10 @@ router.get("/meus", async (req, res) => {
   }
 });
 
-// Consultar um pedido específico do cliente
+// ======================================================
+// CONSULTAR PEDIDO ESPECÍFICO
+// ======================================================
+
 router.get("/:id", async (req, res) => {
   try {
     const pedidoId = Number(req.params.id);
@@ -530,28 +762,30 @@ router.get("/:id", async (req, res) => {
 
     const [pedidos] = await db.query(
       `SELECT
-                p.id,
-                p.data_pedido,
-                p.status,
-                p.tipo_entrega,
-                p.subtotal,
-                p.taxa_entrega,
-                p.desconto,
-                p.total,
-                p.observacoes,
-                e.rua,
-                e.numero,
-                e.bairro,
-                e.cidade,
-                e.complemento,
-                pg.forma_pagamento,
-                pg.status AS status_pagamento
-             FROM pedidos p
-             LEFT JOIN enderecos e ON e.id = p.endereco_id
-             LEFT JOIN pagamentos pg ON pg.pedido_id = p.id
-             WHERE p.id = ?
-               AND p.usuario_id = ?
-             LIMIT 1`,
+        p.id,
+        p.data_pedido,
+        p.status,
+        p.tipo_entrega,
+        p.subtotal,
+        p.taxa_entrega,
+        p.desconto,
+        p.total,
+        p.observacoes,
+        e.rua,
+        e.numero,
+        e.bairro,
+        e.cidade,
+        e.complemento,
+        pg.forma_pagamento,
+        pg.status AS status_pagamento
+      FROM pedidos p
+      LEFT JOIN enderecos e
+        ON e.id = p.endereco_id
+      LEFT JOIN pagamentos pg
+        ON pg.pedido_id = p.id
+      WHERE p.id = ?
+        AND p.usuario_id = ?
+      LIMIT 1`,
       [pedidoId, req.usuario.id],
     );
 
@@ -563,26 +797,26 @@ router.get("/:id", async (req, res) => {
 
     const [itens] = await db.query(
       `SELECT
-                id,
-                produto_id,
-                nome_produto,
-                quantidade,
-                preco_unitario,
-                subtotal,
-                personalizacao
-             FROM itens_pedido
-             WHERE pedido_id = ?`,
+        id,
+        produto_id,
+        nome_produto,
+        quantidade,
+        preco_unitario,
+        subtotal,
+        personalizacao
+      FROM itens_pedido
+      WHERE pedido_id = ?`,
       [pedidoId],
     );
 
     const [historico] = await db.query(
       `SELECT
-                status_anterior,
-                status_novo,
-                data_alteracao
-             FROM historico_pedidos
-             WHERE pedido_id = ?
-             ORDER BY data_alteracao ASC`,
+        status_anterior,
+        status_novo,
+        data_alteracao
+      FROM historico_pedidos
+      WHERE pedido_id = ?
+      ORDER BY data_alteracao ASC`,
       [pedidoId],
     );
 

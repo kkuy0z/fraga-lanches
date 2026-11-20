@@ -13,13 +13,14 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
 
 const db = require("./database");
 
+const clientePerfilRoutes = require("./routes/clientePerfil");
 const pedidosRoutes = require("./routes/pedidos");
 const authRoutes = require("./routes/auth");
 const cardapioRoutes = require("./routes/cardapio");
+const carrinhoRoutes = require("./routes/carrinho");
 const adminCategoriasRoutes = require("./routes/adminCategorias");
 const adminProdutosRoutes = require("./routes/adminProdutos");
 const adminPedidosRoutes = require("./routes/adminPedidos");
-const pedidosRoutes = require("./routes/pedidos");
 const adminDashboardRoutes = require("./routes/adminDashboard");
 
 const app = express();
@@ -32,7 +33,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Rotas da API
+app.use("/api/cliente/perfil", clientePerfilRoutes);
 app.use("/api/cliente/pedidos", pedidosRoutes);
+app.use("/api/cliente/carrinho", carrinhoRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/cardapio", cardapioRoutes);
 app.use("/api/admin/categorias", adminCategoriasRoutes);

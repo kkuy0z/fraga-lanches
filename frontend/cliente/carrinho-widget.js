@@ -28,13 +28,416 @@ document.addEventListener("DOMContentLoaded", () => {
     return elemento;
   };
 
+  function injetarEstilosWidget() {
+    if (document.getElementById("fragaCarrinhoWidgetStyles")) return;
+
+    const style = document.createElement("style");
+    style.id = "fragaCarrinhoWidgetStyles";
+    style.textContent = `
+      #fragaCarrinhoWidget.fraga-carrinho-widget {
+        --cardapio-yellow: #f5c542;
+        --cardapio-yellow-hover: #ffda65;
+        --cardapio-border: rgba(255, 255, 255, 0.1);
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        left: auto;
+        top: auto;
+        z-index: 950;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+        width: fit-content;
+        min-height: 0;
+        height: auto;
+        margin: 0;
+        padding: 0;
+        max-width: calc(100vw - 32px);
+        font-family: "Montserrat", sans-serif;
+        box-sizing: border-box;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-barra {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        width: fit-content;
+        min-height: 0;
+        height: auto;
+        margin: 0;
+        padding: 10px 14px 10px 16px;
+        border: 1px solid rgba(245, 197, 66, 0.45);
+        border-radius: 999px;
+        background-color: #191919;
+        color: #f5f5f5;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        box-sizing: border-box;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-resumo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-icone {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background-color: rgba(245, 197, 66, 0.14);
+        font-size: 16px;
+        line-height: 1;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-informacoes {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-titulo {
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-quantidade {
+        color: #a5a5a5;
+        font-size: 11px;
+        font-weight: 500;
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-total {
+        color: var(--cardapio-yellow);
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-abrir {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        min-height: 0;
+        height: auto;
+        margin: 0;
+        padding: 9px 16px;
+        border: 1px solid var(--cardapio-yellow);
+        border-radius: 999px;
+        background-color: var(--cardapio-yellow);
+        color: #141414;
+        font-family: "Montserrat", sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+        box-sizing: border-box;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-abrir:hover {
+        background-color: var(--cardapio-yellow-hover);
+        transform: translateY(-1px);
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-painel {
+        width: 370px;
+        max-width: calc(100vw - 32px);
+        max-height: 72vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+        border: 1px solid #2f2f2f;
+        border-radius: 14px;
+        background-color: #191919;
+        color: #f5f5f5;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.72);
+        box-sizing: border-box;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-painel[hidden] {
+        display: none;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-painel-cabecalho {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--cardapio-border);
+        background-color: #141414;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-painel-cabecalho h2 {
+        margin: 0;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: 22px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-fechar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid #333333;
+        border-radius: 8px;
+        background-color: #1c1c1c;
+        color: #d8d8d8;
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-fechar:hover {
+        border-color: var(--cardapio-yellow);
+        color: var(--cardapio-yellow);
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-lista {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        padding: 12px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-vazio {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 6px;
+        padding: 28px 12px;
+        color: #a5a5a5;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-vazio span {
+        font-size: 26px;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-vazio strong {
+        color: #ffffff;
+        font-size: 13px;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-vazio p {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid var(--cardapio-border);
+        border-radius: 10px;
+        background-color: #121212;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-item-dados {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 0;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-item-nome {
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 700;
+        word-break: break-word;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-item-preco {
+        color: var(--cardapio-yellow);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-controles {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-quantidade-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        padding: 0;
+        border: 1px solid #383838;
+        border-radius: 6px;
+        background-color: #1b1b1b;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-quantidade-btn:hover:not(:disabled) {
+        border-color: var(--cardapio-yellow);
+        color: var(--cardapio-yellow);
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-quantidade-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-item-quantidade {
+        min-width: 18px;
+        text-align: center;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-remover {
+        padding: 5px 8px;
+        border: 1px solid rgba(255, 107, 107, 0.35);
+        border-radius: 6px;
+        background-color: rgba(255, 107, 107, 0.1);
+        color: #ff8b8b;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-remover:hover:not(:disabled) {
+        background-color: rgba(255, 107, 107, 0.22);
+        color: #ffffff;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-remover:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-painel-rodape {
+        display: flex;
+        gap: 12px;
+        padding: 16px 18px;
+        border-top: 1px solid var(--cardapio-border);
+        background-color: #141414;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-painel-rodape > span {
+        color: #a5a5a5;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-painel-rodape > strong {
+        color: var(--cardapio-yellow);
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-finalizar {
+        width: 100%;
+        min-height: 42px;
+        padding: 10px 16px;
+        border: 1px solid var(--cardapio-yellow);
+        border-radius: 8px;
+        background-color: var(--cardapio-yellow);
+        color: #141414;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-finalizar:hover:not(:disabled) {
+        background-color: var(--cardapio-yellow-hover);
+      }
+
+      #fragaCarrinhoWidget .fraga-carrinho-finalizar:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      @media (max-width: 520px) {
+        #fragaCarrinhoWidget.fraga-carrinho-widget {
+          right: 12px;
+          bottom: 12px;
+          left: 12px;
+          align-items: stretch;
+          width: auto;
+          max-width: none;
+        }
+
+        #fragaCarrinhoWidget .fraga-carrinho-barra {
+          width: 100%;
+          gap: 10px;
+          padding: 9px 12px;
+        }
+
+        #fragaCarrinhoWidget .fraga-carrinho-painel {
+          width: 100%;
+          max-width: none;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function aplicarEstadoCarrinho(novoCarrinho) {
+    if (!novoCarrinho || typeof novoCarrinho !== "object") return;
+    carrinho = {
+      itens: Array.isArray(novoCarrinho.itens) ? novoCarrinho.itens : [],
+      quantidade_itens: Number(novoCarrinho.quantidade_itens) || 0,
+      total: Number(novoCarrinho.total) || 0,
+    };
+    renderizarCarrinho();
+  }
+
+  window.fragaAtualizarEstadoCarrinho = aplicarEstadoCarrinho;
+
   function criarCarrinhoWidget() {
     if (document.getElementById("fragaCarrinhoWidget")) return;
+
+    injetarEstilosWidget();
 
     const widget = criarElemento("section", "fraga-carrinho-widget");
     widget.id = "fragaCarrinhoWidget";
 
-    // Variáveis necessárias para o CSS funcionar fora do cardápio.
     widget.style.setProperty("--cardapio-yellow", "#ffc107");
     widget.style.setProperty("--cardapio-yellow-hover", "#e5ad00");
     widget.style.setProperty("--cardapio-border", "rgba(255,255,255,0.09)");
@@ -98,13 +501,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const rodape = criarElemento("div", "fraga-carrinho-painel-rodape");
 
+    const linhaTotal = criarElemento("div", "");
+    linhaTotal.style.display = "flex";
+    linhaTotal.style.alignItems = "center";
+    linhaTotal.style.justifyContent = "space-between";
+    linhaTotal.style.gap = "8px";
+
     const totalLabel = criarElemento("span", "", "Total");
+    totalLabel.style.color = "#a5a5a5";
+    totalLabel.style.fontSize = "12px";
+    totalLabel.style.fontWeight = "600";
 
     const totalPainel = criarElemento("strong", "", formatarPreco(0));
-
     totalPainel.id = "fragaCarrinhoTotalPainel";
+    totalPainel.style.color = "#f5c542";
+    totalPainel.style.fontSize = "16px";
 
-    rodape.append(totalLabel, totalPainel);
+    linhaTotal.append(totalLabel, totalPainel);
 
     const botaoFinalizar = criarElemento(
       "button",
@@ -121,7 +534,7 @@ document.addEventListener("DOMContentLoaded", () => {
     rodape.style.flexDirection = "column";
     rodape.style.alignItems = "stretch";
 
-    rodape.appendChild(botaoFinalizar);
+    rodape.append(linhaTotal, botaoFinalizar);
     painel.append(cabecalho, lista, rodape);
 
     widget.append(painel, barra);
@@ -154,7 +567,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!widget) return;
 
     const quantidade = widget.querySelector(".fraga-carrinho-quantidade");
-
     const total = widget.querySelector(".fraga-carrinho-total");
     const lista = document.getElementById("fragaCarrinhoLista");
     const totalPainel = document.getElementById("fragaCarrinhoTotalPainel");
@@ -282,15 +694,21 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (!resposta.ok) {
-        throw new Error("Não foi possível carregar o carrinho.");
+        throw new Error(`HTTP ${resposta.status} ao carregar carrinho.`);
       }
 
-      carrinho = await resposta.json();
-      renderizarCarrinho();
+      const dados = await resposta.json();
+      aplicarEstadoCarrinho(dados.carrinho || dados);
     } catch (erro) {
       console.error("Erro ao carregar carrinho:", erro);
     }
   }
+
+  window.fragaRecarregarCarrinho = carregarCarrinho;
+
+  window.addEventListener("fraga:carrinho-atualizado", () => {
+    carregarCarrinho();
+  });
 
   async function atualizarCarrinho(url, metodo, corpo = null) {
     if (atualizando) return;
@@ -321,7 +739,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
 
-      carrinho = dados.carrinho || dados;
+      aplicarEstadoCarrinho(dados.carrinho || dados);
       return true;
     } catch (erro) {
       console.error("Erro no carrinho:", erro);
@@ -353,8 +771,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // Inicialização exclusiva do widget no painel.
   criarCarrinhoWidget();
   carregarCarrinho();
 });
-

@@ -268,3 +268,9 @@ if (botaoSair) {
     }
   });
 }
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", carregarDashboard);
+} else {
+  carregarDashboard();
+}

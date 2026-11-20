@@ -203,3 +203,13 @@ CREATE INDEX idx_pedidos_usuario ON pedidos(usuario_id);
 CREATE INDEX idx_pedidos_status ON pedidos(status);
 CREATE INDEX idx_produtos_categoria ON produtos(categoria_id);
 CREATE INDEX idx_entregas_entregador ON entregas(entregador_id);
+
+ALTER TABLE enderecos
+ADD COLUMN origem ENUM('perfil', 'pedido') NOT NULL DEFAULT 'perfil';
+
+ALTER TABLE pagamentos
+ADD COLUMN tipo_cartao ENUM(
+    'debito',
+    'credito',
+    'vale_refeicao'
+) NULL AFTER forma_pagamento;

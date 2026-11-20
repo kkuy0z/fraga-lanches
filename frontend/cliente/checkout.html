@@ -3,26 +3,554 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout - Fraga Lanches</title>
-    <link rel="stylesheet" href="/design-system.css" />
-    <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#0c0c0c" />
-    <link rel="icon" href="/assets/images/icons/logo.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches" />
+
+    <title>Checkout - Fraga Lanches</title>
+
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/imagens/logo.png" />
+    <link rel="apple-touch-icon" href="/imagens/logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/design-system.css" />
+
+    <style>
+      :root {
+        --chk-bg: #0c0c0c;
+        --chk-card: #191919;
+        --chk-card-alt: #141414;
+        --chk-border: rgba(255, 255, 255, 0.09);
+        --chk-yellow: #f5c542;
+        --chk-yellow-hover: #ffda65;
+        --chk-text: #f5f5f5;
+        --chk-muted: #a5a5a5;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+        width: 100%;
+        overflow-x: clip;
+      }
+
+      body {
+        display: block;
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 0;
+        overflow-x: clip;
+        background:
+          radial-gradient(
+            circle at 15% 8%,
+            rgba(245, 197, 66, 0.08),
+            transparent 42%
+          ),
+          radial-gradient(
+            circle at 85% 88%,
+            rgba(245, 197, 66, 0.05),
+            transparent 40%
+          ),
+          var(--chk-bg);
+        color: var(--chk-text);
+        font-family: "Montserrat", sans-serif;
+      }
+
+      body section {
+        position: static;
+        min-height: 0;
+        height: auto;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      /* Topo e cabeçalho */
+      .checkout-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 20px 0;
+      }
+
+      .btn-voltar {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border: 1px solid #323232;
+        border-radius: 999px;
+        background-color: var(--chk-card);
+        color: #e6e6e6;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+          border-color 0.2s ease,
+          color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .btn-voltar:hover {
+        border-color: rgba(245, 197, 66, 0.55);
+        color: var(--chk-yellow);
+        transform: translateY(-1px);
+      }
+
+      .page-header {
+        padding: 12px 20px 18px;
+        text-align: center;
+      }
+
+      .page-header-inner {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .page-title {
+        margin: 0 0 8px;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(36px, 5vw, 54px);
+        font-weight: 400;
+        line-height: 1.04;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .page-title .accent {
+        color: var(--chk-yellow);
+      }
+
+      .page-subtitle {
+        margin: 0 auto;
+        color: var(--chk-muted);
+        font-size: 13px;
+        line-height: 1.55;
+      }
+
+      .yellow-line {
+        width: 64px;
+        height: 3px;
+        margin: 14px auto 0;
+        border-radius: 999px;
+        background-color: var(--chk-yellow);
+      }
+
+      /* Etapas / Progresso */
+      .checkout-progress {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 14px 20px 6px;
+      }
+
+      .progress-steps {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 14px 18px;
+        border: 1px solid #2b2b2b;
+        border-radius: 12px;
+        background-color: var(--chk-card);
+      }
+
+      .progress-step {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--chk-muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .progress-step-circle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 1px solid #3a3a3a;
+        background-color: #121212;
+        color: #cccccc;
+        font-size: 12px;
+        font-weight: 700;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .progress-step.active {
+        color: #ffffff;
+      }
+
+      .progress-step.active .progress-step-circle {
+        border-color: var(--chk-yellow);
+        background-color: var(--chk-yellow);
+        color: #141414;
+      }
+
+      .progress-line {
+        flex: 1;
+        height: 2px;
+        min-width: 24px;
+        background-color: #2f2f2f;
+      }
+
+      /* Área principal e grid */
+      .checkout-main {
+        width: 100%;
+        padding: 14px 20px 64px;
+      }
+
+      .checkout-main > .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      .checkout-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 390px;
+        gap: 24px;
+        align-items: start;
+      }
+
+      .checkout-form-section,
+      .checkout-step {
+        margin: 0;
+        padding: 20px;
+        border: 1px solid #2b2b2b;
+        border-radius: 14px;
+        background-color: var(--chk-card);
+      }
+
+      .step-title {
+        padding: 0 8px;
+        color: var(--chk-yellow);
+        font-family: "Anton", sans-serif;
+        font-size: 22px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+        flex: 1;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 14px;
+      }
+
+      .form-label {
+        color: var(--chk-muted);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .form-input,
+      .form-select,
+      .form-textarea {
+        width: 100%;
+        min-height: 40px;
+        padding: 9px 12px;
+        border: 1px solid #333333;
+        border-radius: 8px;
+        background-color: #121212;
+        color: #f5f5f5;
+        font-family: "Montserrat", sans-serif;
+        font-size: 13px;
+      }
+
+      .form-textarea {
+        resize: vertical;
+        min-height: 84px;
+      }
+
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        outline: none;
+        border-color: var(--chk-yellow);
+      }
+
+      /* Endereços salvos */
+      .endereco-salvo-area {
+        margin-bottom: 18px;
+        padding: 14px;
+        border: 1px solid rgba(245, 197, 66, 0.2);
+        border-radius: 10px;
+        background: #141414;
+      }
+
+      .endereco-salvo-area .form-group {
+        margin-bottom: 10px;
+      }
+
+      .endereco-salvo-acoes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .endereco-salvo-acoes .btn {
+        min-height: 36px;
+        padding: 8px 12px;
+        font-size: 10px;
+      }
+
+      .endereco-status {
+        margin: 8px 0 0;
+        color: var(--chk-muted);
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .endereco-status.erro {
+        color: #ff7777;
+      }
+
+      .endereco-status.sucesso {
+        color: #8bd69a;
+      }
+
+      .step-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid var(--chk-border);
+      }
+
+      /* Botões */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 9px 18px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .btn-primary {
+        border: 1px solid var(--chk-yellow);
+        background-color: var(--chk-yellow);
+        color: #141414;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        border-color: var(--chk-yellow-hover);
+        background-color: var(--chk-yellow-hover);
+      }
+
+      .btn-secondary {
+        border: 1px solid #383838;
+        background-color: #141414;
+        color: #e5e5e5;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        border-color: var(--chk-yellow);
+        color: var(--chk-yellow);
+      }
+
+      .btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      /* Resumo lateral e confirmação */
+      .checkout-resumo .card {
+        border: 1px solid #2b2b2b;
+        border-radius: 14px;
+        background-color: var(--chk-card);
+        overflow: hidden;
+      }
+
+      .checkout-resumo .card-content {
+        padding: 20px;
+      }
+
+      .card-title,
+      #step3 h3 {
+        margin: 0 0 12px;
+        color: var(--chk-yellow);
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      #step3 h3 {
+        margin-top: 16px;
+        font-size: 16px;
+      }
+
+      #checkoutItens p,
+      #confirmacaoItens p,
+      .checkout-resumo p,
+      #step3 p {
+        margin: 6px 0;
+        font-size: 13px;
+        color: #e4e4e4;
+      }
+
+      .resumo-linha {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+        font-size: 13px;
+      }
+
+      .resumo-total {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--chk-yellow);
+      }
+
+      /* Modal de sucesso */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background-color: rgba(0, 0, 0, 0.82);
+        backdrop-filter: blur(5px);
+      }
+
+      .modal {
+        width: 100%;
+        max-width: 420px;
+        border: 1px solid rgba(245, 197, 66, 0.3);
+        border-radius: 14px;
+        background-color: var(--chk-card);
+        color: var(--chk-text);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+      }
+
+      .modal-body {
+        padding: 24px;
+        text-align: center;
+      }
+
+      .modal-body h2 {
+        margin: 0 0 8px;
+        color: var(--chk-yellow);
+        font-family: "Anton", sans-serif;
+        font-size: 26px;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
+
+      .modal-body p {
+        margin: 0 0 12px;
+        color: #e4e4e4;
+        font-size: 13px;
+      }
+
+      @media (max-width: 920px) {
+        .checkout-layout {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .form-row {
+          flex-direction: column;
+          gap: 0;
+        }
+
+        .progress-step-label {
+          display: none;
+        }
+
+        .endereco-salvo-acoes .btn {
+          flex: 1;
+        }
+      }
+    </style>
   </head>
 
   <body>
+    <div class="checkout-topbar">
+      <a href="/cliente/cardapio.html" class="btn-voltar">
+        ← Voltar ao cardápio
+      </a>
+
+      <a href="/cliente/painel.html" class="btn-voltar"> Painel do cliente </a>
+    </div>
+
     <section class="checkout-progress">
       <div class="progress-steps">
         <div class="progress-step active" data-step="1">
           <div class="progress-step-circle">1</div>
           <span class="progress-step-label">Entrega</span>
         </div>
+
         <div class="progress-line"></div>
+
         <div class="progress-step" data-step="2">
           <div class="progress-step-circle">2</div>
           <span class="progress-step-label">Pagamento</span>
         </div>
+
         <div class="progress-line"></div>
+
         <div class="progress-step" data-step="3">
           <div class="progress-step-circle">3</div>
           <span class="progress-step-label">Confirmação</span>
@@ -33,7 +561,9 @@
     <section class="page-header">
       <div class="page-header-inner">
         <h1 class="page-title">FINALIZAR <span class="accent">PEDIDO</span></h1>
+
         <p class="page-subtitle">Preencha os dados para concluir seu pedido</p>
+
         <div class="yellow-line"></div>
       </div>
     </section>
@@ -41,18 +571,16 @@
     <main class="checkout-main">
       <div class="container">
         <form id="checkoutForm" novalidate>
-          <div
-            class="checkout-layout"
-            style="display: grid; grid-template-columns: 1fr 400px; gap: 32px"
-          >
+          <div class="checkout-layout">
             <section class="checkout-form-section">
               <fieldset class="checkout-step" id="step1">
                 <legend class="step-title">Entrega ou Retirada</legend>
 
                 <div class="form-group">
-                  <label class="form-label" for="tipoEntrega"
-                    >Tipo de pedido</label
-                  >
+                  <label class="form-label" for="tipoEntrega">
+                    Tipo de pedido
+                  </label>
+
                   <select
                     id="tipoEntrega"
                     name="tipoEntrega"
@@ -65,8 +593,44 @@
                 </div>
 
                 <div id="enderecoCampos">
+                  <!-- Endereços cadastrados no perfil -->
+                  <div class="endereco-salvo-area">
+                    <div class="form-group">
+                      <label class="form-label" for="enderecoSalvo">
+                        Meus endereços cadastrados
+                      </label>
+
+                      <select id="enderecoSalvo" class="form-select">
+                        <option value="">Carregando endereços...</option>
+                      </select>
+                    </div>
+
+                    <div class="endereco-salvo-acoes">
+                      <button
+                        type="button"
+                        id="btnNovoEndereco"
+                        class="btn btn-secondary"
+                      >
+                        + Novo endereço
+                      </button>
+
+                      <button
+                        type="button"
+                        id="btnSalvarEnderecoPerfil"
+                        class="btn btn-secondary"
+                      >
+                        Salvar no meu perfil
+                      </button>
+                    </div>
+
+                    <p id="enderecoStatus" class="endereco-status">
+                      Selecione um endereço salvo ou informe um novo.
+                    </p>
+                  </div>
+
                   <div class="form-group">
                     <label class="form-label" for="cep">CEP</label>
+
                     <div style="display: flex; gap: 10px">
                       <input
                         type="text"
@@ -75,6 +639,7 @@
                         placeholder="00000-000"
                         maxlength="9"
                       />
+
                       <button
                         type="button"
                         id="btnBuscarCep"
@@ -88,10 +653,13 @@
                   <div class="form-row">
                     <div class="form-group">
                       <label class="form-label" for="rua">Rua</label>
+
                       <input type="text" id="rua" class="form-input" required />
                     </div>
+
                     <div class="form-group">
                       <label class="form-label" for="numero">Número</label>
+
                       <input
                         type="text"
                         id="numero"
@@ -102,15 +670,17 @@
                   </div>
 
                   <div class="form-group">
-                    <label class="form-label" for="complemento"
-                      >Complemento</label
-                    >
+                    <label class="form-label" for="complemento">
+                      Complemento
+                    </label>
+
                     <input type="text" id="complemento" class="form-input" />
                   </div>
 
                   <div class="form-row">
                     <div class="form-group">
                       <label class="form-label" for="bairro">Bairro</label>
+
                       <input
                         type="text"
                         id="bairro"
@@ -118,8 +688,10 @@
                         required
                       />
                     </div>
+
                     <div class="form-group">
                       <label class="form-label" for="cidade">Cidade</label>
+
                       <input
                         type="text"
                         id="cidade"
@@ -131,9 +703,10 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for="referencia"
-                    >Ponto de referência</label
-                  >
+                  <label class="form-label" for="referencia">
+                    Ponto de referência
+                  </label>
+
                   <input type="text" id="referencia" class="form-input" />
                 </div>
 
@@ -152,9 +725,10 @@
                 <legend class="step-title">Forma de Pagamento</legend>
 
                 <div class="form-group">
-                  <label class="form-label" for="formaPagamento"
-                    >Forma de pagamento</label
-                  >
+                  <label class="form-label" for="formaPagamento">
+                    Forma de pagamento
+                  </label>
+
                   <select id="formaPagamento" class="form-select" required>
                     <option value="">Selecione</option>
                     <option value="pix">PIX</option>
@@ -164,9 +738,10 @@
                 </div>
 
                 <div class="form-group hidden" id="trocoGroup">
-                  <label class="form-label" for="troco"
-                    >Troco para quanto?</label
-                  >
+                  <label class="form-label" for="troco">
+                    Troco para quanto?
+                  </label>
+
                   <input
                     type="number"
                     id="troco"
@@ -178,7 +753,10 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for="observacao">Observações</label>
+                  <label class="form-label" for="observacao">
+                    Observações
+                  </label>
+
                   <textarea
                     id="observacao"
                     class="form-textarea"
@@ -194,6 +772,7 @@
                   >
                     Voltar
                   </button>
+
                   <button
                     type="button"
                     class="btn btn-primary"
@@ -216,7 +795,7 @@
                 <p id="confPagamentoTexto"></p>
 
                 <h3>Total</h3>
-                <p id="confTotal">R$ 0,00</p>
+                <p id="confTotal" class="resumo-total">R$ 0,00</p>
 
                 <div class="step-actions">
                   <button
@@ -226,6 +805,7 @@
                   >
                     Voltar
                   </button>
+
                   <button
                     type="submit"
                     class="btn btn-primary btn-lg"
@@ -241,15 +821,23 @@
               <div class="card">
                 <div class="card-content">
                   <h3 class="card-title">Resumo do Pedido</h3>
+
                   <div id="checkoutItens"></div>
 
-                  <p>
-                    Subtotal: <strong id="checkoutSubtotal">R$ 0,00</strong>
-                  </p>
-                  <p>
-                    Entrega: <strong id="checkoutTaxaEntrega">R$ 0,00</strong>
-                  </p>
-                  <p>Total: <strong id="checkoutTotal">R$ 0,00</strong></p>
+                  <div class="resumo-linha">
+                    <span>Subtotal</span>
+                    <strong id="checkoutSubtotal">R$ 0,00</strong>
+                  </div>
+
+                  <div class="resumo-linha">
+                    <span>Entrega</span>
+                    <strong id="checkoutTaxaEntrega">R$ 0,00</strong>
+                  </div>
+
+                  <div class="resumo-linha resumo-total">
+                    <span>Total</span>
+                    <strong id="checkoutTotal">R$ 0,00</strong>
+                  </div>
                 </div>
               </div>
             </aside>
@@ -263,15 +851,20 @@
       id="sucessoModal"
       role="dialog"
       aria-modal="true"
+      style="display: none"
     >
       <div class="modal modal-sm">
         <div class="modal-body">
           <h2>Pedido registrado!</h2>
+
           <p>Seu pedido foi recebido.</p>
+
           <p id="pedidoNumero"></p>
+
           <a
             href="/cliente/meus-pedidos.html"
             class="btn btn-primary btn-block"
+            style="width: 100%; margin-top: 10px"
           >
             Ver Meus Pedidos
           </a>
@@ -280,5 +873,17 @@
     </div>
 
     <script src="/cliente/checkout.js" defer></script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .catch((erro) =>
+              console.error("Erro ao registrar Service Worker:", erro),
+            );
+        });
+      }
+    </script>
   </body>
 </html>
