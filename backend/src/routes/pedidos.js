@@ -8,6 +8,7 @@ const router = express.Router();
 
 const STATUS_PEDIDO = "novo";
 const STATUS_PAGAMENTO = "pendente";
+const STATUS_CANCELAVEIS = ["novo", "em_preparo"];
 
 // ======================================================
 // TAXAS DE ENTREGA
@@ -140,18 +141,8 @@ router.use(autenticarCliente);
 // PIX - BR CODE COM VALOR DO PEDIDO
 // ======================================================
 
-// Código PIX estático fornecido pelo titular da chave.
-// Mantenha os dados do recebedor exatamente como foram
-// fornecidos pelo banco.
-//
-// Este código-base não possui valor definido.
-
 const PIX_BASE =
   "00020101021126580014br.gov.bcb.pix013619acfdc1-3340-4dfe-9e2b-6aebdb372b945204000053039865802BR5925SAMUEL WELINGTON DE OLIVE6009SAO PAULO622905251M7X3KK0N171P4KK4YQ4MVA5X6304C1D3";
-
-// ======================================================
-// CRC16 - PADRÃO PIX
-// ======================================================
 
 function calcularCRC16(texto) {
   let crc = 0xffff;
@@ -171,44 +162,85 @@ function calcularCRC16(texto) {
   return crc.toString(16).toUpperCase().padStart(4, "0");
 }
 
-// ======================================================
-// GERAR PIX COM VALOR
-// ======================================================
-
 function gerarPixComValor(valorCentavos) {
   if (!Number.isSafeInteger(valorCentavos) || valorCentavos <= 0) {
     throw new Error("Valor inválido para geração do PIX.");
   }
 
-  // Remove o CRC anterior.
-  let payload = PIX_BASE.slice(0, -8);
+  const base = PIX_BASE.trim();
 
-  // Confere se o código-base possui o campo de valor.
-  if (payload.includes("54")) {
-    throw new Error("O QR Code base já possui campo de valor.");
+  if (!base.endsWith(base.slice(-8))) {
+    throw new Error("Código PIX base inválido.");
   }
 
-  // Formata o valor em reais.
-  const valor = formatarDecimal(valorCentavos);
+  const crcOriginal = base.slice(-4);
+  const conteudoParaCRC = base.slice(0, -4);
 
-  // Campo 54: valor da transação.
+  if (calcularCRC16(conteudoParaCRC) !== crcOriginal) {
+    throw new Error("CRC do código PIX original inválido.");
+  }
+
+  let payload = base.slice(0, -8);
+
+  const campos = [];
+  let posicao = 0;
+
+  while (posicao < payload.length) {
+    if (posicao + 4 > payload.length) {
+      throw new Error("Estrutura TLV do PIX inválida.");
+    }
+
+    const tag = payload.substring(posicao, posicao + 2);
+    const tamanhoTexto = payload.substring(posicao + 2, posicao + 4);
+
+    if (!/^\d{2}$/.test(tamanhoTexto)) {
+      throw new Error("Tamanho de campo PIX inválido.");
+    }
+
+    const tamanho = Number(tamanhoTexto);
+    const inicioValor = posicao + 4;
+    const fimValor = inicioValor + tamanho;
+
+    if (fimValor > payload.length) {
+      throw new Error("Campo PIX incompleto.");
+    }
+
+    campos.push({
+      tag,
+      inicio: posicao,
+      fim: fimValor,
+    });
+
+    posicao = fimValor;
+  }
+
+  if (campos.some((campo) => campo.tag === "54")) {
+    throw new Error("O código PIX já possui um valor definido.");
+  }
+
+  const campoPais = campos.find((campo) => campo.tag === "58");
+
+  if (!campoPais) {
+    throw new Error("Campo de país não encontrado no PIX.");
+  }
+
+  const valor = (valorCentavos / 100).toFixed(2);
+
+  if (valor.length > 13) {
+    throw new Error("Valor excede o limite permitido para o PIX.");
+  }
+
   const campoValor = `54${String(valor.length).padStart(2, "0")}${valor}`;
 
-  // O campo 54 deve ser inserido antes do campo 58 (país).
-  const posicaoPais = payload.indexOf("5802BR");
-
-  if (posicaoPais === -1) {
-    throw new Error("QR Code PIX base inválido.");
-  }
-
   payload =
-    payload.slice(0, posicaoPais) + campoValor + payload.slice(posicaoPais);
+    payload.slice(0, campoPais.inicio) +
+    campoValor +
+    payload.slice(campoPais.inicio);
 
-  // Recalcula o CRC16.
   const payloadParaCRC = `${payload}6304`;
-  const crc = calcularCRC16(payloadParaCRC);
+  const novoCRC = calcularCRC16(payloadParaCRC);
 
-  return `${payloadParaCRC}${crc}`;
+  return `${payloadParaCRC}${novoCRC}`;
 }
 
 // ======================================================
@@ -230,25 +262,13 @@ router.post("/", async (req, res) => {
       itens,
     } = req.body;
 
-    // ==================================================
-    // VALIDAR TIPO DE ENTREGA
-    // ==================================================
-
     if (!["entrega", "retirada"].includes(tipo_entrega)) {
       throw criarErroValidacao("Tipo de entrega inválido.");
     }
 
-    // ==================================================
-    // VALIDAR PAGAMENTO
-    // ==================================================
-
     if (!["pix", "cartao", "dinheiro"].includes(forma_pagamento)) {
       throw criarErroValidacao("Forma de pagamento inválida.");
     }
-
-    // ==================================================
-    // VALIDAR ITENS
-    // ==================================================
 
     if (!Array.isArray(itens) || itens.length === 0) {
       throw criarErroValidacao("O pedido precisa ter pelo menos um produto.");
@@ -257,10 +277,6 @@ router.post("/", async (req, res) => {
     if (itens.length > 50) {
       throw criarErroValidacao("Quantidade máxima de itens excedida.");
     }
-
-    // ==================================================
-    // VALIDAR ENDEREÇO E CALCULAR TAXA
-    // ==================================================
 
     let enderecoValidado = null;
     let taxaCentavos = 0;
@@ -292,32 +308,20 @@ router.post("/", async (req, res) => {
         numero: endereco.numero.trim(),
         bairro: endereco.bairro.trim(),
         cidade: endereco.cidade.trim(),
-
         complemento:
           typeof endereco.complemento === "string"
             ? endereco.complemento.trim()
             : null,
       };
 
-      // A taxa é calculada exclusivamente no backend.
       taxaCentavos = calcularTaxaEntrega(enderecoValidado.bairro);
     }
 
-    // ==================================================
-    // INICIAR TRANSAÇÃO
-    // ==================================================
-
     conexao = await db.getConnection();
-
     await conexao.beginTransaction();
-
     transacaoIniciada = true;
 
     let enderecoId = null;
-
-    // ==================================================
-    // SALVAR ENDEREÇO
-    // ==================================================
 
     if (tipo_entrega === "entrega") {
       const [resultadoEndereco] = await conexao.query(
@@ -344,12 +348,7 @@ router.post("/", async (req, res) => {
       enderecoId = resultadoEndereco.insertId;
     }
 
-    // ==================================================
-    // VALIDAR PRODUTOS E ADICIONAIS
-    // ==================================================
-
     let subtotalCentavos = 0;
-
     const itensValidados = [];
 
     for (const item of itens) {
@@ -382,7 +381,6 @@ router.post("/", async (req, res) => {
       }
 
       const produto = produtos[0];
-
       const adicionaisRecebidos = item.adicionais || [];
 
       if (!Array.isArray(adicionaisRecebidos)) {
@@ -476,25 +474,16 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // ==================================================
-    // CALCULAR TOTAL
-    // ==================================================
-
     if (!Number.isSafeInteger(subtotalCentavos) || subtotalCentavos <= 0) {
       throw criarErroValidacao("Valor total do pedido inválido.");
     }
 
     const descontoCentavos = 0;
-
     const totalCentavos = subtotalCentavos + taxaCentavos - descontoCentavos;
 
     if (!Number.isSafeInteger(totalCentavos) || totalCentavos <= 0) {
       throw criarErroValidacao("Valor final do pedido inválido.");
     }
-
-    // ==================================================
-    // VALIDAR TROCO
-    // ==================================================
 
     let trocoTexto = "";
 
@@ -505,7 +494,6 @@ router.post("/", async (req, res) => {
       troco_para !== ""
     ) {
       const valorTroco = Number(troco_para);
-
       const trocoCentavos = converterCentavos(valorTroco);
 
       if (
@@ -521,10 +509,6 @@ router.post("/", async (req, res) => {
       trocoTexto = `Troco para: R$ ${formatarDecimal(trocoCentavos)}.`;
     }
 
-    // ==================================================
-    // OBSERVAÇÕES
-    // ==================================================
-
     let observacoesFinais =
       typeof observacoes === "string" ? observacoes.trim() : "";
 
@@ -539,10 +523,6 @@ router.post("/", async (req, res) => {
         ? `${observacoesFinais}\n${trocoTexto}`
         : trocoTexto;
     }
-
-    // ==================================================
-    // INSERIR PEDIDO
-    // ==================================================
 
     const [resultadoPedido] = await conexao.query(
       `INSERT INTO pedidos (
@@ -571,10 +551,6 @@ router.post("/", async (req, res) => {
 
     const pedidoId = resultadoPedido.insertId;
 
-    // ==================================================
-    // INSERIR ITENS DO PEDIDO
-    // ==================================================
-
     for (const item of itensValidados) {
       const personalizacao =
         item.adicionais.length > 0 ? JSON.stringify(item.adicionais) : null;
@@ -601,10 +577,6 @@ router.post("/", async (req, res) => {
       );
     }
 
-    // ==================================================
-    // REGISTRAR PAGAMENTO
-    // ==================================================
-
     await conexao.query(
       `INSERT INTO pagamentos (
         pedido_id,
@@ -622,10 +594,6 @@ router.post("/", async (req, res) => {
       ],
     );
 
-    // ==================================================
-    // REGISTRAR HISTÓRICO
-    // ==================================================
-
     await conexao.query(
       `INSERT INTO historico_pedidos (
         pedido_id,
@@ -637,36 +605,14 @@ router.post("/", async (req, res) => {
       [pedidoId, req.usuario.id, STATUS_PEDIDO],
     );
 
-    // ==================================================
-    // GERAR PIX COM O VALOR DO PEDIDO
-    // ==================================================
-
     let pixCopiaECola = null;
 
     if (forma_pagamento === "pix") {
       pixCopiaECola = gerarPixComValor(totalCentavos);
     }
 
-    // ==================================================
-    // CONFIRMAR TRANSAÇÃO
-    // ==================================================
-
     await conexao.commit();
-
     transacaoFinalizada = true;
-
-    console.log("Pedido registrado:", {
-      pedidoId,
-      usuarioId: req.usuario.id,
-      subtotal: formatarDecimal(subtotalCentavos),
-      taxaEntrega: formatarDecimal(taxaCentavos),
-      total: formatarDecimal(totalCentavos),
-      formaPagamento: forma_pagamento,
-    });
-
-    // ==================================================
-    // RESPOSTA
-    // ==================================================
 
     return res.status(201).json({
       mensagem: "Pedido registrado com sucesso.",
@@ -674,12 +620,10 @@ router.post("/", async (req, res) => {
       status: STATUS_PEDIDO,
       pagamento: STATUS_PAGAMENTO,
       formaPagamento: forma_pagamento,
-
       subtotal: formatarDecimal(subtotalCentavos),
       taxaEntrega: formatarDecimal(taxaCentavos),
       desconto: formatarDecimal(descontoCentavos),
       total: formatarDecimal(totalCentavos),
-
       pixCopiaECola,
       pixValor:
         forma_pagamento === "pix" ? formatarDecimal(totalCentavos) : null,
@@ -745,6 +689,137 @@ router.get("/meus", async (req, res) => {
     });
   }
 });
+
+// ======================================================
+// CANCELAR PEDIDO DO CLIENTE
+// ======================================================
+
+async function cancelarPedidoCliente(req, res) {
+  let conexao;
+  let transacaoIniciada = false;
+  let transacaoFinalizada = false;
+
+  try {
+    const pedidoId = Number(req.params.id);
+
+    if (!Number.isInteger(pedidoId) || pedidoId <= 0) {
+      return res.status(400).json({
+        mensagem: "ID de pedido inválido.",
+      });
+    }
+
+    const motivoBruto =
+      req.body?.motivo || req.body?.observacao || "Cancelado pelo cliente";
+    const motivo =
+      String(motivoBruto).trim().slice(0, 255) || "Cancelado pelo cliente";
+
+    conexao = await db.getConnection();
+    await conexao.beginTransaction();
+    transacaoIniciada = true;
+
+    const [pedidos] = await conexao.query(
+      `SELECT id, usuario_id, status, observacoes
+       FROM pedidos
+       WHERE id = ?
+         AND usuario_id = ?
+       FOR UPDATE`,
+      [pedidoId, req.usuario.id],
+    );
+
+    if (!pedidos.length) {
+      await conexao.rollback();
+      transacaoFinalizada = true;
+      return res.status(404).json({
+        mensagem: "Pedido não encontrado.",
+      });
+    }
+
+    const pedido = pedidos[0];
+    const statusAtual = String(pedido.status || "").toLowerCase();
+
+    if (statusAtual === "cancelado") {
+      await conexao.rollback();
+      transacaoFinalizada = true;
+      return res.status(400).json({
+        mensagem: "Este pedido já está cancelado.",
+      });
+    }
+
+    if (!STATUS_CANCELAVEIS.includes(statusAtual)) {
+      await conexao.rollback();
+      transacaoFinalizada = true;
+      return res.status(400).json({
+        mensagem:
+          "Não é possível cancelar este pedido pois ele já avançou no preparo ou saiu para entrega.",
+      });
+    }
+
+    const linhaMotivo = `Cancelamento: ${motivo}`;
+    const novasObservacoes = pedido.observacoes
+      ? `${pedido.observacoes}\n${linhaMotivo}`.slice(0, 1000)
+      : linhaMotivo.slice(0, 1000);
+
+    await conexao.query(
+      `UPDATE pedidos
+       SET status = 'cancelado',
+           observacoes = ?
+       WHERE id = ?
+         AND usuario_id = ?`,
+      [novasObservacoes, pedidoId, req.usuario.id],
+    );
+
+    await conexao.query(
+      `UPDATE pagamentos
+       SET status = 'cancelado'
+       WHERE pedido_id = ?
+         AND status = 'pendente'`,
+      [pedidoId],
+    );
+
+    await conexao.query(
+      `INSERT INTO historico_pedidos (
+        pedido_id,
+        usuario_id,
+        status_anterior,
+        status_novo,
+        data_alteracao
+      ) VALUES (?, ?, ?, 'cancelado', NOW())`,
+      [pedidoId, req.usuario.id, statusAtual],
+    );
+
+    await conexao.commit();
+    transacaoFinalizada = true;
+
+    return res.json({
+      mensagem: `Pedido #${pedidoId} cancelado com sucesso.`,
+      pedido: {
+        id: pedidoId,
+        status: "cancelado",
+      },
+    });
+  } catch (erro) {
+    if (conexao && transacaoIniciada && !transacaoFinalizada) {
+      try {
+        await conexao.rollback();
+      } catch (erroRollback) {
+        console.error("Erro ao desfazer cancelamento:", erroRollback);
+      }
+    }
+
+    console.error("Erro ao cancelar pedido:", erro);
+
+    return res.status(500).json({
+      mensagem: "Erro ao cancelar o pedido.",
+    });
+  } finally {
+    if (conexao) {
+      conexao.release();
+    }
+  }
+}
+
+router.patch("/:id/cancelar", cancelarPedidoCliente);
+router.put("/:id/cancelar", cancelarPedidoCliente);
 
 // ======================================================
 // CONSULTAR PEDIDO ESPECÍFICO

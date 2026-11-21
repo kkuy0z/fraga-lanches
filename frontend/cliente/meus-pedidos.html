@@ -79,6 +79,10 @@
         height: auto;
       }
 
+      .hidden {
+        display: none !important;
+      }
+
       .page-main {
         width: 100%;
         padding: 20px 20px 104px;
@@ -240,13 +244,18 @@
           transform 0.2s ease;
       }
 
+      .btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
       .btn-primary {
         border: 1px solid var(--ped-yellow);
         background-color: var(--ped-yellow);
         color: #141414;
       }
 
-      .btn-primary:hover {
+      .btn-primary:hover:not(:disabled) {
         border-color: var(--ped-yellow-hover);
         background-color: var(--ped-yellow-hover);
       }
@@ -257,9 +266,21 @@
         color: #e5e5e5;
       }
 
-      .btn-secondary:hover {
+      .btn-secondary:hover:not(:disabled) {
         border-color: var(--ped-yellow);
         color: var(--ped-yellow);
+      }
+
+      .btn-danger {
+        border: 1px solid rgba(248, 113, 113, 0.45);
+        background-color: rgba(248, 113, 113, 0.14);
+        color: #fca5a5;
+      }
+
+      .btn-danger:hover:not(:disabled) {
+        border-color: #f87171;
+        background-color: #dc2626;
+        color: #ffffff;
       }
 
       /* Tabela */
@@ -563,6 +584,7 @@
         display: flex;
         align-items: center;
         justify-content: flex-end;
+        flex-wrap: wrap;
         gap: 10px;
         padding: 14px 22px;
         border-top: 1px solid var(--ped-border);
@@ -576,7 +598,7 @@
         color: var(--ped-yellow);
       }
 
-      #pedidoModal .modal-footer .btn-secondary:hover {
+      #pedidoModal .modal-footer .btn-secondary:hover:not(:disabled) {
         border-color: var(--ped-yellow-hover);
         background-color: var(--ped-yellow);
         color: #141414;
@@ -769,6 +791,14 @@
         </div>
 
         <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-danger hidden"
+            id="pedidoModalCancelar"
+          >
+            Cancelar Pedido
+          </button>
+
           <button
             type="button"
             class="btn btn-secondary"

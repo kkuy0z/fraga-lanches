@@ -41,7 +41,6 @@ const campoBairro = document.getElementById("bairro");
 const campoCidade = document.getElementById("cidade");
 const campoReferencia = document.getElementById("referencia");
 
-// Elementos de endereços salvos.
 const seletorEndereco = document.getElementById("enderecoSalvo");
 const btnNovoEndereco = document.getElementById("btnNovoEndereco");
 const btnSalvarEnderecoPerfil = document.getElementById(
@@ -57,12 +56,11 @@ let etapaAtual = 1;
 let usuarioAtual = null;
 let taxaEntregaAtual = 0;
 let timerCalculoTaxa = null;
-
 let carrinhoAtual = [];
 
-// Endereços cadastrados no perfil.
 let enderecosSalvos = [];
 let enderecoSelecionadoId = null;
+let pedidoEmEnvio = false;
 
 // ======================================================
 // UTILITÁRIOS
@@ -73,7 +71,8 @@ function normalizarTexto(texto) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .trim()
-    .toLowerCase();
+    .toLowerCase()
+    .replace(/\s+/g, " ");
 }
 
 function moeda(valor) {
@@ -102,6 +101,62 @@ function definirStatusEndereco(mensagem, tipo = "") {
   }
 }
 
+function criarElemento(tag, texto, estilos = "") {
+  const elemento = document.createElement(tag);
+
+  if (texto !== undefined && texto !== null) {
+    elemento.textContent = texto;
+  }
+
+  if (estilos) {
+    elemento.style.cssText = estilos;
+  }
+
+  return elemento;
+}
+
+function normalizarAdicional(adicional) {
+  return {
+    id: Number(adicional.id ?? adicional.adicional_id),
+    nome: adicional.nome || adicional.nome_adicional || "Adicional",
+    preco: Number(adicional.preco || 0),
+  };
+}
+
+function normalizarItemCarrinho(item) {
+  const produtoId = Number(
+    item.produto_id ?? item.produtoId ?? item.id_produto,
+  );
+
+  const quantidade = Number(item.quantidade || 1);
+  const preco = Number(item.preco || 0);
+
+  const adicionais = Array.isArray(item.adicionais)
+    ? item.adicionais.map(normalizarAdicional)
+    : [];
+
+  const totalAdicionais = adicionais.reduce(
+    (total, adicional) => total + adicional.preco,
+    0,
+  );
+
+  const precoUnitario = preco + totalAdicionais;
+
+  return {
+    id: item.id,
+    produto_id: produtoId,
+    produtoId,
+    nome: item.nome || item.nome_produto || "Produto",
+    descricao: item.descricao || "",
+    imagem: item.imagem || "",
+    preco,
+    quantidade,
+    preco_unitario: precoUnitario,
+    subtotal: precoUnitario * quantidade,
+    adicionais,
+  };
+}
+
 // ======================================================
 // ENDEREÇOS DO PERFIL
 // ======================================================
@@ -124,7 +179,6 @@ function preencherCamposEndereco(endereco) {
   campoBairro.value = endereco.bairro || "";
   campoCidade.value = endereco.cidade || "";
 
-  // O banco de dados não armazena CEP.
   campoCep.value = "";
 
   enderecoSelecionadoId = Number(endereco.id);
@@ -170,11 +224,11 @@ async function carregarEnderecosSalvos(opcoes = {}) {
 
   if (!seletorEndereco) {
     console.warn("Elemento #enderecoSalvo não encontrado no checkout.html.");
-
     return false;
   }
 
   seletorEndereco.disabled = true;
+
   definirStatusEndereco("Carregando seus endereços...");
 
   try {
@@ -224,7 +278,6 @@ async function carregarEnderecosSalvos(opcoes = {}) {
     }
 
     if (!enderecoParaSelecionar && selecionarPrimeiro) {
-      // A API ordena os endereços do mais recente para o mais antigo.
       enderecoParaSelecionar = enderecosSalvos[0];
     }
 
@@ -278,7 +331,6 @@ function selecionarEnderecoSalvo() {
 
   if (!endereco) {
     definirStatusEndereco("Não foi possível localizar esse endereço.", "erro");
-
     return;
   }
 
@@ -325,7 +377,6 @@ async function salvarEnderecoNoPerfil() {
 
   if (!rua || !numero || !bairro || !cidade) {
     alert("Preencha rua, número, bairro e cidade antes de salvar o endereço.");
-
     return;
   }
 
@@ -361,7 +412,6 @@ async function salvarEnderecoNoPerfil() {
       );
     }
 
-    // Atualiza a lista consultando novamente o banco.
     const carregou = await carregarEnderecosSalvos({
       selecionarPrimeiro: false,
     });
@@ -372,7 +422,6 @@ async function salvarEnderecoNoPerfil() {
       );
     }
 
-    // A API ordena por ID decrescente; o novo endereço aparece primeiro.
     let novoEnderecoSalvo = null;
 
     if (dados.endereco && dados.endereco.id) {
@@ -458,27 +507,7 @@ async function carregarCarrinho() {
         ? carrinho.itens
         : [];
 
-    carrinhoAtual = itens.map((item) => {
-      const produtoId = Number(
-        item.produto_id ?? item.produtoId ?? item.id_produto,
-      );
-
-      const quantidade = Number(item.quantidade || 1);
-      const preco = Number(item.preco || 0);
-
-      return {
-        id: item.id,
-        produto_id: produtoId,
-        produtoId,
-        nome: item.nome || "Produto",
-        descricao: item.descricao || "",
-        imagem: item.imagem || "",
-        preco,
-        quantidade,
-        subtotal: Number(item.subtotal ?? preco * quantidade),
-        adicionais: Array.isArray(item.adicionais) ? item.adicionais : [],
-      };
-    });
+    carrinhoAtual = itens.map(normalizarItemCarrinho);
 
     atualizarResumo();
 
@@ -516,7 +545,6 @@ async function limparCarrinhoServidor() {
     return true;
   } catch (erro) {
     console.warn("Não foi possível limpar o carrinho:", erro);
-
     return false;
   }
 }
@@ -527,15 +555,15 @@ async function limparCarrinhoServidor() {
 
 function subtotalCarrinho() {
   return obterCarrinho().reduce((total, item) => {
-    const adicionais = (item.adicionais || []).reduce(
+    const precoProduto = Number(item.preco || 0);
+    const quantidade = Number(item.quantidade || 1);
+
+    const totalAdicionais = (item.adicionais || []).reduce(
       (soma, adicional) => soma + Number(adicional.preco || 0),
       0,
     );
 
-    return (
-      total +
-      (Number(item.preco || 0) + adicionais) * Number(item.quantidade || 1)
-    );
+    return total + (precoProduto + totalAdicionais) * quantidade;
   }, 0);
 }
 
@@ -565,7 +593,6 @@ async function calcularTaxaEntrega() {
   if (tipoEntrega.value !== "entrega") {
     taxaEntregaAtual = 0;
     atualizarResumo();
-
     return 0;
   }
 
@@ -584,6 +611,31 @@ function agendarCalculoTaxa() {
   timerCalculoTaxa = setTimeout(() => {
     calcularTaxaEntrega();
   }, 200);
+}
+
+// ======================================================
+// RENDERIZAÇÃO DOS ADICIONAIS
+// ======================================================
+
+function renderizarAdicionais(item, container) {
+  const adicionais = Array.isArray(item.adicionais) ? item.adicionais : [];
+
+  adicionais.forEach((adicional) => {
+    const nome = adicional.nome || adicional.nome_adicional || "Adicional";
+
+    const detalhe = criarElemento(
+      "p",
+      `+ ${nome} — ${moeda(adicional.preco)}`,
+      `
+        margin: 5px 0 0 12px;
+        color: #b5b5b5;
+        font-size: 12px;
+        line-height: 1.5;
+      `,
+    );
+
+    container.appendChild(detalhe);
+  });
 }
 
 // ======================================================
@@ -655,11 +707,53 @@ function atualizarResumo() {
     itens.appendChild(mensagem);
   } else {
     carrinho.forEach((item) => {
-      const linha = document.createElement("p");
+      const quantidade = Number(item.quantidade || 1);
+      const precoProduto = Number(item.preco || 0);
 
-      linha.textContent = `${item.quantidade}x ${item.nome}`;
+      const totalAdicionais = (item.adicionais || []).reduce(
+        (soma, adicional) => soma + Number(adicional.preco || 0),
+        0,
+      );
 
-      itens.appendChild(linha);
+      const totalUnitario = precoProduto + totalAdicionais;
+
+      const grupo = criarElemento(
+        "div",
+        null,
+        `
+          padding: 10px 0;
+          border-bottom: 1px solid rgba(255,255,255,0.08);
+        `,
+      );
+
+      const linha = criarElemento(
+        "p",
+        `${quantidade}x ${item.nome}`,
+        `
+          margin: 0;
+          color: #fff;
+          font-weight: 600;
+        `,
+      );
+
+      grupo.appendChild(linha);
+
+      renderizarAdicionais(item, grupo);
+
+      const valor = criarElemento(
+        "p",
+        moeda(totalUnitario * quantidade),
+        `
+          margin: 7px 0 0;
+          color: #f5c542;
+          font-size: 13px;
+          font-weight: 700;
+          text-align: right;
+        `,
+      );
+
+      grupo.appendChild(valor);
+      itens.appendChild(grupo);
     });
   }
 
@@ -775,9 +869,52 @@ function montarConfirmacao(dadosPedido = null) {
   confItens.innerHTML = "";
 
   carrinho.forEach((item) => {
-    const linha = document.createElement("p");
-    linha.textContent = `${item.quantidade || 1}x ${item.nome || "Produto"}`;
-    confItens.appendChild(linha);
+    const quantidade = Number(item.quantidade || 1);
+
+    const totalAdicionais = (item.adicionais || []).reduce(
+      (soma, adicional) => soma + Number(adicional.preco || 0),
+      0,
+    );
+
+    const totalUnitario = Number(item.preco || 0) + totalAdicionais;
+
+    const grupo = criarElemento(
+      "div",
+      null,
+      `
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      `,
+    );
+
+    const titulo = criarElemento(
+      "p",
+      `${quantidade}x ${item.nome || "Produto"}`,
+      `
+        margin: 0;
+        color: #fff;
+        font-weight: 600;
+      `,
+    );
+
+    grupo.appendChild(titulo);
+
+    renderizarAdicionais(item, grupo);
+
+    const valor = criarElemento(
+      "p",
+      moeda(totalUnitario * quantidade),
+      `
+        margin: 7px 0 0;
+        color: #f5c542;
+        font-size: 13px;
+        font-weight: 700;
+        text-align: right;
+      `,
+    );
+
+    grupo.appendChild(valor);
+    confItens.appendChild(grupo);
   });
 
   const retirada = tipoEntrega.value === "retirada";
@@ -787,6 +924,7 @@ function montarConfirmacao(dadosPedido = null) {
     : `${campoRua.value}, ${campoNumero.value} - ${campoBairro.value}, ${campoCidade.value}`;
 
   const metodo = formaPagamento.options[formaPagamento.selectedIndex].text;
+
   const troco = document.getElementById("troco").value;
 
   document.getElementById("confPagamentoTexto").textContent =
@@ -812,7 +950,6 @@ async function buscarCep() {
 
   if (cep.length !== 8) {
     alert("Informe um CEP válido.");
-
     return;
   }
 
@@ -829,7 +966,6 @@ async function buscarCep() {
     campoBairro.value = dados.bairro || "";
     campoCidade.value = dados.localidade || "";
 
-    // Ao alterar os campos, deixa de ser um endereço salvo selecionado.
     enderecoSelecionadoId = null;
 
     if (seletorEndereco) {
@@ -875,7 +1011,6 @@ campoBairro.addEventListener("input", () => {
 });
 
 campoBairro.addEventListener("change", calcularTaxaEntrega);
-
 campoCep.addEventListener("change", calcularTaxaEntrega);
 
 tipoEntrega.addEventListener("change", async () => {
@@ -910,7 +1045,6 @@ formaPagamento.addEventListener("change", () => {
 document.getElementById("btnProximo1").addEventListener("click", async () => {
   if (obterCarrinho().length === 0) {
     alert("Adicione produtos ao carrinho antes de continuar.");
-
     return;
   }
 
@@ -928,7 +1062,6 @@ document.getElementById("btnVoltar2").addEventListener("click", () => {
 document.getElementById("btnProximo2").addEventListener("click", () => {
   if (!formaPagamento.value) {
     alert("Selecione uma forma de pagamento.");
-
     return;
   }
 
@@ -958,12 +1091,6 @@ document.getElementById("btnVoltar3").addEventListener("click", () => {
 // FINALIZAÇÃO DO PEDIDO
 // ======================================================
 
-// ======================================================
-// FINALIZAÇÃO DO PEDIDO
-// ======================================================
-
-let pedidoEmEnvio = false;
-
 form.addEventListener("submit", async (evento) => {
   evento.preventDefault();
 
@@ -976,6 +1103,7 @@ form.addEventListener("submit", async (evento) => {
       "Seu carrinho ainda está vazio!\n\n" +
         "Que tal explorar nosso cardápio e escolher algo delicioso?",
     );
+
     return;
   }
 
@@ -986,6 +1114,7 @@ form.addEventListener("submit", async (evento) => {
     console.error(
       "Elementos necessários para finalizar o pedido não encontrados.",
     );
+
     alert("Não foi possível carregar a confirmação do pedido.");
     return;
   }
@@ -1007,9 +1136,26 @@ form.addEventListener("submit", async (evento) => {
 
     const taxaFinal = entrega === "entrega" ? await calcularTaxaEntrega() : 0;
 
+    const itensPedido = carrinho.map((item) => {
+      const adicionais = (item.adicionais || []).map((adicional) =>
+        Number(adicional.id ?? adicional.adicional_id),
+      );
+
+      if (adicionais.some((id) => !Number.isInteger(id) || id <= 0)) {
+        throw new Error(
+          `Os adicionais de "${item.nome}" possuem dados inválidos. Recarregue o carrinho.`,
+        );
+      }
+
+      return {
+        produto_id: Number(item.produto_id),
+        quantidade: Number(item.quantidade || 1),
+        adicionais,
+      };
+    });
+
     const payload = {
       tipo_entrega: entrega,
-      taxa_entrega: taxaFinal,
 
       endereco:
         entrega === "entrega"
@@ -1033,11 +1179,7 @@ form.addEventListener("submit", async (evento) => {
 
       observacoes: document.getElementById("observacao").value.trim(),
 
-      itens: carrinho.map((item) => ({
-        produto_id: item.produto_id,
-        quantidade: item.quantidade,
-        adicionais: (item.adicionais || []).map((adicional) => adicional.id),
-      })),
+      itens: itensPedido,
     };
 
     const resposta = await fetch(API_PEDIDOS, {
@@ -1058,13 +1200,11 @@ form.addEventListener("submit", async (evento) => {
       );
     }
 
-    // Pedido registrado pelo servidor.
     const numeroPedido =
       dados.pedidoId || dados.pedido_id || dados.id || "Registrado";
 
     elementoPedidoNumero.textContent = `Pedido #${numeroPedido}`;
 
-    // Recupera os valores oficiais retornados pelo backend.
     const totalConfirmado =
       dados.total !== undefined ? Number(dados.total) : null;
 
@@ -1078,7 +1218,6 @@ form.addEventListener("submit", async (evento) => {
           ? Number(dados.taxa_entrega)
           : null;
 
-    // Atualiza os valores exibidos.
     if (Number.isFinite(totalConfirmado)) {
       const elementoTotal = document.getElementById("checkoutTotal");
       const elementoConfTotal = document.getElementById("confTotal");
@@ -1108,14 +1247,12 @@ form.addEventListener("submit", async (evento) => {
       }
     }
 
-    // Exibe a confirmação.
     sucessoModal.classList.remove("hidden");
     sucessoModal.style.display = "flex";
     sucessoModal.setAttribute("aria-hidden", "false");
 
     botao.textContent = "Pedido registrado";
 
-    // Limpa o carrinho somente depois do registro.
     const carrinhoLimpo = await limparCarrinhoServidor();
 
     if (!carrinhoLimpo) {
@@ -1124,7 +1261,6 @@ form.addEventListener("submit", async (evento) => {
       );
     }
 
-    // A limpeza atualiza o resumo. Reaplica os valores do pedido concluído.
     if (Number.isFinite(totalConfirmado)) {
       const elementoTotal = document.getElementById("checkoutTotal");
       const elementoConfTotal = document.getElementById("confTotal");
@@ -1139,6 +1275,7 @@ form.addEventListener("submit", async (evento) => {
     }
   } catch (erro) {
     console.error("Erro ao finalizar pedido:", erro);
+
     alert(erro.message || "Não foi possível finalizar seu pedido.");
   } finally {
     pedidoEmEnvio = false;
@@ -1160,18 +1297,14 @@ async function iniciarCheckout() {
 
     if (!autenticado) return;
 
-    // Primeiro carrega o carrinho do MySQL.
     const carregado = await carregarCarrinho();
 
     if (!carregado) return;
 
-    // Carrega os endereços cadastrados no perfil.
     await carregarEnderecosSalvos();
 
-    // Atualiza os valores e a taxa de entrega.
     await calcularTaxaEntrega();
 
-    // Abre a primeira etapa.
     mostrarEtapa(1);
   } catch (erro) {
     console.error("Erro ao iniciar checkout:", erro);

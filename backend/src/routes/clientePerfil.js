@@ -8,7 +8,10 @@ const router = express.Router();
 
 const autenticar = authRoutes.autenticar;
 
-// Todas as rotas exigem autenticação de cliente.
+// ======================================================
+// AUTENTICAÇÃO
+// ======================================================
+
 function exigirCliente(req, res, next) {
   if (!req.usuario || req.usuario.tipo !== "cliente") {
     return res.status(403).json({
@@ -23,6 +26,50 @@ function exigirCliente(req, res, next) {
 router.use(autenticar, exigirCliente);
 
 // ======================================================
+// VALIDAR ENDEREÇO
+// ======================================================
+
+function validarEndereco(dados) {
+  const endereco = {
+    rua: String(dados.rua || "").trim(),
+    numero: String(dados.numero || "").trim(),
+    bairro: String(dados.bairro || "").trim(),
+    cidade: String(dados.cidade || "").trim(),
+    complemento: String(dados.complemento || "").trim(),
+  };
+
+  if (
+    !endereco.rua ||
+    !endereco.numero ||
+    !endereco.bairro ||
+    !endereco.cidade
+  ) {
+    return {
+      valido: false,
+      mensagem: "Preencha rua, número, bairro e cidade.",
+    };
+  }
+
+  if (
+    endereco.rua.length > 150 ||
+    endereco.numero.length > 20 ||
+    endereco.bairro.length > 100 ||
+    endereco.cidade.length > 100 ||
+    endereco.complemento.length > 100
+  ) {
+    return {
+      valido: false,
+      mensagem: "Um ou mais campos ultrapassaram o limite permitido.",
+    };
+  }
+
+  return {
+    valido: true,
+    endereco,
+  };
+}
+
+// ======================================================
 // BUSCAR PERFIL E ENDEREÇOS
 // GET /api/cliente/perfil
 // ======================================================
@@ -33,9 +80,9 @@ router.get("/", async (req, res) => {
 
     const [usuarios] = await db.execute(
       `SELECT id, nome, email, telefone
-             FROM usuarios
-             WHERE id = ?
-             LIMIT 1`,
+       FROM usuarios
+       WHERE id = ?
+       LIMIT 1`,
       [usuarioId],
     );
 
@@ -48,9 +95,10 @@ router.get("/", async (req, res) => {
 
     const [enderecos] = await db.execute(
       `SELECT id, rua, numero, bairro, cidade, complemento
-             FROM enderecos
-             WHERE usuario_id = ?
-             ORDER BY id DESC`,
+       FROM enderecos
+       WHERE usuario_id = ?
+       AND ativo = TRUE
+       ORDER BY id DESC`,
       [usuarioId],
     );
 
@@ -78,45 +126,29 @@ router.post("/enderecos", async (req, res) => {
   try {
     const usuarioId = req.usuario.id;
 
-    const { rua, numero, bairro, cidade, complemento } = req.body;
+    const validacao = validarEndereco(req.body || {});
 
-    const endereco = {
-      rua: String(rua || "").trim(),
-      numero: String(numero || "").trim(),
-      bairro: String(bairro || "").trim(),
-      cidade: String(cidade || "").trim(),
-      complemento: String(complemento || "").trim(),
-    };
-
-    if (
-      !endereco.rua ||
-      !endereco.numero ||
-      !endereco.bairro ||
-      !endereco.cidade
-    ) {
+    if (!validacao.valido) {
       return res.status(400).json({
         sucesso: false,
-        mensagem: "Preencha rua, número, bairro e cidade.",
+        mensagem: validacao.mensagem,
       });
     }
 
-    if (
-      endereco.rua.length > 150 ||
-      endereco.numero.length > 20 ||
-      endereco.bairro.length > 100 ||
-      endereco.cidade.length > 100 ||
-      endereco.complemento.length > 100
-    ) {
-      return res.status(400).json({
-        sucesso: false,
-        mensagem: "Um ou mais campos ultrapassaram o limite permitido.",
-      });
-    }
+    const endereco = validacao.endereco;
 
     const [resultado] = await db.execute(
       `INSERT INTO enderecos
-            (usuario_id, rua, numero, bairro, cidade, complemento)
-            VALUES (?, ?, ?, ?, ?, ?)`,
+       (
+         usuario_id,
+         rua,
+         numero,
+         bairro,
+         cidade,
+         complemento,
+         ativo
+       )
+       VALUES (?, ?, ?, ?, ?, ?, TRUE)`,
       [
         usuarioId,
         endereco.rua,
@@ -159,50 +191,27 @@ router.put("/enderecos/:id", async (req, res) => {
       });
     }
 
-    const { rua, numero, bairro, cidade, complemento } = req.body;
+    const validacao = validarEndereco(req.body || {});
 
-    const endereco = {
-      rua: String(rua || "").trim(),
-      numero: String(numero || "").trim(),
-      bairro: String(bairro || "").trim(),
-      cidade: String(cidade || "").trim(),
-      complemento: String(complemento || "").trim(),
-    };
-
-    if (
-      !endereco.rua ||
-      !endereco.numero ||
-      !endereco.bairro ||
-      !endereco.cidade
-    ) {
+    if (!validacao.valido) {
       return res.status(400).json({
         sucesso: false,
-        mensagem: "Preencha rua, número, bairro e cidade.",
+        mensagem: validacao.mensagem,
       });
     }
 
-    if (
-      endereco.rua.length > 150 ||
-      endereco.numero.length > 20 ||
-      endereco.bairro.length > 100 ||
-      endereco.cidade.length > 100 ||
-      endereco.complemento.length > 100
-    ) {
-      return res.status(400).json({
-        sucesso: false,
-        mensagem: "Um ou mais campos ultrapassaram o limite permitido.",
-      });
-    }
+    const endereco = validacao.endereco;
 
     const [resultado] = await db.execute(
       `UPDATE enderecos
-             SET rua = ?,
-                 numero = ?,
-                 bairro = ?,
-                 cidade = ?,
-                 complemento = ?
-             WHERE id = ?
-             AND usuario_id = ?`,
+       SET rua = ?,
+           numero = ?,
+           bairro = ?,
+           cidade = ?,
+           complemento = ?
+       WHERE id = ?
+       AND usuario_id = ?
+       AND ativo = TRUE`,
       [
         endereco.rua,
         endereco.numero,
@@ -217,7 +226,7 @@ router.put("/enderecos/:id", async (req, res) => {
     if (resultado.affectedRows === 0) {
       return res.status(404).json({
         sucesso: false,
-        mensagem: "Endereço não encontrado.",
+        mensagem: "Endereço não encontrado ou já excluído.",
       });
     }
 
@@ -236,7 +245,7 @@ router.put("/enderecos/:id", async (req, res) => {
 });
 
 // ======================================================
-// EXCLUIR ENDEREÇO
+// EXCLUIR ENDEREÇO (EXCLUSÃO LÓGICA)
 // DELETE /api/cliente/perfil/enderecos/:id
 // ======================================================
 
@@ -253,33 +262,27 @@ router.delete("/enderecos/:id", async (req, res) => {
     }
 
     const [resultado] = await db.execute(
-      `DELETE FROM enderecos
-             WHERE id = ?
-             AND usuario_id = ?`,
+      `UPDATE enderecos
+       SET ativo = FALSE
+       WHERE id = ?
+       AND usuario_id = ?
+       AND ativo = TRUE`,
       [enderecoId, usuarioId],
     );
 
     if (resultado.affectedRows === 0) {
       return res.status(404).json({
         sucesso: false,
-        mensagem: "Endereço não encontrado.",
+        mensagem: "Endereço não encontrado ou já excluído.",
       });
     }
 
     return res.json({
       sucesso: true,
-      mensagem: "Endereço excluído com sucesso.",
+      mensagem: "Endereço removido da sua lista com sucesso.",
     });
   } catch (erro) {
     console.error("Erro ao excluir endereço:", erro);
-
-    if (erro.code === "ER_ROW_IS_REFERENCED_2") {
-      return res.status(409).json({
-        sucesso: false,
-        mensagem:
-          "Este endereço está vinculado a um pedido e não pode ser excluído.",
-      });
-    }
 
     return res.status(500).json({
       sucesso: false,

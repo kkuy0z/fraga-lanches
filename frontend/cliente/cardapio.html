@@ -11,7 +11,7 @@
     />
     <meta name="apple-mobile-web-app-title" content="Fraga Lanches" />
 
-    <title>Cardápio - Fraga Lanches</title>
+    <title>Cardápio | Fraga Lanches</title>
 
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/imagens/logo.png" />
@@ -20,7 +20,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
@@ -28,13 +28,14 @@
 
     <style>
       /* =====================================================
-         FRAGA LANCHES — CARDÁPIO (IDENTIDADE & LAYOUT)
+         FRAGA LANCHES — CARDÁPIO
+         Identidade visual: preto, dourado e branco
          ===================================================== */
 
       :root {
         --cdp-bg: #0c0c0c;
-        --cdp-card: #191919;
-        --cdp-card-hover: #1f1f1f;
+        --cdp-card: #181818;
+        --cdp-card-hover: #202020;
         --cdp-border: rgba(255, 255, 255, 0.09);
         --cdp-yellow: #f5c542;
         --cdp-yellow-hover: #ffda65;
@@ -68,21 +69,20 @@
         overflow-x: clip;
         background:
           radial-gradient(
-            circle at 15% 8%,
-            rgba(245, 197, 66, 0.08),
+            ellipse at 50% 0%,
+            rgba(245, 197, 66, 0.09),
             transparent 42%
           ),
           radial-gradient(
-            circle at 85% 88%,
-            rgba(245, 197, 66, 0.05),
-            transparent 40%
+            circle at 90% 80%,
+            rgba(245, 197, 66, 0.035),
+            transparent 35%
           ),
           var(--cdp-bg);
         color: var(--cdp-text);
         font-family: "Montserrat", sans-serif;
       }
 
-      /* Anula min-height: 100vh de section do design-system.css */
       body section {
         position: static;
         min-height: 0;
@@ -97,17 +97,17 @@
       }
 
       /* =====================================================
-         BANNER ESTABELECIMENTO FECHADO
+         BANNER — ESTABELECIMENTO FECHADO
          ===================================================== */
 
       .closed-banner {
         width: 100%;
         background: linear-gradient(
           90deg,
-          rgba(245, 197, 66, 0.14),
-          rgba(255, 107, 107, 0.14)
+          rgba(245, 197, 66, 0.12),
+          rgba(255, 107, 107, 0.12)
         );
-        border-bottom: 1px solid rgba(245, 197, 66, 0.35);
+        border-bottom: 1px solid rgba(245, 197, 66, 0.28);
       }
 
       .closed-banner.hidden {
@@ -118,24 +118,23 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 12px;
+        gap: 14px;
         max-width: 1200px;
         margin: 0 auto;
-        padding: 12px 20px;
+        padding: 13px 20px;
         color: var(--cdp-yellow);
-        text-align: left;
       }
 
       .closed-banner-text {
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 3px;
       }
 
       .closed-banner-text strong {
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.06em;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.09em;
         text-transform: uppercase;
       }
 
@@ -145,7 +144,7 @@
       }
 
       /* =====================================================
-         CABEÇALHO DO CARDÁPIO
+         CABEÇALHO
          ===================================================== */
 
       .page-header {
@@ -154,8 +153,8 @@
         max-width: 100%;
         min-height: 0;
         margin: 0 auto;
-        padding: 20px 20px 14px;
-        background: transparent;
+        padding: 24px 24px 22px;
+        background: transparent !important;
         border: 0;
         text-align: center;
       }
@@ -166,32 +165,30 @@
         justify-content: flex-start;
         width: 100%;
         max-width: 1200px;
-        margin: 0 auto 12px;
+        margin: 0 auto 30px;
       }
 
       .btn-voltar-painel {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 8px 14px;
-        border: 1px solid #323232;
-        border-radius: 999px;
-        background-color: var(--cdp-card);
-        color: #e6e6e6;
-        font-size: 12px;
-        font-weight: 600;
+        gap: 9px;
+        padding: 10px 16px;
+        border: 1px solid #333333;
+        border-radius: 8px;
+        background: rgba(24, 24, 24, 0.9);
+        color: #dddddd;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
         text-decoration: none;
-        transition:
-          background-color 0.2s ease,
-          border-color 0.2s ease,
-          color 0.2s ease,
-          transform 0.2s ease;
+        transition: 0.2s ease;
       }
 
       .btn-voltar-painel:hover {
-        border-color: rgba(245, 197, 66, 0.55);
+        border-color: var(--cdp-yellow);
+        background: rgba(245, 197, 66, 0.08);
         color: var(--cdp-yellow);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
       }
 
       .page-header-inner {
@@ -208,14 +205,14 @@
       .page-title {
         display: block;
         width: 100%;
-        margin: 0 0 8px;
+        margin: 0 0 12px;
         padding: 0;
         color: #ffffff;
         font-family: "Anton", sans-serif;
-        font-size: clamp(40px, 5.2vw, 60px);
+        font-size: clamp(44px, 6vw, 68px);
         font-weight: 400;
-        line-height: 1.04;
-        letter-spacing: 0.03em;
+        line-height: 1;
+        letter-spacing: 0.045em;
         text-transform: uppercase;
         text-align: center;
       }
@@ -227,23 +224,24 @@
       .page-subtitle {
         display: block;
         width: 100%;
-        max-width: 580px;
+        max-width: 590px;
         margin: 0 auto;
         padding: 0;
-        color: var(--cdp-muted);
+        color: #a5a5a5;
         font-size: 13px;
         font-weight: 400;
-        line-height: 1.55;
+        line-height: 1.8;
         text-align: center;
       }
 
       .yellow-line {
         display: block;
-        width: 64px;
+        width: 72px;
         height: 3px;
-        margin: 14px auto 0;
+        margin: 19px auto 0;
         border-radius: 999px;
-        background-color: var(--cdp-yellow);
+        background: var(--cdp-yellow);
+        box-shadow: 0 0 18px rgba(245, 197, 66, 0.3);
       }
 
       /* =====================================================
@@ -252,7 +250,7 @@
 
       .categorias-filtro {
         width: 100%;
-        padding: 10px 20px 18px;
+        padding: 14px 20px 25px;
       }
 
       .categorias-filtro .container {
@@ -276,18 +274,18 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
-        min-height: 38px;
-        padding: 8px 16px;
-        border: 1px solid #323232;
-        border-radius: 999px;
-        background-color: var(--cdp-card);
-        color: #dcdcdc;
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 0.02em;
+        min-height: 42px;
+        padding: 10px 19px;
+        border: 1px solid #333333;
+        border-radius: 8px;
+        background: #181818;
+        color: #c8c8c8;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.035em;
         cursor: pointer;
         transition:
-          background-color 0.2s ease,
+          background 0.2s ease,
           border-color 0.2s ease,
           color 0.2s ease,
           transform 0.2s ease;
@@ -295,27 +293,29 @@
 
       .categorias-scroll button:hover,
       .categorias-scroll .categoria-btn:hover {
-        border-color: rgba(245, 197, 66, 0.5);
+        border-color: rgba(245, 197, 66, 0.6);
+        background: rgba(245, 197, 66, 0.07);
         color: var(--cdp-yellow);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
       }
 
       .categorias-scroll button.active,
       .categorias-scroll button[aria-selected="true"],
       .categorias-scroll .categoria-btn.active {
         border-color: var(--cdp-yellow);
-        background-color: var(--cdp-yellow);
+        background: var(--cdp-yellow);
         color: #141414;
-        font-weight: 700;
+        font-weight: 800;
+        box-shadow: 0 4px 16px rgba(245, 197, 66, 0.13);
       }
 
       /* =====================================================
-         ÁREA PRINCIPAL & GRID DE PRODUTOS
+         ÁREA PRINCIPAL
          ===================================================== */
 
       .cardapio-main {
         width: 100%;
-        padding: 8px 20px 96px;
+        padding: 12px 20px 110px;
       }
 
       .cardapio-main > .container {
@@ -328,25 +328,171 @@
       .cardapio-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 20px;
+        align-items: stretch;
+        gap: 24px;
       }
 
       .cardapio-grid > * {
         min-width: 0;
       }
 
-      /* Estado vazio */
+      /* =====================================================
+         CARDS DE PRODUTOS
+         ===================================================== */
+
+      .cardapio-grid > article,
+      .cardapio-grid > div,
+      .cardapio-grid .produto-card,
+      .cardapio-grid .card-produto {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 15px;
+        min-width: 0;
+        padding: 16px;
+        overflow: hidden;
+        border: 1px solid #303030;
+        border-radius: 13px;
+        background: linear-gradient(
+          145deg,
+          #1d1d1d 0%,
+          #171717 65%,
+          #141414 100%
+        );
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+        transition:
+          border-color 0.25s ease,
+          background 0.25s ease,
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+
+      .cardapio-grid > article:hover,
+      .cardapio-grid > div:hover,
+      .cardapio-grid .produto-card:hover,
+      .cardapio-grid .card-produto:hover {
+        border-color: rgba(245, 197, 66, 0.55);
+        background: linear-gradient(
+          145deg,
+          #222222 0%,
+          #191919 65%,
+          #151515 100%
+        );
+        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.4);
+        transform: translateY(-4px);
+      }
+
+      .cardapio-grid img {
+        display: block;
+        width: 100%;
+        height: 205px;
+        padding: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.055);
+        border-radius: 9px;
+        background:
+          radial-gradient(
+            circle at center,
+            rgba(245, 197, 66, 0.055),
+            transparent 70%
+          ),
+          #111111;
+        object-fit: contain;
+        transition: transform 0.35s ease;
+      }
+
+      .cardapio-grid > article:hover img,
+      .cardapio-grid > div:hover img,
+      .cardapio-grid .produto-card:hover img,
+      .cardapio-grid .card-produto:hover img {
+        transform: scale(1.025);
+      }
+
+      .cardapio-grid h2,
+      .cardapio-grid h3 {
+        margin: 0;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: 23px;
+        font-weight: 400;
+        letter-spacing: 0.035em;
+        line-height: 1.2;
+        text-transform: uppercase;
+      }
+
+      .cardapio-grid p {
+        margin: 0;
+        color: #a5a5a5;
+        font-size: 12px;
+        line-height: 1.65;
+      }
+
+      .cardapio-grid strong,
+      .cardapio-grid .preco,
+      .cardapio-grid [class*="preco"] {
+        color: var(--cdp-yellow);
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: 0.015em;
+      }
+
+      .cardapio-grid button,
+      .cardapio-grid .btn,
+      .cardapio-grid a[class*="btn"] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        min-height: 43px;
+        margin-top: auto;
+        padding: 11px 16px;
+        border: 1px solid var(--cdp-yellow);
+        border-radius: 8px;
+        background: var(--cdp-yellow);
+        color: #171717;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.055em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          background 0.2s ease,
+          border-color 0.2s ease,
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .cardapio-grid button:hover,
+      .cardapio-grid .btn:hover,
+      .cardapio-grid a[class*="btn"]:hover {
+        border-color: var(--cdp-yellow-hover);
+        background: var(--cdp-yellow-hover);
+        box-shadow: 0 5px 16px rgba(245, 197, 66, 0.16);
+        transform: translateY(-1px);
+      }
+
+      .cardapio-grid button:active,
+      .cardapio-grid .btn:active {
+        transform: scale(0.98);
+      }
+
+      /* =====================================================
+         ESTADO VAZIO
+         ===================================================== */
+
       .empty-state {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        margin-top: 18px;
+        padding: 60px 24px;
+        border: 1px solid #303030;
+        border-radius: 14px;
+        background: linear-gradient(145deg, #1c1c1c, #151515);
         text-align: center;
-        padding: 48px 24px;
-        margin-top: 12px;
-        border: 1px solid #2c2c2c;
-        border-radius: 12px;
-        background-color: var(--cdp-card);
       }
 
       .empty-state.hidden {
@@ -355,24 +501,24 @@
 
       .empty-state-icon {
         display: inline-flex;
-        width: 64px;
-        height: 64px;
+        width: 68px;
+        height: 68px;
         align-items: center;
         justify-content: center;
-        margin-bottom: 16px;
-        border-radius: 50%;
-        background-color: rgba(245, 197, 66, 0.1);
+        margin-bottom: 19px;
         border: 1px solid rgba(245, 197, 66, 0.28);
+        border-radius: 18px;
+        background: rgba(245, 197, 66, 0.09);
         color: var(--cdp-yellow);
       }
 
       .empty-state-title {
-        margin: 0 0 8px;
+        margin: 0 0 10px;
         color: #ffffff;
         font-family: "Anton", sans-serif;
-        font-size: 26px;
+        font-size: 27px;
         font-weight: 400;
-        letter-spacing: 0.03em;
+        letter-spacing: 0.035em;
         text-transform: uppercase;
       }
 
@@ -381,17 +527,20 @@
         margin: 0;
         color: var(--cdp-muted);
         font-size: 13px;
-        line-height: 1.6;
+        line-height: 1.7;
       }
 
-      /* Paginação */
+      /* =====================================================
+         PAGINAÇÃO
+         ===================================================== */
+
       .pagination {
         display: flex;
         align-items: center;
         justify-content: center;
         flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 32px;
+        gap: 9px;
+        margin-top: 36px;
       }
 
       .pagination[hidden] {
@@ -403,21 +552,18 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-width: 38px;
-        height: 38px;
-        padding: 0 12px;
-        border: 1px solid #323232;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 13px;
+        border: 1px solid #333333;
         border-radius: 8px;
-        background-color: var(--cdp-card);
-        color: #e4e4e4;
+        background: #191919;
+        color: #dddddd;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 700;
         text-decoration: none;
         cursor: pointer;
-        transition:
-          background-color 0.2s ease,
-          border-color 0.2s ease,
-          color 0.2s ease;
+        transition: 0.2s ease;
       }
 
       .pagination button:hover:not(:disabled),
@@ -429,115 +575,13 @@
       .pagination button.active,
       .pagination a.active {
         border-color: var(--cdp-yellow);
-        background-color: var(--cdp-yellow);
+        background: var(--cdp-yellow);
         color: #141414;
-        font-weight: 700;
       }
 
       .pagination button:disabled {
-        opacity: 0.45;
+        opacity: 0.4;
         cursor: not-allowed;
-      }
-
-      /* =====================================================
-         CARDS DE PRODUTOS DO CARDÁPIO (#cardapioGrid)
-         ===================================================== */
-
-      .cardapio-grid > article,
-      .cardapio-grid > div,
-      .cardapio-grid .produto-card,
-      .cardapio-grid .card-produto {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        gap: 14px;
-        padding: 16px;
-        border: 1px solid #2e2e2e;
-        border-radius: 12px;
-        background-color: #191919;
-        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
-        transition:
-          border-color 0.2s ease,
-          transform 0.2s ease;
-      }
-
-      .cardapio-grid > article:hover,
-      .cardapio-grid > div:hover,
-      .cardapio-grid .produto-card:hover,
-      .cardapio-grid .card-produto:hover {
-        border-color: rgba(245, 197, 66, 0.45);
-        transform: translateY(-2px);
-      }
-
-      .cardapio-grid img {
-        display: block;
-        width: 100%;
-        height: 190px;
-        object-fit: contain;
-        padding: 10px;
-        border-radius: 8px;
-        background-color: #121212;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-      }
-
-      .cardapio-grid h2,
-      .cardapio-grid h3 {
-        margin: 0;
-        color: #ffffff;
-        font-family: "Anton", sans-serif;
-        font-size: 22px;
-        font-weight: 400;
-        letter-spacing: 0.03em;
-        text-transform: uppercase;
-        line-height: 1.15;
-      }
-
-      .cardapio-grid p {
-        margin: 0;
-        color: #a5a5a5;
-        font-size: 12px;
-        line-height: 1.5;
-      }
-
-      .cardapio-grid strong,
-      .cardapio-grid .preco,
-      .cardapio-grid [class*="preco"] {
-        color: #f5c542;
-        font-size: 16px;
-        font-weight: 700;
-      }
-
-      .cardapio-grid button,
-      .cardapio-grid .btn,
-      .cardapio-grid a[class*="btn"] {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        min-height: 40px;
-        margin-top: auto;
-        padding: 10px 16px;
-        border: 1px solid #f5c542;
-        border-radius: 8px;
-        background-color: #f5c542;
-        color: #141414;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        text-decoration: none;
-        cursor: pointer;
-        transition:
-          background-color 0.2s ease,
-          border-color 0.2s ease,
-          transform 0.2s ease;
-      }
-
-      .cardapio-grid button:hover,
-      .cardapio-grid .btn:hover,
-      .cardapio-grid a[class*="btn"]:hover {
-        border-color: #ffda65;
-        background-color: #ffda65;
       }
 
       /* =====================================================
@@ -547,44 +591,124 @@
       @media (max-width: 960px) {
         .cardapio-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 16px;
+          gap: 18px;
+        }
+
+        .cardapio-grid img {
+          height: 190px;
         }
       }
 
       @media (max-width: 600px) {
         .page-header {
-          padding: 16px 14px 10px;
+          padding: 18px 15px 16px;
+        }
+
+        .page-header-top {
+          margin-bottom: 25px;
+        }
+
+        .page-title {
+          font-size: clamp(38px, 11vw, 52px);
         }
 
         .page-subtitle {
+          max-width: 420px;
           font-size: 12px;
+          line-height: 1.7;
         }
 
         .categorias-filtro {
-          padding: 8px 14px 14px;
+          padding: 10px 14px 18px;
         }
 
         .categorias-scroll {
           justify-content: flex-start;
           flex-wrap: nowrap;
           overflow-x: auto;
-          padding-bottom: 6px;
+          padding: 2px 1px 9px;
           -webkit-overflow-scrolling: touch;
           scrollbar-width: thin;
+          scrollbar-color: #555 transparent;
         }
 
         .categorias-scroll button,
         .categorias-scroll .categoria-btn {
           flex-shrink: 0;
+          min-height: 39px;
+          padding: 9px 15px;
+          font-size: 10px;
         }
 
         .cardapio-main {
-          padding: 6px 14px 104px;
+          padding: 8px 14px 110px;
         }
 
         .cardapio-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .cardapio-grid > article,
+        .cardapio-grid > div,
+        .cardapio-grid .produto-card,
+        .cardapio-grid .card-produto {
+          gap: 10px;
+          padding: 10px;
+          border-radius: 10px;
+        }
+
+        .cardapio-grid img {
+          height: 145px;
+          padding: 5px;
+        }
+
+        .cardapio-grid h2,
+        .cardapio-grid h3 {
+          font-size: 18px;
+        }
+
+        .cardapio-grid p {
+          font-size: 10px;
+          line-height: 1.5;
+        }
+
+        .cardapio-grid strong,
+        .cardapio-grid .preco,
+        .cardapio-grid [class*="preco"] {
+          font-size: 15px;
+        }
+
+        .cardapio-grid button,
+        .cardapio-grid .btn,
+        .cardapio-grid a[class*="btn"] {
+          min-height: 38px;
+          padding: 9px 7px;
+          font-size: 9px;
+          letter-spacing: 0.02em;
+        }
+
+        .empty-state {
+          padding: 45px 18px;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .cardapio-grid {
           grid-template-columns: minmax(0, 1fr);
-          gap: 14px;
+        }
+
+        .cardapio-grid img {
+          height: 190px;
+        }
+
+        .cardapio-grid h2,
+        .cardapio-grid h3 {
+          font-size: 21px;
+        }
+
+        .cardapio-grid p {
+          font-size: 12px;
         }
       }
 
@@ -597,7 +721,7 @@
       input:focus-visible,
       select:focus-visible {
         outline: 2px solid var(--cdp-yellow);
-        outline-offset: 2px;
+        outline-offset: 3px;
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -613,6 +737,7 @@
   </head>
 
   <body>
+    <!-- AVISO DE ESTABELECIMENTO FECHADO -->
     <div
       id="closedBanner"
       class="closed-banner hidden"
@@ -644,10 +769,12 @@
       </div>
     </div>
 
+    <!-- CABEÇALHO -->
     <section class="page-header">
       <div class="page-header-top">
         <a href="/cliente/painel.html" class="btn-voltar-painel">
-          ← Voltar ao painel
+          <span aria-hidden="true">←</span>
+          Voltar ao painel
         </a>
       </div>
 
@@ -656,13 +783,14 @@
 
         <p class="page-subtitle">
           Hambúrgueres artesanais, marmitas, porções e bebidas preparados com
-          ingredientes selecionados
+          ingredientes selecionados.
         </p>
 
         <div class="yellow-line"></div>
       </div>
     </section>
 
+    <!-- FILTROS -->
     <section class="categorias-filtro" aria-label="Filtrar por categoria">
       <div class="container">
         <div
@@ -674,7 +802,8 @@
       </div>
     </section>
 
-    <main class="cardapio-main" role="main">
+    <!-- PRODUTOS -->
+    <main class="cardapio-main">
       <div class="container">
         <div
           class="cardapio-grid"
@@ -683,6 +812,7 @@
           aria-label="Produtos do cardápio"
         ></div>
 
+        <!-- ESTADO VAZIO -->
         <div class="empty-state hidden" id="emptyState">
           <div class="empty-state-icon">
             <svg
@@ -708,6 +838,7 @@
           </p>
         </div>
 
+        <!-- PAGINAÇÃO -->
         <nav
           class="pagination"
           id="pagination"
@@ -717,8 +848,10 @@
       </div>
     </main>
 
+    <!-- SCRIPTS ORIGINAIS -->
     <script src="/cliente/cardapio.js" defer></script>
     <script src="/cliente/carrinho-widget.js" defer></script>
+
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {

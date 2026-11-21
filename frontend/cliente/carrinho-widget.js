@@ -582,7 +582,9 @@ document.addEventListener("DOMContentLoaded", () => {
       botaoFinalizar.disabled = !itens.length || atualizando;
     }
 
-    quantidade.textContent = `${quantidadeTotal} ${quantidadeTotal === 1 ? "item" : "itens"}`;
+    quantidade.textContent = `${quantidadeTotal} ${
+      quantidadeTotal === 1 ? "item" : "itens"
+    }`;
 
     total.textContent = formatarPreco(carrinho.total);
     totalPainel.textContent = formatarPreco(carrinho.total);
@@ -607,20 +609,81 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const dados = criarElemento("div", "fraga-carrinho-item-dados");
 
+      // Nome do produto
       const nome = criarElemento(
         "strong",
         "fraga-carrinho-item-nome",
         item.nome || "Produto",
       );
 
+      // Adicionais selecionados
+      const adicionais = Array.isArray(item.adicionais) ? item.adicionais : [];
+
+      const totalAdicionais = adicionais.reduce(
+        (soma, adicional) => soma + (Number(adicional.preco) || 0),
+        0,
+      );
+
+      // Preço unitário considerando produto + adicionais
+      const precoUnitario = Number(
+        item.preco_unitario ?? Number(item.preco || 0) + totalAdicionais,
+      );
+
+      // Subtotal considerando a quantidade
+      const subtotal = Number(
+        item.subtotal ?? precoUnitario * Number(item.quantidade || 1),
+      );
+
+      // Informações dos adicionais
+      if (adicionais.length > 0) {
+        const listaAdicionais = criarElemento(
+          "div",
+          "fraga-carrinho-adicionais",
+        );
+
+        listaAdicionais.style.display = "flex";
+        listaAdicionais.style.flexDirection = "column";
+        listaAdicionais.style.gap = "3px";
+        listaAdicionais.style.marginTop = "5px";
+
+        adicionais.forEach((adicional) => {
+          const detalhe = criarElemento(
+            "span",
+            "",
+            `+ ${adicional.nome} (${formatarPreco(adicional.preco)})`,
+          );
+
+          detalhe.style.color = "#b5b5b5";
+          detalhe.style.fontSize = "10px";
+
+          listaAdicionais.appendChild(detalhe);
+        });
+
+        dados.append(nome, listaAdicionais);
+      } else {
+        dados.appendChild(nome);
+      }
+
+      // Preço unitário e subtotal
       const preco = criarElemento(
         "span",
         "fraga-carrinho-item-preco",
-        formatarPreco(item.preco),
+        `${formatarPreco(precoUnitario)} cada`,
       );
 
-      dados.append(nome, preco);
+      const subtotalTexto = criarElemento(
+        "span",
+        "",
+        `Subtotal: ${formatarPreco(subtotal)}`,
+      );
 
+      subtotalTexto.style.color = "#a5a5a5";
+      subtotalTexto.style.fontSize = "10px";
+      subtotalTexto.style.marginTop = "3px";
+
+      dados.append(preco, subtotalTexto);
+
+      // Controles de quantidade
       const controles = criarElemento("div", "fraga-carrinho-controles");
 
       const diminuir = criarElemento(
@@ -631,6 +694,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       diminuir.type = "button";
       diminuir.disabled = atualizando;
+
       diminuir.setAttribute("aria-label", "Diminuir quantidade");
 
       diminuir.addEventListener("click", () => {
@@ -672,6 +736,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       controles.append(diminuir, numero, aumentar, remover);
+
       linha.append(dados, controles);
       lista.appendChild(linha);
     });

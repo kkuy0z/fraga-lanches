@@ -74,10 +74,16 @@
         font-family: "Montserrat", sans-serif;
       }
 
-      body section {
-        position: static;
-        min-height: 0;
-        height: auto;
+      body section,
+      body .checkout-progress,
+      body .page-header {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        z-index: auto !important;
+        min-height: 0 !important;
+        height: auto !important;
       }
 
       .hidden {
@@ -121,7 +127,7 @@
       }
 
       .page-header {
-        padding: 12px 20px 18px;
+        padding: 10px 20px 14px;
         text-align: center;
       }
 
@@ -162,6 +168,7 @@
 
       /* Etapas / Progresso */
       .checkout-progress {
+        width: 100%;
         max-width: 1200px;
         margin: 0 auto;
         padding: 14px 20px 6px;
@@ -535,6 +542,16 @@
       <a href="/cliente/painel.html" class="btn-voltar"> Painel do cliente </a>
     </div>
 
+    <section class="page-header">
+      <div class="page-header-inner">
+        <h1 class="page-title">FINALIZAR <span class="accent">PEDIDO</span></h1>
+
+        <p class="page-subtitle">Preencha os dados para concluir seu pedido</p>
+
+        <div class="yellow-line"></div>
+      </div>
+    </section>
+
     <section class="checkout-progress">
       <div class="progress-steps">
         <div class="progress-step active" data-step="1">
@@ -555,16 +572,6 @@
           <div class="progress-step-circle">3</div>
           <span class="progress-step-label">Confirmação</span>
         </div>
-      </div>
-    </section>
-
-    <section class="page-header">
-      <div class="page-header-inner">
-        <h1 class="page-title">FINALIZAR <span class="accent">PEDIDO</span></h1>
-
-        <p class="page-subtitle">Preencha os dados para concluir seu pedido</p>
-
-        <div class="yellow-line"></div>
       </div>
     </section>
 

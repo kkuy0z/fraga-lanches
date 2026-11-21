@@ -1,11 +1,18 @@
 "use strict";
 
+// ======================================================
+// CONFIGURAÇÕES
+// ======================================================
+
 const API = "/api/pedidos";
 
-const tbody = document.getElementById("tbodyPedidos");
-const emptyState = document.getElementById("emptyState");
-const tabelaPedidos = document.getElementById("tabelaPedidos");
+const STATUS_CANCELAVEIS = ["novo", "em_preparo"];
 
+// ======================================================
+// ELEMENTOS
+// ======================================================
+
+const tabelaPedidos = document.getElementById("tbodyPedidos");
 const filtroStatus = document.getElementById("filtroStatus");
 const dataInicio = document.getElementById("dataInicio");
 const dataFim = document.getElementById("dataFim");
@@ -15,121 +22,31 @@ const pedidoModal = document.getElementById("pedidoModal");
 const pedidoModalBody = document.getElementById("pedidoModalBody");
 const pedidoModalClose = document.getElementById("pedidoModalClose");
 const pedidoModalFechar = document.getElementById("pedidoModalFechar");
+const pedidoModalCancelar = document.getElementById("pedidoModalCancelar");
+
+// ======================================================
+// ESTADO
+// ======================================================
 
 let pedidos = [];
-let requisicaoDetalhesAtual = 0;
+let pedidoAtualId = null;
 
-const STATUS = {
-  novo: "Novo",
-  em_preparo: "Em preparo",
-  pronto: "Pronto",
-  saiu_para_entrega: "Saiu para entrega",
-  concluido: "Concluído",
-  cancelado: "Cancelado",
-};
-
-const STATUS_CLASSES = {
-  novo: "status-novo",
-  em_preparo: "status-preparo",
-  pronto: "status-pronto",
-  saiu_para_entrega: "status-entrega",
-  concluido: "status-concluido",
-  cancelado: "status-cancelado",
-};
-
-function injetarEstilosStatus() {
-  if (document.getElementById("fragaMeusPedidosStyles")) return;
-
-  const style = document.createElement("style");
-  style.id = "fragaMeusPedidosStyles";
-
-  style.textContent = `
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background-color: rgba(255, 255, 255, 0.06);
-      color: #f5f5f5;
-      white-space: nowrap;
-    }
-
-    .status-badge.status-novo {
-      border-color: rgba(245, 197, 66, 0.45);
-      background-color: rgba(245, 197, 66, 0.14);
-      color: #f5c542;
-    }
-
-    .status-badge.status-preparo {
-      border-color: rgba(96, 165, 250, 0.45);
-      background-color: rgba(96, 165, 250, 0.14);
-      color: #93c5fd;
-    }
-
-    .status-badge.status-pronto {
-      border-color: rgba(192, 132, 252, 0.45);
-      background-color: rgba(192, 132, 252, 0.14);
-      color: #d8b4fe;
-    }
-
-    .status-badge.status-entrega {
-      border-color: rgba(251, 146, 60, 0.45);
-      background-color: rgba(251, 146, 60, 0.14);
-      color: #fdba74;
-    }
-
-    .status-badge.status-concluido {
-      border-color: rgba(74, 222, 128, 0.45);
-      background-color: rgba(74, 222, 128, 0.14);
-      color: #86efac;
-    }
-
-    .status-badge.status-cancelado {
-      border-color: rgba(248, 113, 113, 0.45);
-      background-color: rgba(248, 113, 113, 0.14);
-      color: #fca5a5;
-    }
-
-    .pedido-detalhes h3 {
-      margin: 0 0 8px;
-      color: #f5c542;
-      font-family: "Anton", sans-serif;
-      font-size: 18px;
-      font-weight: 400;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    .pedido-detalhes p {
-      margin: 4px 0;
-      color: #e4e4e4;
-    }
-
-    .btn-detalhes {
-      cursor: pointer;
-    }
-  `;
-
-  document.head.appendChild(style);
-}
+// ======================================================
+// FUNÇÕES AUXILIARES
+// ======================================================
 
 function escaparHTML(valor) {
-  return String(valor ?? "").replace(
-    /[&<>"']/g,
-    (caractere) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;",
-      })[caractere],
-  );
+  return String(valor ?? "").replace(/[&<>"']/g, (caractere) => {
+    const entidades = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;",
+    };
+
+    return entidades[caractere];
+  });
 }
 
 function formatarMoeda(valor) {
@@ -139,71 +56,81 @@ function formatarMoeda(valor) {
   });
 }
 
-function formatarData(data) {
-  if (!data) return "—";
+function formatarData(valor) {
+  if (!valor) return "-";
 
-  const dataObj = new Date(data);
+  const data = new Date(valor);
 
-  if (Number.isNaN(dataObj.getTime())) {
-    return "—";
+  if (Number.isNaN(data.getTime())) return "-";
+
+  return data.toLocaleString("pt-BR");
+}
+
+function normalizarStatus(status) {
+  return String(status || "")
+    .trim()
+    .toLowerCase();
+}
+
+function podeCancelarPedido(status) {
+  return STATUS_CANCELAVEIS.includes(normalizarStatus(status));
+}
+
+function obterMensagemErro(dados, resposta) {
+  return (
+    dados?.erro ||
+    dados?.mensagem ||
+    dados?.message ||
+    `Erro HTTP ${resposta.status}`
+  );
+}
+
+function parsePersonalizacao(valor) {
+  if (Array.isArray(valor)) return valor;
+
+  if (!valor) return [];
+
+  try {
+    const resultado = JSON.parse(valor);
+    return Array.isArray(resultado) ? resultado : [];
+  } catch (erro) {
+    console.error("Erro ao interpretar personalização:", erro);
+    return [];
   }
-
-  return dataObj.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
-function formatarDataInput(data) {
-  if (!data) return "";
-
-  const dataObj = new Date(data);
-
-  if (Number.isNaN(dataObj.getTime())) {
-    return "";
-  }
-
-  const ano = dataObj.getFullYear();
-  const mes = String(dataObj.getMonth() + 1).padStart(2, "0");
-  const dia = String(dataObj.getDate()).padStart(2, "0");
-
-  return `${ano}-${mes}-${dia}`;
+function obterDataPedido(pedido) {
+  return (
+    pedido.data_pedido ||
+    pedido.data_criacao ||
+    pedido.created_at ||
+    pedido.data
+  );
 }
 
-function obterNomeStatus(status) {
-  return STATUS[status] || status || "Desconhecido";
+function obterTotalPedido(pedido) {
+  return pedido.total ?? pedido.valor_total ?? 0;
 }
 
-function obterClasseStatus(status) {
-  return STATUS_CLASSES[status] || "";
-}
+// ======================================================
+// REQUISIÇÕES
+// ======================================================
 
-function exibirMensagemTabela(mensagem) {
-  if (!tbody) return;
-
-  tbody.innerHTML = `
-    <tr>
-      <td colspan="6" style="text-align:center; padding:24px;">
-        ${escaparHTML(mensagem)}
-      </td>
-    </tr>
-  `;
-}
-
-async function requisicao(url) {
-  const resposta = await fetch(url, {
-    method: "GET",
+async function requisicao(url, opcoes = {}) {
+  const configuracao = {
     credentials: "same-origin",
     cache: "no-store",
+    ...opcoes,
     headers: {
       Accept: "application/json",
+      ...(opcoes.body ? { "Content-Type": "application/json" } : {}),
+      ...(opcoes.headers || {}),
     },
-  });
+  };
 
-  let dados;
+  const resposta = await fetch(url, configuracao);
+
+  let dados = {};
 
   try {
     dados = await resposta.json();
@@ -213,30 +140,72 @@ async function requisicao(url) {
 
   if (resposta.status === 401) {
     window.location.href = "/cadastro/login.html";
-    throw new Error("Sua sessão expirou. Faça login novamente.");
+    throw new Error("Sua sessão expirou. Entre novamente.");
   }
 
   if (!resposta.ok) {
-    throw new Error(
-      dados.mensagem ||
-        dados.erro ||
-        `Erro HTTP ${resposta.status}: não foi possível realizar a solicitação.`,
-    );
+    throw new Error(obterMensagemErro(dados, resposta));
   }
 
   return dados;
 }
 
-async function carregarPedidos() {
-  injetarEstilosStatus();
+// ======================================================
+// NOTIFICAÇÕES
+// ======================================================
 
-  exibirMensagemTabela("Carregando pedidos...");
+function mostrarMensagem(mensagem, tipo = "info") {
+  let elemento = document.getElementById("mensagemPedidos");
 
-  emptyState?.classList.add("hidden");
+  if (!elemento) {
+    elemento = document.createElement("div");
+    elemento.id = "mensagemPedidos";
 
-  if (tabelaPedidos) {
-    tabelaPedidos.style.display = "";
+    elemento.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 99999;
+      max-width: 380px;
+      padding: 14px 18px;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,.25);
+    `;
+
+    document.body.appendChild(elemento);
   }
+
+  const cores = {
+    sucesso: "#198754",
+    erro: "#dc3545",
+    info: "#343a40",
+  };
+
+  elemento.style.background = cores[tipo] || cores.info;
+  elemento.textContent = mensagem;
+  elemento.style.display = "block";
+
+  clearTimeout(elemento._temporizador);
+
+  elemento._temporizador = setTimeout(() => {
+    elemento.style.display = "none";
+  }, 4500);
+}
+
+// ======================================================
+// CARREGAR PEDIDOS
+// ======================================================
+
+async function carregarPedidos() {
+  if (!tabelaPedidos) return;
+
+  tabelaPedidos.innerHTML = `
+    <tr>
+      <td colspan="6">Carregando pedidos...</td>
+    </tr>
+  `;
 
   try {
     const dados = await requisicao(`${API}/meus`);
@@ -247,361 +216,406 @@ async function carregarPedidos() {
         ? dados.pedidos
         : [];
 
-    aplicarFiltros();
+    renderizarPedidos();
   } catch (erro) {
     console.error("Erro ao carregar pedidos:", erro);
 
-    exibirMensagemTabela(erro.message);
+    tabelaPedidos.innerHTML = `
+      <tr>
+        <td colspan="6">${escaparHTML(erro.message)}</td>
+      </tr>
+    `;
   }
 }
 
-function aplicarFiltros() {
-  const statusSelecionado = filtroStatus?.value || "";
+// ======================================================
+// RENDERIZAR PEDIDOS
+// ======================================================
+
+function renderizarPedidos() {
+  if (!tabelaPedidos) return;
+
+  const statusSelecionado = normalizarStatus(filtroStatus?.value);
   const inicio = dataInicio?.value || "";
   const fim = dataFim?.value || "";
 
   const filtrados = pedidos.filter((pedido) => {
-    if (statusSelecionado && pedido.status !== statusSelecionado) {
+    const statusPedido = normalizarStatus(pedido.status);
+
+    if (statusSelecionado && statusPedido !== statusSelecionado) {
       return false;
     }
 
-    const dataPedido = formatarDataInput(pedido.data_pedido);
+    const dataPedido = obterDataPedido(pedido);
 
-    if (inicio && dataPedido < inicio) {
-      return false;
+    if (inicio && dataPedido) {
+      const data = new Date(dataPedido);
+
+      if (data < new Date(`${inicio}T00:00:00`)) {
+        return false;
+      }
     }
 
-    if (fim && dataPedido > fim) {
-      return false;
+    if (fim && dataPedido) {
+      const data = new Date(dataPedido);
+
+      if (data > new Date(`${fim}T23:59:59`)) {
+        return false;
+      }
     }
 
     return true;
   });
 
-  renderizarPedidos(filtrados);
-}
-
-function renderizarPedidos(lista) {
-  if (!tbody) return;
-
-  tbody.innerHTML = "";
-
-  if (!lista.length) {
-    if (tabelaPedidos) {
-      tabelaPedidos.style.display = "none";
-    }
-
-    emptyState?.classList.remove("hidden");
-    return;
-  }
-
-  if (tabelaPedidos) {
-    tabelaPedidos.style.display = "";
-  }
-
-  emptyState?.classList.add("hidden");
-
-  lista.forEach((pedido) => {
-    const linha = document.createElement("tr");
-
-    const quantidadeItens = Number(
-      pedido.quantidade_itens ?? pedido.total_itens ?? 0,
-    );
-
-    linha.innerHTML = `
-      <td>
-        <strong>#${escaparHTML(pedido.id)}</strong>
-      </td>
-
-      <td>
-        ${escaparHTML(formatarData(pedido.data_pedido))}
-      </td>
-
-      <td>
-        <span class="status-badge ${escaparHTML(obterClasseStatus(pedido.status))}">
-          ${escaparHTML(obterNomeStatus(pedido.status))}
-        </span>
-      </td>
-
-      <td>
-        ${quantidadeItens}
-      </td>
-
-      <td>
-        <strong>${formatarMoeda(pedido.total)}</strong>
-      </td>
-
-      <td>
-        <button
-          type="button"
-          class="btn btn-secondary btn-detalhes"
-          data-id="${escaparHTML(pedido.id)}">
-          Ver detalhes
-        </button>
-      </td>
+  if (!filtrados.length) {
+    tabelaPedidos.innerHTML = `
+      <tr>
+        <td colspan="6">Nenhum pedido encontrado.</td>
+      </tr>
     `;
 
-    tbody.appendChild(linha);
-  });
-}
-
-async function abrirDetalhes(id) {
-  if (!id || !pedidoModal || !pedidoModalBody) {
-    console.error("Não foi possível abrir os detalhes: ID ou modal ausente.");
     return;
   }
 
-  const requisicaoId = ++requisicaoDetalhesAtual;
+  tabelaPedidos.innerHTML = filtrados
+    .map(
+      (pedido) => `
+        <tr>
+          <td>#${escaparHTML(pedido.id)}</td>
 
-  pedidoModal.classList.remove("hidden");
-  pedidoModal.style.display = "flex";
+          <td>${formatarData(obterDataPedido(pedido))}</td>
 
-  pedidoModal.setAttribute("aria-hidden", "false");
+          <td>${formatarMoeda(obterTotalPedido(pedido))}</td>
 
-  pedidoModalBody.innerHTML = `
-    <p style="text-align:center; padding:24px;">
-      Carregando detalhes do pedido...
-    </p>
+          <td>${escaparHTML(pedido.status || "-")}</td>
+
+          <td>${escaparHTML(pedido.forma_pagamento || "-")}</td>
+
+          <td>
+            <button
+              type="button"
+              class="btn btn-primary btn-ver-pedido"
+              data-id="${escaparHTML(pedido.id)}"
+            >
+              Ver detalhes
+            </button>
+          </td>
+        </tr>
+      `,
+    )
+    .join("");
+}
+
+// ======================================================
+// RENDERIZAR ITENS DO PEDIDO
+// ======================================================
+
+function renderizarItens(itens) {
+  if (!Array.isArray(itens) || !itens.length) {
+    return "<p>Nenhum item encontrado.</p>";
+  }
+
+  return `
+    <ul class="lista-itens-pedido">
+      ${itens
+        .map((item) => {
+          const quantidade = Number(item.quantidade || 1);
+
+          const nome = item.nome_produto || item.nome || "Produto";
+
+          const subtotal = Number(
+            item.subtotal ??
+              Number(item.preco_unitario || item.preco || 0) * quantidade,
+          );
+
+          const adicionais = parsePersonalizacao(item.personalizacao);
+
+          return `
+            <li class="item-pedido-detalhe">
+
+              <div class="item-pedido-principal">
+                <strong>
+                  ${escaparHTML(quantidade)}x
+                  ${escaparHTML(nome)}
+                </strong>
+
+                <span>
+                  ${formatarMoeda(subtotal)}
+                </span>
+              </div>
+
+              ${
+                adicionais.length
+                  ? `
+                    <ul class="lista-adicionais-pedido">
+                      ${adicionais
+                        .map(
+                          (adicional) => `
+                            <li>
+                              + ${escaparHTML(adicional.nome || adicional.nome_adicional || "Adicional")}
+                              — ${formatarMoeda(adicional.preco)}
+                            </li>
+                          `,
+                        )
+                        .join("")}
+                    </ul>
+                  `
+                  : ""
+              }
+
+            </li>
+          `;
+        })
+        .join("")}
+    </ul>
   `;
+}
 
+// ======================================================
+// RENDERIZAR HISTÓRICO
+// ======================================================
+
+function renderizarHistorico(historico) {
+  if (!Array.isArray(historico) || !historico.length) {
+    return "<p>Nenhum histórico disponível.</p>";
+  }
+
+  return `
+    <ul class="lista-historico-pedido">
+      ${historico
+        .map((item) => {
+          const statusAnterior = item.status_anterior;
+          const statusNovo = item.status_novo || item.status;
+
+          const descricao = statusAnterior
+            ? `${statusAnterior} → ${statusNovo}`
+            : `Pedido registrado: ${statusNovo}`;
+
+          return `
+            <li>
+              <strong>${escaparHTML(descricao)}</strong>
+
+              <span>
+                ${formatarData(item.data_alteracao)}
+              </span>
+            </li>
+          `;
+        })
+        .join("")}
+    </ul>
+  `;
+}
+
+// ======================================================
+// DETALHES DO PEDIDO
+// ======================================================
+
+async function abrirDetalhes(id) {
   try {
     const dados = await requisicao(`${API}/${encodeURIComponent(id)}`);
 
-    if (requisicaoId !== requisicaoDetalhesAtual) return;
-
+    // O backend retorna pedido, itens e historico separadamente.
     const pedido = dados.pedido || dados;
-    const itens = Array.isArray(dados.itens) ? dados.itens : [];
-    const historico = Array.isArray(dados.historico) ? dados.historico : [];
 
-    renderizarDetalhes(pedido, itens, historico);
-  } catch (erro) {
-    if (requisicaoId !== requisicaoDetalhesAtual) return;
+    // Compatibilidade com o formato atual do backend.
+    const itens = Array.isArray(dados.itens)
+      ? dados.itens
+      : Array.isArray(pedido.itens)
+        ? pedido.itens
+        : [];
 
-    console.error("Erro ao carregar detalhes:", erro);
+    const historico = Array.isArray(dados.historico)
+      ? dados.historico
+      : Array.isArray(pedido.historico)
+        ? pedido.historico
+        : [];
+
+    pedidoAtualId = pedido.id;
+
+    atualizarBotaoCancelar(pedido);
 
     pedidoModalBody.innerHTML = `
-      <p style="text-align:center; padding:24px;">
-        ${escaparHTML(erro.message)}
-      </p>
-    `;
-  }
-}
+      <div class="pedido-detalhes">
 
-function renderizarDetalhes(pedido, itens, historico) {
-  const endereco = pedido.endereco;
-
-  const htmlEndereco = endereco
-    ? `
-      <p>
-        ${escaparHTML(endereco.rua)},
-        ${escaparHTML(endereco.numero)}
-      </p>
-
-      <p>
-        ${escaparHTML(endereco.bairro)} -
-        ${escaparHTML(endereco.cidade)}
-      </p>
-
-      ${
-        endereco.complemento
-          ? `<p>Complemento: ${escaparHTML(endereco.complemento)}</p>`
-          : ""
-      }
-    `
-    : "<p>Retirada no estabelecimento</p>";
-
-  const htmlItens = itens.length
-    ? itens
-        .map(
-          (item) => `
-            <div class="pedido-item"
-              style="display:flex; justify-content:space-between; gap:16px; padding:12px 0; border-bottom:1px solid var(--border-color, #333);">
-
-              <div>
-                <strong>
-                  ${Number(item.quantidade)}x
-                  ${escaparHTML(item.nome_produto)}
-                </strong>
-
-                ${
-                  item.personalizacao
-                    ? `<p style="color:#a5a5a5; font-size:12px;">${escaparHTML(formatarPersonalizacao(item.personalizacao))}</p>`
-                    : ""
-                }
-              </div>
-
-              <strong>
-                ${formatarMoeda(item.subtotal)}
-              </strong>
-            </div>
-          `,
-        )
-        .join("")
-    : "<p>Nenhum item encontrado.</p>";
-
-  const htmlHistorico = historico.length
-    ? historico
-        .map(
-          (registro) => `
-            <div style="padding:10px 0; border-bottom:1px solid var(--border-color, #333);">
-              <strong>
-                ${escaparHTML(obterNomeStatus(registro.status_novo))}
-              </strong>
-
-              <p style="color:#a5a5a5; font-size:12px;">
-                ${escaparHTML(formatarData(registro.data_alteracao))}
-              </p>
-            </div>
-          `,
-        )
-        .join("")
-    : "<p>Nenhuma atualização registrada.</p>";
-
-  pedidoModalBody.innerHTML = `
-    <div class="pedido-detalhes">
-
-      <section style="margin-bottom:20px;">
         <h3>Pedido #${escaparHTML(pedido.id)}</h3>
 
         <p>
-          Data: ${escaparHTML(formatarData(pedido.data_pedido))}
+          <strong>Status:</strong>
+          ${escaparHTML(pedido.status || "-")}
         </p>
 
         <p>
-          Status:
-          <strong>
-            ${escaparHTML(obterNomeStatus(pedido.status))}
-          </strong>
+          <strong>Data:</strong>
+          ${formatarData(obterDataPedido(pedido))}
         </p>
 
         <p>
-          Tipo:
-          ${pedido.tipo_entrega === "entrega" ? "Entrega" : "Retirada"}
-        </p>
-      </section>
-
-      <section style="margin-bottom:20px;">
-        <h3>Itens do pedido</h3>
-        ${htmlItens}
-      </section>
-
-      <section style="margin-bottom:20px;">
-        <h3>Endereço</h3>
-        ${htmlEndereco}
-      </section>
-
-      <section style="margin-bottom:20px;">
-        <h3>Pagamento</h3>
-
-        <p>
-          Forma:
-          ${escaparHTML(pedido.forma_pagamento || "Não informado")}
+          <strong>Subtotal:</strong>
+          ${formatarMoeda(pedido.subtotal)}
         </p>
 
         <p>
-          Status:
-          ${escaparHTML(pedido.status_pagamento || "Pendente")}
+          <strong>Entrega:</strong>
+          ${formatarMoeda(pedido.taxa_entrega)}
         </p>
-      </section>
 
-      <section style="margin-bottom:20px;">
-        <h3>Resumo</h3>
+        <p>
+          <strong>Total:</strong>
+          ${formatarMoeda(obterTotalPedido(pedido))}
+        </p>
 
-        <p>Subtotal: ${formatarMoeda(pedido.subtotal)}</p>
-        <p>Entrega: ${formatarMoeda(pedido.taxa_entrega)}</p>
-        <p>Desconto: ${formatarMoeda(pedido.desconto)}</p>
+        <p>
+          <strong>Pagamento:</strong>
+          ${escaparHTML(pedido.forma_pagamento || "-")}
+        </p>
 
-        <h3>Total: ${formatarMoeda(pedido.total)}</h3>
-      </section>
+        <p>
+          <strong>Status do pagamento:</strong>
+          ${escaparHTML(pedido.status_pagamento || "-")}
+        </p>
 
-      ${
-        pedido.observacoes
-          ? `
-            <section style="margin-bottom:20px;">
-              <h3>Observações</h3>
-              <p>${escaparHTML(pedido.observacoes)}</p>
-            </section>
-          `
-          : ""
-      }
+        <hr>
 
-      <section>
-        <h3>Histórico do pedido</h3>
-        ${htmlHistorico}
-      </section>
+        <h4>Itens do pedido</h4>
 
-    </div>
-  `;
-}
+        ${renderizarItens(itens)}
 
-function formatarPersonalizacao(valor) {
-  try {
-    const dados = typeof valor === "string" ? JSON.parse(valor) : valor;
+        <hr>
 
-    if (!Array.isArray(dados)) {
-      return "";
-    }
+        <h4>Histórico</h4>
 
-    return dados
-      .map((adicional) => adicional.nome)
-      .filter(Boolean)
-      .join(", ");
-  } catch {
-    return "";
+        ${renderizarHistorico(historico)}
+
+      </div>
+    `;
+
+    pedidoModal?.classList.remove("hidden");
+  } catch (erro) {
+    console.error("Erro ao abrir detalhes:", erro);
+
+    mostrarMensagem(erro.message, "erro");
   }
 }
 
+// ======================================================
+// BOTÃO CANCELAR
+// ======================================================
+
+function atualizarBotaoCancelar(pedido) {
+  if (!pedidoModalCancelar) return;
+
+  const cancelavel = podeCancelarPedido(pedido.status);
+
+  pedidoModalCancelar.classList.toggle("hidden", !cancelavel);
+  pedidoModalCancelar.disabled = !cancelavel;
+  pedidoModalCancelar.textContent = "Cancelar Pedido";
+}
+
+// ======================================================
+// CANCELAR PEDIDO
+// ======================================================
+
+async function cancelarPedidoAtual() {
+  if (!pedidoAtualId) {
+    mostrarMensagem("Nenhum pedido selecionado.", "erro");
+    return;
+  }
+
+  const confirmado = window.confirm(
+    "Tem certeza de que deseja cancelar este pedido?",
+  );
+
+  if (!confirmado) return;
+
+  const motivoInformado = window.prompt(
+    "Informe o motivo do cancelamento (opcional):",
+  );
+
+  if (motivoInformado === null) return;
+
+  const motivo = motivoInformado.trim() || "Cancelado pelo cliente";
+
+  const url = `${API}/${encodeURIComponent(pedidoAtualId)}/cancelar`;
+
+  pedidoModalCancelar.disabled = true;
+  pedidoModalCancelar.textContent = "Cancelando...";
+
+  try {
+    await requisicao(url, {
+      method: "PATCH",
+      body: JSON.stringify({ motivo }),
+    });
+
+    mostrarMensagem("Pedido cancelado com sucesso!", "sucesso");
+
+    await carregarPedidos();
+    await abrirDetalhes(pedidoAtualId);
+  } catch (erro) {
+    console.error("Erro ao cancelar pedido:", erro);
+
+    mostrarMensagem(`Não foi possível cancelar: ${erro.message}`, "erro");
+
+    pedidoModalCancelar.disabled = false;
+    pedidoModalCancelar.textContent = "Cancelar Pedido";
+  }
+}
+
+// ======================================================
+// MODAL
+// ======================================================
+
 function fecharModal() {
-  if (!pedidoModal) return;
+  pedidoAtualId = null;
 
-  requisicaoDetalhesAtual++;
+  pedidoModal?.classList.add("hidden");
 
-  pedidoModal.classList.add("hidden");
-  pedidoModal.style.display = "none";
-  pedidoModal.setAttribute("aria-hidden", "true");
+  if (pedidoModalCancelar) {
+    pedidoModalCancelar.classList.add("hidden");
+    pedidoModalCancelar.disabled = false;
+  }
 }
 
-function limparFiltros() {
-  if (filtroStatus) filtroStatus.value = "";
-  if (dataInicio) dataInicio.value = "";
-  if (dataFim) dataFim.value = "";
+// ======================================================
+// EVENTOS
+// ======================================================
 
-  aplicarFiltros();
-}
+tabelaPedidos?.addEventListener("click", (evento) => {
+  const botao = evento.target.closest(".btn-ver-pedido");
 
-// Eventos dos filtros
-filtroStatus?.addEventListener("change", aplicarFiltros);
-dataInicio?.addEventListener("change", aplicarFiltros);
-dataFim?.addEventListener("change", aplicarFiltros);
-
-btnLimparFiltros?.addEventListener("click", limparFiltros);
-
-// Evento delegado: funciona mesmo quando as linhas são recriadas.
-tbody?.addEventListener("click", (event) => {
-  const botao = event.target.closest(".btn-detalhes");
-
-  if (!botao || !tbody.contains(botao)) return;
-
-  event.preventDefault();
+  if (!botao) return;
 
   abrirDetalhes(botao.dataset.id);
 });
 
-// Fechar modal
+pedidoModalCancelar?.addEventListener("click", cancelarPedidoAtual);
+
 pedidoModalClose?.addEventListener("click", fecharModal);
 pedidoModalFechar?.addEventListener("click", fecharModal);
 
-pedidoModal?.addEventListener("click", (event) => {
-  if (event.target === pedidoModal) {
+pedidoModal?.addEventListener("click", (evento) => {
+  if (evento.target === pedidoModal) {
     fecharModal();
   }
 });
 
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") {
-    fecharModal();
-  }
+filtroStatus?.addEventListener("change", renderizarPedidos);
+dataInicio?.addEventListener("change", renderizarPedidos);
+dataFim?.addEventListener("change", renderizarPedidos);
+
+btnLimparFiltros?.addEventListener("click", () => {
+  if (filtroStatus) filtroStatus.value = "";
+  if (dataInicio) dataInicio.value = "";
+  if (dataFim) dataFim.value = "";
+
+  renderizarPedidos();
 });
 
-// Inicialização
-carregarPedidos();
+// ======================================================
+// INICIALIZAÇÃO
+// ======================================================
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", carregarPedidos);
+} else {
+  carregarPedidos();
+}

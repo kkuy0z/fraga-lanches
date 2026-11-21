@@ -78,7 +78,6 @@
         font-family: "Montserrat", sans-serif;
       }
 
-      /* Anula min-height: 100vh de section do design-system.css */
       body section {
         position: static;
         min-height: 0;
@@ -90,9 +89,7 @@
         font: inherit;
       }
 
-      /* =====================================================
-         CABECALHO E NAVEGACAO
-         ===================================================== */
+      /* CABEÇALHO E NAVEGAÇÃO */
 
       .pnl-header {
         position: sticky;
@@ -197,9 +194,7 @@
         color: #ffffff;
       }
 
-      /* =====================================================
-         CONTEUDO PRINCIPAL
-         ===================================================== */
+      /* CONTEÚDO PRINCIPAL */
 
       .pnl-main {
         flex: 1 0 auto;
@@ -259,6 +254,7 @@
       }
 
       /* Grade de atalhos */
+
       .pnl-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -359,9 +355,7 @@
         transform: translateY(-1px);
       }
 
-      /* =====================================================
-         RODAPE
-         ===================================================== */
+      /* RODAPÉ */
 
       .pnl-footer {
         width: 100%;
@@ -380,9 +374,7 @@
         text-transform: uppercase;
       }
 
-      /* =====================================================
-         RESPONSIVIDADE
-         ===================================================== */
+      /* RESPONSIVIDADE */
 
       @media (max-width: 820px) {
         .pnl-header-inner {
@@ -431,9 +423,7 @@
         }
       }
 
-      /* =====================================================
-         ACESSIBILIDADE
-         ===================================================== */
+      /* ACESSIBILIDADE */
 
       a:focus-visible,
       button:focus-visible {
@@ -449,6 +439,12 @@
           transition-duration: 0.01ms;
           animation-duration: 0.01ms;
         }
+      }
+
+      .pnl-grid > .pnl-card:last-child {
+        grid-column: 1 / -1;
+        width: calc(50% - 10px);
+        justify-self: center;
       }
     </style>
   </head>
@@ -481,6 +477,7 @@
           <a href="/cliente/cardapio.html">Cardápio</a>
           <a href="/cliente/meus-pedidos.html">Meus pedidos</a>
           <a href="/cliente/perfil.html">Minha conta</a>
+
           <button type="button" id="btn-sair" class="pnl-btn-sair">
             <svg
               width="14"
@@ -511,6 +508,7 @@
       </section>
 
       <div class="pnl-grid">
+        <!-- CARDÁPIO -->
         <section class="pnl-card">
           <div class="pnl-card-top">
             <span class="pnl-card-icon" aria-hidden="true">
@@ -529,14 +527,17 @@
                 <path d="M4 15h16a2 2 0 0 1 2 2v1H2v-1a2 2 0 0 1 2-2z" />
               </svg>
             </span>
+
             <div>
               <h2>Cardápio</h2>
               <p>Confira nossos hambúrgueres, porções, marmitas e bebidas.</p>
             </div>
           </div>
+
           <a href="/cliente/cardapio.html" class="pnl-btn">Ver cardápio</a>
         </section>
 
+        <!-- MEUS PEDIDOS -->
         <section class="pnl-card">
           <div class="pnl-card-top">
             <span class="pnl-card-icon" aria-hidden="true">
@@ -558,16 +559,19 @@
                 <line x1="16" y1="17" x2="8" y2="17" />
               </svg>
             </span>
+
             <div>
               <h2>Meus pedidos</h2>
               <p>Acompanhe seus pedidos e consulte seu histórico.</p>
             </div>
           </div>
-          <a href="/cliente/meus-pedidos.html" class="pnl-btn"
-            >Acompanhar pedidos</a
-          >
+
+          <a href="/cliente/meus-pedidos.html" class="pnl-btn">
+            Acompanhar pedidos
+          </a>
         </section>
 
+        <!-- MINHA CONTA -->
         <section class="pnl-card">
           <div class="pnl-card-top">
             <span class="pnl-card-icon" aria-hidden="true">
@@ -585,40 +589,14 @@
                 <circle cx="12" cy="7" r="4" />
               </svg>
             </span>
+
             <div>
               <h2>Minha conta</h2>
               <p>Consulte seus dados pessoais e endereços.</p>
             </div>
           </div>
-          <a href="/cliente/perfil.html" class="pnl-btn">Acessar perfil</a>
-        </section>
 
-        <section class="pnl-card">
-          <div class="pnl-card-top">
-            <span class="pnl-card-icon" aria-hidden="true">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="9" cy="21" r="1" />
-                <circle cx="20" cy="21" r="1" />
-                <path
-                  d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
-                />
-              </svg>
-            </span>
-            <div>
-              <h2>Carrinho</h2>
-              <p>Confira os produtos que você selecionou.</p>
-            </div>
-          </div>
-          <a href="/cliente/carrinho.html" class="pnl-btn">Ver carrinho</a>
+          <a href="/cliente/perfil.html" class="pnl-btn">Acessar perfil</a>
         </section>
       </div>
     </main>
@@ -633,6 +611,7 @@
       document.addEventListener("DOMContentLoaded", () => {
         const elNome = document.getElementById("nome-usuario");
         if (!elNome) return;
+
         const atual = elNome.textContent.trim();
         if (atual && atual !== "Cliente") return;
 
@@ -643,10 +622,13 @@
           "usuarioLogado",
           "clienteLogado",
         ];
+
         for (const chave of chaves) {
           const bruto =
             localStorage.getItem(chave) || sessionStorage.getItem(chave);
+
           if (!bruto) continue;
+
           try {
             const parsed = JSON.parse(bruto);
             const nome =
@@ -654,6 +636,7 @@
               parsed?.name ||
               parsed?.usuario?.nome ||
               parsed?.cliente?.nome;
+
             if (nome && typeof nome === "string" && nome.trim()) {
               elNome.textContent = nome.trim();
               return;
@@ -675,6 +658,8 @@
         });
       }
     </script>
+
+    <!-- Carrinho flutuante mantido -->
     <script src="/cliente/carrinho-widget.js" defer></script>
   </body>
 </html>

@@ -3674,3 +3674,53 @@ section {
     font-size: 12px;
   }
 }
+
+/* ==========================================
+   CORREÇÃO GLOBAL DOS TÍTULOS DAS PÁGINAS
+   Remove fundos e faixas atrás dos títulos
+   ========================================== */
+
+.page-header,
+.page-header-inner {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.page-title,
+.page-title span,
+.page-title .accent {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Remove possíveis faixas criadas por pseudo-elementos */
+.page-header::before,
+.page-header::after,
+.page-header-inner::before,
+.page-header-inner::after,
+.page-title::before,
+.page-title::after {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Mantém a identidade visual dos títulos */
+.page-title {
+  color: #ffffff;
+  font-family: "Anton", sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.page-title .accent {
+  color: var(--color-accent);
+}
+
+/* Mantém o fundo amarelo da linha decorativa */
+.yellow-line {
+  background-color: var(--color-accent) !important;
+}

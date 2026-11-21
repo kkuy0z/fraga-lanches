@@ -1,290 +1,620 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#1a1a1a" />
-
-    <meta name="theme-color" content="#1a1a1a" />
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0c0c0c" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches" />
 
     <title>Meu Perfil - Fraga Lanches</title>
-    <link rel="stylesheet" href="/design-system.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0c0c0c">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Fraga Lanches">
-    <link rel="apple-touch-icon" href="/img/icon-192.svg">
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self';">
-    <!-- Referrer Policy -->
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    <!-- Permissions Policy -->
-    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
-</head>
 
-<body>
-    <!-- Header Fixo -->
-    <header class="header-fixed" role="banner">
-        <div class="header-inner">
-            <div class="logo">
-                <a href="/inicio/index.html">
-                    <img src="/frontend/imagens/logo.png" alt="Fraga Lanches Delivery" class="logo-img">
-                </a>
-            </div>
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/imagens/logo.png" />
+    <link rel="apple-touch-icon" href="/imagens/logo.png" />
 
-            <nav class="nav-menu" id="navMenu" role="navigation" aria-label="Menu principal">
-                <a href="/inicio/index.html">INÃCIO</a>
-                <a href="/cliente/cliente/cardapio.html">CARDÃPIO</a>
-                <a href="/inicio/index.html#sobre">SOBRE</a>
-                <a href="/inicio/index.html#espaco">ESPAÃ‡O</a>
-                <a href="/inicio/index.html#avaliacoes">AVALIAÃ‡Ã•ES</a>
-                <a href="/inicio/index.html#contato">CONTATO</a>
-            </nav>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-            <div class="header-actions">
-                <a href="/cliente/cliente/carrinho.html" class="cart-button" id="cartButton" aria-label="Carrinho de compras">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <circle cx="9" cy="21" r="1"></circle>
-                        <circle cx="20" cy="21" r="1"></circle>
-                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                    </svg>
-                    <span>Carrinho</span>
-                    <span class="cart-count" id="cartCount" aria-label="Itens no carrinho">0</span>
-                </a>
+    <link rel="stylesheet" href="/design-system.css" />
 
-                <div class="user-menu" id="userMenu">
-                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuÃ¡rio">
-                        <div class="user-avatar" id="userAvatar">?</div>
-                        <span id="userName">Minha Conta</span>
-                    </button>
-                    <div class="user-dropdown" id="userDropdown" role="menu">
-                        <a href="/cliente/cliente/meus-pedidos.html" class="user-dropdown-item" role="menuitem">Meus Pedidos</a>
-                        <a href="/cliente/cliente/perfil.html" class="user-dropdown-item active" role="menuitem">Meu Perfil</a>
-                        <div class="user-dropdown-divider"></div>
-                        <button class="user-dropdown-item btn-logout" id="logoutBtn" role="menuitem">Sair</button>
-                    </div>
-                </div>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://viacep.com.br; base-uri 'self'; form-action 'self';"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="geolocation=(), microphone=(), camera=()"
+    />
 
-                <a href="/inicio/admin-login.html" class="btn btn-outline btn-sm login-link" id="loginLink" style="display: none;">Entrar</a>
+    <style>
+      :root {
+        --prf-bg: #0c0c0c;
+        --prf-card: #191919;
+        --prf-card-alt: #141414;
+        --prf-border: rgba(255, 255, 255, 0.09);
+        --prf-yellow: #f5c542;
+        --prf-yellow-hover: #ffda65;
+        --prf-text: #f5f5f5;
+        --prf-muted: #a5a5a5;
+      }
 
-                <a href="/inicio/admin-login.html" class="btn btn-outline btn-sm" style="display: none;" id="adminLink">Painel Admin</a>
-            </div>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+        width: 100%;
+        overflow-x: clip;
+      }
+
+      body {
+        display: block;
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 0;
+        overflow-x: clip;
+        background:
+          radial-gradient(
+            circle at 15% 8%,
+            rgba(245, 197, 66, 0.08),
+            transparent 42%
+          ),
+          radial-gradient(
+            circle at 85% 88%,
+            rgba(245, 197, 66, 0.05),
+            transparent 40%
+          ),
+          var(--prf-bg);
+        color: var(--prf-text);
+        font-family: "Montserrat", sans-serif;
+      }
+
+      body section {
+        position: static;
+        min-height: 0;
+        height: auto;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .page-main {
+        width: 100%;
+        padding: 20px 20px 104px;
+      }
+
+      .page-main > .container {
+        width: 100%;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      .page-header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .btn-voltar-painel {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border: 1px solid #323232;
+        border-radius: 999px;
+        background-color: var(--prf-card);
+        color: #e6e6e6;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition:
+          border-color 0.2s ease,
+          color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .btn-voltar-painel:hover {
+        border-color: rgba(245, 197, 66, 0.55);
+        color: var(--prf-yellow);
+        transform: translateY(-1px);
+      }
+
+      /* Cabeçalho centralizado */
+      .page-header {
+        width: 100%;
+        text-align: center;
+        background: transparent !important;
+      }
+
+      .page-header-inner {
+        width: 100%;
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0;
+        text-align: center;
+        background: transparent !important;
+      }
+
+      .page-title {
+        width: 100%;
+        margin: 0 0 8px;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(36px, 5vw, 54px);
+        font-weight: 400;
+        line-height: 1.04;
+        letter-spacing: 0.03em;
+        text-align: center;
+        text-transform: uppercase;
+        background: transparent !important;
+      }
+
+      .page-title .accent {
+        color: var(--prf-yellow);
+      }
+
+      .page-subtitle {
+        width: 100%;
+        max-width: 560px;
+        margin: 0 auto;
+        color: var(--prf-muted);
+        font-size: 13px;
+        line-height: 1.55;
+        text-align: center;
+      }
+
+      .yellow-line {
+        width: 64px;
+        height: 3px;
+        margin: 14px auto 0;
+        border-radius: 999px;
+        background-color: var(--prf-yellow);
+      }
+
+      /* Abas */
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 8px;
+        border: 1px solid #2b2b2b;
+        border-radius: 12px;
+        background-color: var(--prf-card);
+      }
+
+      .tab-btn {
+        padding: 10px 16px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--prf-muted);
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease,
+          border-color 0.2s ease;
+      }
+
+      .tab-btn:hover {
+        color: #ffffff;
+      }
+
+      .tab-btn.active {
+        border-color: rgba(245, 197, 66, 0.4);
+        background-color: rgba(245, 197, 66, 0.14);
+        color: var(--prf-yellow);
+      }
+
+      /* Cards e formulários */
+      .card {
+        border: 1px solid #2b2b2b;
+        border-radius: 14px;
+        background-color: var(--prf-card);
+      }
+
+      .card-title {
+        margin: 0 0 12px;
+        color: var(--prf-yellow);
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+        flex: 1;
+        min-width: 220px;
+      }
+
+      .form-label {
+        color: var(--prf-muted);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .form-input {
+        width: 100%;
+        min-height: 40px;
+        padding: 9px 12px;
+        border: 1px solid #333333;
+        border-radius: 8px;
+        background-color: #121212;
+        color: #f5f5f5;
+        font-family: "Montserrat", sans-serif;
+        font-size: 13px;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--prf-yellow);
+      }
+
+      .form-input[readonly] {
+        background-color: #171717;
+        color: #a5a5a5;
+        cursor: not-allowed;
+      }
+
+      .form-help {
+        margin: 4px 0 0;
+        color: var(--prf-muted);
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      .input-with-icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .input-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: 0 12px;
+        border: 1px solid #353535;
+        border-radius: 8px;
+        background-color: #151515;
+        color: #e5e5e5;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .input-icon-btn:hover {
+        border-color: var(--prf-yellow);
+        color: var(--prf-yellow);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        min-height: 40px;
+        padding: 9px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .btn-primary {
+        border: 1px solid var(--prf-yellow);
+        background-color: var(--prf-yellow);
+        color: #141414;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        border-color: var(--prf-yellow-hover);
+        background-color: var(--prf-yellow-hover);
+      }
+
+      .btn-secondary {
+        border: 1px solid #383838;
+        background-color: #141414;
+        color: #e5e5e5;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        border-color: var(--prf-yellow);
+        color: var(--prf-yellow);
+      }
+
+      .btn-danger {
+        border: 1px solid rgba(248, 113, 113, 0.45);
+        background-color: rgba(248, 113, 113, 0.14);
+        color: #fca5a5;
+      }
+
+      .btn-danger:hover:not(:disabled) {
+        border-color: #f87171;
+        background-color: rgba(248, 113, 113, 0.24);
+      }
+
+      .d-flex {
+        display: flex;
+      }
+
+      .justify-end {
+        justify-content: flex-end;
+      }
+
+      .justify-between {
+        justify-content: space-between;
+      }
+
+      .align-center {
+        align-items: center;
+      }
+
+      .gap-2 {
+        gap: 10px;
+      }
+
+      /* Endereços */
+      .enderecos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+      }
+
+      .endereco-card .card-body {
+        padding: 18px;
+      }
+
+      .endereco-card p {
+        margin: 5px 0;
+        font-size: 13px;
+        color: #e4e4e4;
+      }
+
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 44px 20px;
+        border: 1px solid #2c2c2c;
+        border-radius: 12px;
+        background-color: var(--prf-card);
+      }
+
+      .empty-state-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        margin-bottom: 14px;
+        border-radius: 50%;
+        background-color: rgba(245, 197, 66, 0.1);
+        border: 1px solid rgba(245, 197, 66, 0.28);
+        color: var(--prf-yellow);
+      }
+
+      .empty-state-title {
+        margin: 0 0 6px;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: 24px;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
+
+      .empty-state-message {
+        margin: 0;
+        color: var(--prf-muted);
+        font-size: 13px;
+      }
+
+      /* Modais */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(4px);
+      }
+
+      .modal-overlay.show:not(.hidden) {
+        display: flex;
+      }
+
+      .modal {
+        width: 100%;
+        max-width: 520px;
+        max-height: 88vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid #323232;
+        border-radius: 14px;
+        background-color: var(--prf-card);
+        color: var(--prf-text);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+      }
+
+      .modal-sm {
+        max-width: 400px;
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--prf-border);
+        background-color: var(--prf-card-alt);
+      }
+
+      .modal-title {
+        margin: 0;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
+
+      .modal-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: 1px solid #353535;
+        border-radius: 8px;
+        background-color: #202020;
+        color: #e4e4e4;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .modal-close:hover {
+        border-color: var(--prf-yellow);
+        color: var(--prf-yellow);
+      }
+
+      .modal-body {
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--prf-border);
+        background-color: var(--prf-card-alt);
+      }
+
+      /* Responsividade */
+      @media (max-width: 600px) {
+        .page-main {
+          padding: 16px 14px 90px;
+        }
+
+        .page-header-top {
+          gap: 8px;
+        }
+
+        .btn-voltar-painel {
+          font-size: 11px;
+          padding: 8px 10px;
+        }
+
+        .tabs {
+          gap: 6px;
+        }
+
+        .tab-btn {
+          flex: 1 1 auto;
+          padding: 10px 8px;
+          font-size: 10px;
+        }
+
+        .form-row {
+          gap: 8px;
+        }
+
+        .form-group {
+          min-width: 100%;
+        }
+
+        .modal {
+          max-height: 92vh;
+        }
+
+        .modal-body {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="page-main" role="main">
+      <div class="container">
+        <div class="page-header-top">
+          <a href="/cliente/painel.html" class="btn-voltar-painel">
+            ← Voltar ao painel
+          </a>
+
+          <a href="/cliente/cardapio.html" class="btn-voltar-painel">
+            Ver cardápio →
+          </a>
         </div>
 
-        <nav
-          class="admin-nav cliente-nav"
-          id="clienteNav"
-          role="navigation"
-          aria-label="Navegação do cliente"
-        >
-          <a href="/cliente/painel.html">
-            <span>⌂</span>
-            Painel
-          </a>
-
-          <a href="/cliente/cardapio.html">
-            <span>☰</span>
-            Cardápio
-          </a>
-
-          <a href="/cliente/carrinho.html">
-            <span>🛒</span>
-            Carrinho
-          </a>
-
-          <a href="/cliente/meus-pedidos.html">
-            <span>▤</span>
-            Meus pedidos
-          </a>
-        </nav>
-
-        <div class="header-actions">
-          <div class="user-menu" id="userMenu">
-            <button
-              class="user-button"
-              id="userButton"
-              aria-expanded="false"
-              aria-haspopup="true"
-              aria-label="Menu do usuário"
-              type="button"
-            >
-              <div class="user-avatar" id="userAvatar">?</div>
-
-              <span id="userName">Cliente</span>
-            </button>
-
-            <div class="user-dropdown" id="userDropdown" role="menu" hidden>
-              <div class="user-dropdown-header">
-                <span id="dropdownUserName">Cliente</span>
-                <span class="badge badge-info">Cliente</span>
-              </div>
-
-              <div class="user-dropdown-divider"></div>
-
-              <a
-                href="/cliente/perfil.html"
-                class="user-dropdown-item"
-                role="menuitem"
-              >
-                Meu perfil
-              </a>
-
-              <button
-                class="user-dropdown-item btn-logout"
-                id="logoutBtn"
-                type="button"
-                role="menuitem"
-              >
-                <span>↪</span>
-                Sair
-              </button>
-            </div>
+        <div class="page-header">
+          <div class="page-header-inner">
+            <h1 class="page-title">Meu <span class="accent">Perfil</span></h1>
+            <p class="page-subtitle">
+              Gerencie seus dados pessoais, endereços e segurança
+            </p>
+            <div class="yellow-line"></div>
           </div>
         </div>
-      </div>
-    </header>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
 
-<body>
-    <!-- Main Content -->
-    <main class="page-main" role="main">
-        <div class="container">
-            <!-- Page Header -->
-            <div class="page-header">
-                <div class="page-header-inner">
-                    <h1 class="page-title">Meu <span class="accent">Perfil</span></h1>
-                    <p class="page-subtitle">Gerencie seus dados pessoais, endereÃ§os e seguranÃ§a</p>
-                    <div class="yellow-line"></div>
-                </div>
-            </div>
-
-            <!-- Tabs Navigation -->
-            <nav class="tabs" id="perfilTabs" role="tablist" aria-label="SeÃ§Ãµes do perfil">
-                <button role="tab" class="tab-btn active" aria-selected="true" aria-controls="tab-dados" id="tab-btn-dados" data-tab="dados">Dados Pessoais</button>
-                <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-enderecos" id="tab-btn-enderecos" data-tab="enderecos">EndereÃ§os</button>
-                <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-seguranca" id="tab-btn-seguranca" data-tab="seguranca">SeguranÃ§a</button>
-            </nav>
-
-            <!-- Tab: Dados Pessoais -->
-            <div role="tabpanel" id="tab-dados" class="tab-panel active" aria-labelledby="tab-btn-dados">
-                <form id="formDadosPessoais" class="card" style="padding: var(--space-6);" novalidate>
-                    <h3 class="card-title" style="margin-bottom: var(--space-6);">InformaÃ§Ãµes Pessoais</h3>
-
-                    <div class="form-row">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="perfilNome" class="form-label">Nome Completo *</label>
-                            <input type="text" id="perfilNome" name="nome" class="form-input" required maxlength="100">
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label for="perfilEmail" class="form-label">E-mail *</label>
-                            <input type="email" id="perfilEmail" name="email" class="form-input" required maxlength="120" readonly style="background: var(--color-bg-secondary); cursor: not-allowed;">
-                            <p class="form-help">O e-mail nÃ£o pode ser alterado. Entre em contato com o suporte se precisar alterÃ¡-lo.</p>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="perfilTelefone" class="form-label">Telefone *</label>
-                            <input type="tel" id="perfilTelefone" name="telefone" class="form-input" required maxlength="15" placeholder="(11) 99999-9999">
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-end gap-2" style="margin-top: var(--space-6);">
-                        <button type="submit" class="btn btn-primary">
-                            <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
-                            Salvar AlteraÃ§Ãµes
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Tab: EndereÃ§os -->
-            <div role="tabpanel" id="tab-enderecos" class="tab-panel hidden" aria-labelledby="tab-btn-enderecos">
-                <div class="d-flex justify-between align-center" style="margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-3);">
-                    <h3 class="card-title" style="margin: 0;">Meus EndereÃ§os</h3>
-                    <button class="btn btn-primary" id="btnNovoEndereco" aria-label="Adicionar novo endereÃ§o">
-                        <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
-                        Novo EndereÃ§o
-                    </button>
-                </div>
-
-                <div id="enderecosList" class="enderecos-grid">
-                    <!-- EndereÃ§os serÃ£o inseridos via JS -->
-                </div>
-
-                <!-- Estado Vazio -->
-                <div class="empty-state hidden" id="enderecosEmptyState" style="grid-column: 1 / -1;">
-                    <div class="empty-state-icon">
-                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><use href="#i-map-marker" /></svg>
-                    </div>
-                    <h2 class="empty-state-title">Nenhum endereÃ§o cadastrado</h2>
-                    <p class="empty-state-message">Adicione um endereÃ§o para agilizar seus pedidos.</p>
-                </div>
-            </div>
-
-            <!-- Tab: SeguranÃ§a -->
-            <div role="tabpanel" id="tab-seguranca" class="tab-panel hidden" aria-labelledby="tab-btn-seguranca">
-                <form id="formAlterarSenha" class="card" style="padding: var(--space-6); max-width: 500px;" novalidate>
-                    <h3 class="card-title" style="margin-bottom: var(--space-2);">Alterar Senha</h3>
-                    <p class="form-help" style="margin-bottom: var(--space-6);">Sua senha deve ter no mÃ­nimo 8 caracteres.</p>
-
-                    <div class="form-group">
-                        <label for="senhaAtual" class="form-label">Senha Atual *</label>
-                        <div class="input-with-icon">
-                            <input type="password" id="senhaAtual" name="senha_atual" class="form-input" required placeholder="Digite sua senha atual" autocomplete="current-password" minlength="8">
-                            <button type="button" class="input-icon-btn" id="toggleSenhaAtual" aria-label="Mostrar/ocultar senha">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="senhaNova" class="form-label">Nova Senha *</label>
-                        <div class="input-with-icon">
-                            <input type="password" id="senhaNova" name="senha_nova" class="form-input" required placeholder="MÃ­nimo 8 caracteres" autocomplete="new-password" minlength="8" aria-describedby="senhaNovaHelp">
-                            <button type="button" class="input-icon-btn" id="toggleSenhaNova" aria-label="Mostrar/ocultar senha">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                        <p class="form-help" id="senhaNovaHelp">MÃ­nimo 8 caracteres</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="senhaConfirmar" class="form-label">Confirmar Nova Senha *</label>
-                        <div class="input-with-icon">
-                            <input type="password" id="senhaConfirmar" name="senha_confirmar" class="form-input" required placeholder="Confirme a nova senha" autocomplete="new-password" minlength="8">
-                            <button type="button" class="input-icon-btn" id="toggleSenhaConfirmar" aria-label="Mostrar/ocultar senha">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-end gap-2" style="margin-top: var(--space-6);">
-                        <button type="submit" class="btn btn-primary">
-                            <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
-                            Alterar Senha
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- ABAS -->
+        <!-- Abas -->
         <nav
           class="tabs"
           id="perfilTabs"
@@ -328,7 +658,7 @@
           </button>
         </nav>
 
-        <!-- ABA: DADOS PESSOAIS -->
+        <!-- Aba: Dados Pessoais -->
         <div
           role="tabpanel"
           id="tab-dados"
@@ -338,19 +668,16 @@
           <form
             id="formDadosPessoais"
             class="card"
-            style="padding: var(--space-6)"
+            style="padding: 24px"
             novalidate
           >
-            <h3 class="card-title" style="margin-bottom: var(--space-6)">
-              Informações Pessoais
-            </h3>
+            <h3 class="card-title">Informações Pessoais</h3>
 
             <div class="form-row">
-              <div class="form-group" style="flex: 1">
+              <div class="form-group">
                 <label for="perfilNome" class="form-label">
                   Nome Completo *
                 </label>
-
                 <input
                   type="text"
                   id="perfilNome"
@@ -361,9 +688,8 @@
                 />
               </div>
 
-              <div class="form-group" style="flex: 1">
-                <label for="perfilEmail" class="form-label"> E-mail * </label>
-
+              <div class="form-group">
+                <label for="perfilEmail" class="form-label">E-mail *</label>
                 <input
                   type="email"
                   id="perfilEmail"
@@ -373,19 +699,17 @@
                   readonly
                   maxlength="120"
                 />
-
                 <p class="form-help">
-                  Você pode atualizar seu endereço de e-mail.
+                  O e-mail não pode ser alterado diretamente por aqui.
                 </p>
               </div>
             </div>
 
             <div class="form-row">
-              <div class="form-group" style="flex: 1">
+              <div class="form-group">
                 <label for="perfilTelefone" class="form-label">
                   Telefone
                 </label>
-
                 <input
                   type="tel"
                   id="perfilTelefone"
@@ -397,22 +721,15 @@
               </div>
             </div>
 
-            <div
-              class="d-flex justify-end gap-2"
-              style="margin-top: var(--space-6)"
-            >
+            <div class="d-flex justify-end gap-2" style="margin-top: 16px">
               <button type="submit" class="btn btn-primary">
-                <svg class="btn-icon" aria-hidden="true">
-                  <use href="#i-save" />
-                </svg>
-
                 Salvar Alterações
               </button>
             </div>
           </form>
         </div>
 
-        <!-- ABA: ENDEREÇOS -->
+        <!-- Aba: Endereços -->
         <div
           role="tabpanel"
           id="tab-enderecos"
@@ -421,11 +738,7 @@
         >
           <div
             class="d-flex justify-between align-center"
-            style="
-              margin-bottom: var(--space-6);
-              flex-wrap: wrap;
-              gap: var(--space-3);
-            "
+            style="margin-bottom: 18px; flex-wrap: wrap; gap: 12px"
           >
             <h3 class="card-title" style="margin: 0">Meus Endereços</h3>
 
@@ -435,46 +748,22 @@
               id="btnNovoEndereco"
               aria-label="Adicionar novo endereço"
             >
-              <svg class="btn-icon" aria-hidden="true">
-                <use href="#i-add" />
-              </svg>
-
-              Novo Endereço
+              + Novo Endereço
             </button>
           </div>
 
-          <div id="enderecosList" class="enderecos-grid">
-            <!-- Endereços carregados pelo JavaScript -->
-          </div>
+          <div id="enderecosList" class="enderecos-grid"></div>
 
-          <div
-            class="empty-state hidden"
-            id="enderecosEmptyState"
-            style="grid-column: 1 / -1"
-          >
-            <div class="empty-state-icon">
-              <svg
-                width="36"
-                height="36"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                aria-hidden="true"
-              >
-                <use href="#i-map-marker" />
-              </svg>
-            </div>
-
+          <div class="empty-state hidden" id="enderecosEmptyState">
+            <div class="empty-state-icon">📍</div>
             <h2 class="empty-state-title">Nenhum endereço cadastrado</h2>
-
             <p class="empty-state-message">
               Adicione um endereço para agilizar seus pedidos.
             </p>
           </div>
         </div>
 
-        <!-- ABA: SEGURANÇA -->
+        <!-- Aba: Segurança -->
         <div
           role="tabpanel"
           id="tab-seguranca"
@@ -484,20 +773,16 @@
           <form
             id="formAlterarSenha"
             class="card"
-            style="padding: var(--space-6); max-width: 500px"
+            style="padding: 24px; max-width: 520px"
             novalidate
           >
-            <h3 class="card-title" style="margin-bottom: var(--space-2)">
-              Alterar Senha
-            </h3>
-
-            <p class="form-help" style="margin-bottom: var(--space-6)">
+            <h3 class="card-title">Alterar Senha</h3>
+            <p class="form-help" style="margin-bottom: 18px">
               Sua senha deve ter entre 8 e 64 caracteres.
             </p>
 
             <div class="form-group">
-              <label for="senhaAtual" class="form-label"> Senha Atual * </label>
-
+              <label for="senhaAtual" class="form-label">Senha Atual *</label>
               <div class="input-with-icon">
                 <input
                   type="password"
@@ -508,34 +793,19 @@
                   placeholder="Digite sua senha atual"
                   autocomplete="current-password"
                 />
-
                 <button
                   type="button"
                   class="input-icon-btn"
                   id="toggleSenhaAtual"
-                  aria-label="Mostrar/ocultar senha"
+                  aria-label="Mostrar ou ocultar senha atual"
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                    ></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
+                  Ver
                 </button>
               </div>
             </div>
 
             <div class="form-group">
-              <label for="senhaNova" class="form-label"> Nova Senha * </label>
-
+              <label for="senhaNova" class="form-label">Nova Senha *</label>
               <div class="input-with-icon">
                 <input
                   type="password"
@@ -549,30 +819,15 @@
                   maxlength="64"
                   aria-describedby="senhaNovaHelp"
                 />
-
                 <button
                   type="button"
                   class="input-icon-btn"
                   id="toggleSenhaNova"
-                  aria-label="Mostrar/ocultar senha"
+                  aria-label="Mostrar ou ocultar nova senha"
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                    ></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
+                  Ver
                 </button>
               </div>
-
               <p class="form-help" id="senhaNovaHelp">Mínimo 8 caracteres</p>
             </div>
 
@@ -580,7 +835,6 @@
               <label for="senhaConfirmar" class="form-label">
                 Confirmar Nova Senha *
               </label>
-
               <div class="input-with-icon">
                 <input
                   type="password"
@@ -593,40 +847,19 @@
                   minlength="8"
                   maxlength="64"
                 />
-
                 <button
                   type="button"
                   class="input-icon-btn"
                   id="toggleSenhaConfirmar"
-                  aria-label="Mostrar/ocultar senha"
+                  aria-label="Mostrar ou ocultar confirmação de senha"
                 >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                    ></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
+                  Ver
                 </button>
               </div>
             </div>
 
-            <div
-              class="d-flex justify-end gap-2"
-              style="margin-top: var(--space-6)"
-            >
+            <div class="d-flex justify-end gap-2" style="margin-top: 16px">
               <button type="submit" class="btn btn-primary">
-                <svg class="btn-icon" aria-hidden="true">
-                  <use href="#i-save" />
-                </svg>
-
                 Alterar Senha
               </button>
             </div>
@@ -635,85 +868,33 @@
       </div>
     </main>
 
-    <!-- MODAL: NOVO / EDITAR ENDEREÇO -->
+    <!-- Modal: Novo / Editar Endereço -->
     <div
       class="modal-overlay hidden"
       id="enderecoModal"
       role="dialog"
       aria-modal="true"
+      aria-hidden="true"
       aria-labelledby="enderecoModalTitulo"
     >
-      <div class="modal modal-md">
+      <div class="modal">
         <div class="modal-header">
           <h2 class="modal-title" id="enderecoModalTitulo">Novo Endereço</h2>
-
-    <!-- Modal Novo/Editar EndereÃ§o -->
-    <div class="modal-overlay hidden" id="enderecoModal" role="dialog" aria-modal="true" aria-labelledby="enderecoModalTitulo">
-        <div class="modal modal-md">
-            <div class="modal-header">
-                <h2 class="modal-title" id="enderecoModalTitulo">Novo EndereÃ§o</h2>
-                <button class="modal-close" id="enderecoModalClose" aria-label="Fechar modal">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-x" /></svg>
-                </button>
-            </div>
-            <form id="enderecoForm" class="modal-body" novalidate>
-                <input type="hidden" id="enderecoId" name="id">
-
-                <div class="form-group">
-                    <label for="enderecoCep" class="form-label">CEP *</label>
-                    <div class="input-with-icon">
-                        <input type="text" id="enderecoCep" name="cep" class="form-input" required placeholder="00000-000" maxlength="9" aria-describedby="cepHelp">
-                        <button type="button" class="input-icon-btn" id="btnBuscarCep" aria-label="Buscar endereÃ§o pelo CEP">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-search" /></svg>
-                        </button>
-                    </div>
-                    <p class="form-help" id="cepHelp">Digite o CEP e clique no Ã­cone de busca para preencher automaticamente</p>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group" style="flex: 1;">
-                        <label for="enderecoLogradouro" class="form-label">Logradouro *</label>
-                        <input type="text" id="enderecoLogradouro" name="logradouro" class="form-input" required maxlength="150" placeholder="Rua, Avenida, etc.">
-                    </div>
-                    <div class="form-group" style="flex: 0 0 100px;">
-                        <label for="enderecoNumero" class="form-label">NÃºmero *</label>
-                        <input type="text" id="enderecoNumero" name="numero" class="form-input" required maxlength="10" placeholder="NÂº">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group" style="flex: 1;">
-                        <label for="enderecoBairro" class="form-label">Bairro *</label>
-                        <input type="text" id="enderecoBairro" name="bairro" class="form-input" required maxlength="80" placeholder="Bairro">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="enderecoComplemento" class="form-label">Complemento</label>
-                    <input type="text" id="enderecoComplemento" name="complemento" class="form-input" maxlength="100" placeholder="Apto, Bloco, Casa, etc. (opcional)">
-                </div>
-
-                <div class="form-check" style="margin-top: var(--space-4);">
-                    <input type="checkbox" id="enderecoPrincipal" name="principal" class="form-check-input">
-                    <label for="enderecoPrincipal" class="form-check-label">Definir como endereÃ§o principal</label>
-                </div>
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="btnCancelarEnderecoModal">Cancelar</button>
-                <button type="submit" form="enderecoForm" class="btn btn-primary" id="btnSalvarEndereco">
-                    <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
-                    Salvar EndereÃ§o
-                </button>
-            </div>
+          <button
+            type="button"
+            class="modal-close"
+            id="enderecoModalClose"
+            aria-label="Fechar modal"
+          >
+            &times;
+          </button>
         </div>
 
         <form id="enderecoForm" class="modal-body" novalidate>
           <input type="hidden" id="enderecoId" name="id" />
 
-          <!-- CEP -->
           <div class="form-group">
-            <label for="enderecoCep" class="form-label"> CEP </label>
-
+            <label for="enderecoCep" class="form-label">CEP</label>
             <div class="input-with-icon">
               <input
                 type="text"
@@ -725,40 +906,25 @@
                 inputmode="numeric"
                 aria-describedby="cepHelp"
               />
-
               <button
                 type="button"
                 class="input-icon-btn"
                 id="btnBuscarCep"
                 aria-label="Buscar endereço pelo CEP"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  aria-hidden="true"
-                >
-                  <use href="#i-search" />
-                </svg>
+                Buscar
               </button>
             </div>
-
             <p class="form-help" id="cepHelp">
-              Informe o CEP e utilize a busca para preencher o endereço
-              automaticamente. O CEP não é armazenado no cadastro atual.
+              Informe o CEP e clique em Buscar para preencher automaticamente.
             </p>
           </div>
 
-          <!-- RUA E NÚMERO -->
           <div class="form-row">
             <div class="form-group" style="flex: 1">
               <label for="enderecoLogradouro" class="form-label">
                 Logradouro *
               </label>
-
               <input
                 type="text"
                 id="enderecoLogradouro"
@@ -770,9 +936,8 @@
               />
             </div>
 
-            <div class="form-group" style="flex: 0 0 110px">
-              <label for="enderecoNumero" class="form-label"> Número * </label>
-
+            <div class="form-group" style="flex: 0 0 110px; min-width: 110px">
+              <label for="enderecoNumero" class="form-label">Número *</label>
               <input
                 type="text"
                 id="enderecoNumero"
@@ -785,42 +950,38 @@
             </div>
           </div>
 
-          <!-- BAIRRO -->
-          <div class="form-group">
-            <label for="enderecoBairro" class="form-label"> Bairro * </label>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="enderecoBairro" class="form-label">Bairro *</label>
+              <input
+                type="text"
+                id="enderecoBairro"
+                name="bairro"
+                class="form-input"
+                required
+                maxlength="100"
+                placeholder="Bairro"
+              />
+            </div>
 
-            <input
-              type="text"
-              id="enderecoBairro"
-              name="bairro"
-              class="form-input"
-              required
-              maxlength="100"
-              placeholder="Bairro"
-            />
+            <div class="form-group">
+              <label for="enderecoCidade" class="form-label">Cidade *</label>
+              <input
+                type="text"
+                id="enderecoCidade"
+                name="cidade"
+                class="form-input"
+                required
+                maxlength="100"
+                placeholder="Cidade"
+              />
+            </div>
           </div>
 
-          <!-- CIDADE -->
-          <div class="form-group">
-            <label for="enderecoCidade" class="form-label"> Cidade * </label>
-
-            <input
-              type="text"
-              id="enderecoCidade"
-              name="cidade"
-              class="form-input"
-              required
-              maxlength="100"
-              placeholder="Cidade"
-            />
-          </div>
-
-          <!-- COMPLEMENTO -->
-          <div class="form-group">
+          <div class="form-group" style="margin-bottom: 0">
             <label for="enderecoComplemento" class="form-label">
               Complemento
             </label>
-
             <input
               type="text"
               id="enderecoComplemento"
@@ -847,38 +1008,32 @@
             class="btn btn-primary"
             id="btnSalvarEndereco"
           >
-            <svg class="btn-icon" aria-hidden="true">
-              <use href="#i-save" />
-            </svg>
-
             Salvar Endereço
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Modal Confirmar ExclusÃ£o EndereÃ§o -->
-    <div class="modal-overlay hidden" id="deleteEnderecoModal" role="dialog" aria-modal="true" aria-labelledby="deleteEnderecoModalTitulo">
-        <div class="modal modal-sm">
-            <div class="modal-header">
-                <h2 class="modal-title" id="deleteEnderecoModalTitulo">Confirmar ExclusÃ£o</h2>
-            </div>
-            <div class="modal-body">
-                <p>Tem certeza que deseja excluir este endereÃ§o?</p>
-                <p class="form-help">Esta aÃ§Ã£o nÃ£o pode ser desfeita.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="btnCancelarDeleteEndereco">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="btnConfirmarDeleteEndereco">
-                    <svg class="btn-icon" aria-hidden="true"><use href="#i-trash" /></svg>
-                    Excluir
-                </button>
-            </div>
+    <!-- Modal: Confirmar Exclusão de Endereço -->
+    <div
+      class="modal-overlay hidden"
+      id="deleteEnderecoModal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="deleteEnderecoModalTitulo"
+    >
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <h2 class="modal-title" id="deleteEnderecoModalTitulo">
+            Confirmar Exclusão
+          </h2>
         </div>
 
         <div class="modal-body">
-          <p>Tem certeza que deseja excluir este endereço?</p>
-
+          <p style="margin: 0 0 6px">
+            Tem certeza que deseja excluir este endereço?
+          </p>
           <p class="form-help">Esta ação não pode ser desfeita.</p>
         </div>
 
@@ -896,18 +1051,15 @@
             class="btn btn-danger"
             id="btnConfirmarDeleteEndereco"
           >
-            <svg class="btn-icon" aria-hidden="true">
-              <use href="#i-trash" />
-            </svg>
-
             Excluir
           </button>
         </div>
       </div>
     </div>
 
-    <script type="module" src="js/shared-components.js"></script>
-    <script type="module" src="js/perfil.js"></script>
+    <script src="/cliente/perfil.js" defer></script>
+    <script src="/cliente/carrinho-widget.js" defer></script>
+
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -916,17 +1068,6 @@
           });
         });
       }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll("img").forEach((img) => {
-          img.addEventListener("error", function () {
-            this.style.display = "none";
-          });
-        });
-      });
     </script>
-     <script src="/cliente/carrinho-widget.js" defer></script>
-</body>
-</html>
-
+  </body>
 </html>

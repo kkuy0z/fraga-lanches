@@ -198,6 +198,22 @@ CREATE TABLE horarios_funcionamento (
     ativo BOOLEAN DEFAULT TRUE
 );
 
+CREATE TABLE item_carrinho_adicionais (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    item_carrinho_id INT NOT NULL,
+    adicional_id INT,
+    nome_adicional VARCHAR(100) NOT NULL,
+    preco DECIMAL(10,2) NOT NULL,
+
+    FOREIGN KEY (item_carrinho_id)
+        REFERENCES itens_carrinho(id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (adicional_id)
+        REFERENCES adicionais(id)
+        ON DELETE SET NULL
+);
+
 -- ÍNDICES
 CREATE INDEX idx_pedidos_usuario ON pedidos(usuario_id);
 CREATE INDEX idx_pedidos_status ON pedidos(status);
@@ -213,3 +229,7 @@ ADD COLUMN tipo_cartao ENUM(
     'credito',
     'vale_refeicao'
 ) NULL AFTER forma_pagamento;
+
+
+ALTER TABLE enderecos
+ADD COLUMN ativo BOOLEAN NOT NULL DEFAULT TRUE;
