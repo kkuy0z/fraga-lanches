@@ -11,22 +11,8 @@ const STATUS_PAGAMENTO = "pendente";
 const STATUS_CANCELAVEIS = ["novo", "em_preparo"];
 
 // ======================================================
-// TAXAS DE ENTREGA
+// FUNÇÕES GERAIS
 // ======================================================
-
-const TAXA_PADRAO_CENTAVOS = 600;
-
-const TAXAS_POR_BAIRRO_CENTAVOS = {
-  marimba: 0,
-  centro: 500,
-  industrial: 600,
-  eldorado: 700,
-  alterosa: 700,
-  petropolis: 800,
-  imbirucu: 800,
-  "jardim alterosa": 850,
-  "nossa senhora das gracas": 750,
-};
 
 function normalizarTexto(valor) {
   return String(valor || "")
@@ -36,16 +22,6 @@ function normalizarTexto(valor) {
     .toLowerCase()
     .replace(/\s+/g, " ");
 }
-
-function calcularTaxaEntrega(bairro) {
-  const bairroNormalizado = normalizarTexto(bairro);
-
-  return TAXAS_POR_BAIRRO_CENTAVOS[bairroNormalizado] ?? TAXA_PADRAO_CENTAVOS;
-}
-
-// ======================================================
-// FUNÇÕES GERAIS
-// ======================================================
 
 function criarErroValidacao(mensagem) {
   const erro = new Error(mensagem);
@@ -76,6 +52,84 @@ function lerCookie(req, nome) {
   } catch {
     return null;
   }
+}
+
+// ======================================================
+// CONFIGURAÇÃO DINÂMICA DE ENTREGA
+// ======================================================
+
+async function obterConfiguracaoEntrega(conexao, bairro) {
+  const [configuracoes] = await conexao.query(
+    `
+      SELECT
+        taxa_padrao,
+        valor_minimo,
+        tempo_medio_minutos
+      FROM configuracoes_entrega
+      WHERE id = 1
+      LIMIT 1
+    `,
+  );
+
+  if (!configuracoes.length) {
+    throw new Error("As configurações de entrega não foram inicializadas.");
+  }
+
+  const configuracao = configuracoes[0];
+
+  const taxaPadraoCentavos = converterCentavos(configuracao.taxa_padrao);
+  const valorMinimoCentavos = converterCentavos(configuracao.valor_minimo);
+
+  if (
+    !Number.isSafeInteger(taxaPadraoCentavos) ||
+    taxaPadraoCentavos < 0 ||
+    !Number.isSafeInteger(valorMinimoCentavos) ||
+    valorMinimoCentavos < 0
+  ) {
+    throw new Error("As configurações de valores de entrega são inválidas.");
+  }
+
+  const [bairros] = await conexao.query(
+    `
+      SELECT id, nome, taxa_final, ativo
+      FROM bairros_entrega
+    `,
+  );
+
+  const bairroNormalizado = normalizarTexto(bairro);
+
+  const bairroEncontrado = bairros.find(
+    (item) => normalizarTexto(item.nome) === bairroNormalizado,
+  );
+
+  if (!bairroEncontrado) {
+    return {
+      taxaCentavos: taxaPadraoCentavos,
+      valorMinimoCentavos,
+      tempoMedioMinutos: Number(configuracao.tempo_medio_minutos),
+    };
+  }
+
+  const bairroAtivo =
+    bairroEncontrado.ativo === true || Number(bairroEncontrado.ativo) === 1;
+
+  if (!bairroAtivo) {
+    throw criarErroValidacao(
+      "Este bairro está temporariamente indisponível para entrega.",
+    );
+  }
+
+  const taxaBairroCentavos = converterCentavos(bairroEncontrado.taxa_final);
+
+  if (!Number.isSafeInteger(taxaBairroCentavos) || taxaBairroCentavos < 0) {
+    throw new Error("A taxa cadastrada para este bairro é inválida.");
+  }
+
+  return {
+    taxaCentavos: taxaBairroCentavos,
+    valorMinimoCentavos,
+    tempoMedioMinutos: Number(configuracao.tempo_medio_minutos),
+  };
 }
 
 // ======================================================
@@ -168,11 +222,6 @@ function gerarPixComValor(valorCentavos) {
   }
 
   const base = PIX_BASE.trim();
-
-  if (!base.endsWith(base.slice(-8))) {
-    throw new Error("Código PIX base inválido.");
-  }
-
   const crcOriginal = base.slice(-4);
   const conteudoParaCRC = base.slice(0, -4);
 
@@ -256,7 +305,7 @@ router.post("/", async (req, res) => {
     const {
       tipo_entrega,
       endereco,
-      forma_pagamento,
+      forma_pagamento_id,
       troco_para,
       observacoes,
       itens,
@@ -266,8 +315,10 @@ router.post("/", async (req, res) => {
       throw criarErroValidacao("Tipo de entrega inválido.");
     }
 
-    if (!["pix", "cartao", "dinheiro"].includes(forma_pagamento)) {
-      throw criarErroValidacao("Forma de pagamento inválida.");
+    const formaPagamentoId = Number(forma_pagamento_id);
+
+    if (!Number.isSafeInteger(formaPagamentoId) || formaPagamentoId <= 0) {
+      throw criarErroValidacao("Selecione uma forma de pagamento válida.");
     }
 
     if (!Array.isArray(itens) || itens.length === 0) {
@@ -279,7 +330,9 @@ router.post("/", async (req, res) => {
     }
 
     let enderecoValidado = null;
+    let enderecoId = null;
     let taxaCentavos = 0;
+    let valorMinimoCentavos = 0;
 
     if (tipo_entrega === "entrega") {
       if (!endereco || typeof endereco !== "object") {
@@ -313,15 +366,54 @@ router.post("/", async (req, res) => {
             ? endereco.complemento.trim()
             : null,
       };
-
-      taxaCentavos = calcularTaxaEntrega(enderecoValidado.bairro);
     }
 
     conexao = await db.getConnection();
+
     await conexao.beginTransaction();
     transacaoIniciada = true;
 
-    let enderecoId = null;
+    // A forma de pagamento é validada diretamente no banco.
+    const [formasPagamento] = await conexao.query(
+      `
+        SELECT
+          id,
+          nome,
+          tipo,
+          taxa_percentual,
+          prazo_recebimento,
+          ativo,
+          online
+        FROM formas_pagamento
+        WHERE id = ?
+          AND ativo = 1
+        LIMIT 1
+        FOR UPDATE
+      `,
+      [formaPagamentoId],
+    );
+
+    if (!formasPagamento.length) {
+      throw criarErroValidacao(
+        "Esta forma de pagamento não está disponível. Atualize a página e selecione outra.",
+      );
+    }
+
+    const formaPagamento = formasPagamento[0];
+    const tipoPagamento = String(formaPagamento.tipo).toLowerCase();
+
+    // A taxa percentual cadastrada não é repassada ao cliente.
+    // O total permanece subtotal + entrega - desconto.
+
+    if (tipo_entrega === "entrega") {
+      const configuracao = await obterConfiguracaoEntrega(
+        conexao,
+        enderecoValidado.bairro,
+      );
+
+      taxaCentavos = configuracao.taxaCentavos;
+      valorMinimoCentavos = configuracao.valorMinimoCentavos;
+    }
 
     if (tipo_entrega === "entrega") {
       const [resultadoEndereco] = await conexao.query(
@@ -478,7 +570,14 @@ router.post("/", async (req, res) => {
       throw criarErroValidacao("Valor total do pedido inválido.");
     }
 
+    if (tipo_entrega === "entrega" && subtotalCentavos < valorMinimoCentavos) {
+      throw criarErroValidacao(
+        `O valor mínimo para entrega é R$ ${formatarDecimal(valorMinimoCentavos)}. Seu subtotal é R$ ${formatarDecimal(subtotalCentavos)}.`,
+      );
+    }
+
     const descontoCentavos = 0;
+
     const totalCentavos = subtotalCentavos + taxaCentavos - descontoCentavos;
 
     if (!Number.isSafeInteger(totalCentavos) || totalCentavos <= 0) {
@@ -488,7 +587,7 @@ router.post("/", async (req, res) => {
     let trocoTexto = "";
 
     if (
-      forma_pagamento === "dinheiro" &&
+      tipoPagamento === "dinheiro" &&
       troco_para !== null &&
       troco_para !== undefined &&
       troco_para !== ""
@@ -588,7 +687,7 @@ router.post("/", async (req, res) => {
       ) VALUES (?, ?, ?, ?, NULL, NULL)`,
       [
         pedidoId,
-        forma_pagamento,
+        tipoPagamento,
         formatarDecimal(totalCentavos),
         STATUS_PAGAMENTO,
       ],
@@ -607,7 +706,7 @@ router.post("/", async (req, res) => {
 
     let pixCopiaECola = null;
 
-    if (forma_pagamento === "pix") {
+    if (tipoPagamento === "pix") {
       pixCopiaECola = gerarPixComValor(totalCentavos);
     }
 
@@ -619,14 +718,15 @@ router.post("/", async (req, res) => {
       pedidoId,
       status: STATUS_PEDIDO,
       pagamento: STATUS_PAGAMENTO,
-      formaPagamento: forma_pagamento,
+      formaPagamento: tipoPagamento,
+      formaPagamentoId: Number(formaPagamento.id),
+      formaPagamentoNome: formaPagamento.nome,
       subtotal: formatarDecimal(subtotalCentavos),
       taxaEntrega: formatarDecimal(taxaCentavos),
       desconto: formatarDecimal(descontoCentavos),
       total: formatarDecimal(totalCentavos),
       pixCopiaECola,
-      pixValor:
-        forma_pagamento === "pix" ? formatarDecimal(totalCentavos) : null,
+      pixValor: tipoPagamento === "pix" ? formatarDecimal(totalCentavos) : null,
     });
   } catch (erro) {
     if (conexao && transacaoIniciada && !transacaoFinalizada) {
@@ -710,10 +810,12 @@ async function cancelarPedidoCliente(req, res) {
 
     const motivoBruto =
       req.body?.motivo || req.body?.observacao || "Cancelado pelo cliente";
+
     const motivo =
       String(motivoBruto).trim().slice(0, 255) || "Cancelado pelo cliente";
 
     conexao = await db.getConnection();
+
     await conexao.beginTransaction();
     transacaoIniciada = true;
 
@@ -729,6 +831,7 @@ async function cancelarPedidoCliente(req, res) {
     if (!pedidos.length) {
       await conexao.rollback();
       transacaoFinalizada = true;
+
       return res.status(404).json({
         mensagem: "Pedido não encontrado.",
       });
@@ -740,6 +843,7 @@ async function cancelarPedidoCliente(req, res) {
     if (statusAtual === "cancelado") {
       await conexao.rollback();
       transacaoFinalizada = true;
+
       return res.status(400).json({
         mensagem: "Este pedido já está cancelado.",
       });
@@ -748,6 +852,7 @@ async function cancelarPedidoCliente(req, res) {
     if (!STATUS_CANCELAVEIS.includes(statusAtual)) {
       await conexao.rollback();
       transacaoFinalizada = true;
+
       return res.status(400).json({
         mensagem:
           "Não é possível cancelar este pedido pois ele já avançou no preparo ou saiu para entrega.",
@@ -755,6 +860,7 @@ async function cancelarPedidoCliente(req, res) {
     }
 
     const linhaMotivo = `Cancelamento: ${motivo}`;
+
     const novasObservacoes = pedido.observacoes
       ? `${pedido.observacoes}\n${linhaMotivo}`.slice(0, 1000)
       : linhaMotivo.slice(0, 1000);

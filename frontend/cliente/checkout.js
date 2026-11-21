@@ -7,6 +7,7 @@
 const API_CARRINHO = "/api/cliente/carrinho";
 const API_PEDIDOS = "/api/pedidos";
 const API_PERFIL = "/api/cliente/perfil";
+const API_FORMAS_PAGAMENTO = "/api/formas-pagamento";
 
 const TAXA_PADRAO_ENTREGA = 6.0;
 
@@ -61,6 +62,8 @@ let carrinhoAtual = [];
 let enderecosSalvos = [];
 let enderecoSelecionadoId = null;
 let pedidoEmEnvio = false;
+
+let formasPagamentoDisponiveis = [];
 
 // ======================================================
 // UTILITÁRIOS
@@ -155,6 +158,140 @@ function normalizarItemCarrinho(item) {
     subtotal: precoUnitario * quantidade,
     adicionais,
   };
+}
+
+// ======================================================
+// FORMAS DE PAGAMENTO
+// ======================================================
+
+function obterFormaPagamentoSelecionada() {
+  if (!formaPagamento || !formaPagamento.value) {
+    return null;
+  }
+
+  const id = Number(formaPagamento.value);
+
+  return (
+    formasPagamentoDisponiveis.find((forma) => Number(forma.id) === id) || null
+  );
+}
+
+function obterTipoPagamentoSelecionado() {
+  const forma = obterFormaPagamentoSelecionada();
+
+  return forma ? String(forma.tipo).toLowerCase() : "";
+}
+
+async function carregarFormasPagamento() {
+  if (!formaPagamento) {
+    throw new Error("Campo de forma de pagamento não encontrado.");
+  }
+
+  formaPagamento.disabled = true;
+  formaPagamento.replaceChildren();
+
+  const opcaoInicial = document.createElement("option");
+  opcaoInicial.value = "";
+  opcaoInicial.textContent = "Carregando formas de pagamento...";
+
+  formaPagamento.appendChild(opcaoInicial);
+
+  try {
+    const resposta = await fetch(API_FORMAS_PAGAMENTO, {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    const dados = await lerResposta(resposta);
+
+    if (!resposta.ok) {
+      throw new Error(
+        dados.mensagem || "Não foi possível carregar as formas de pagamento.",
+      );
+    }
+
+    if (!Array.isArray(dados.formasPagamento)) {
+      throw new Error(
+        "A API não retornou uma lista válida de formas de pagamento.",
+      );
+    }
+
+    formasPagamentoDisponiveis = dados.formasPagamento.filter((forma) => {
+      return (
+        Number(forma.id) > 0 &&
+        typeof forma.nome === "string" &&
+        typeof forma.tipo === "string"
+      );
+    });
+
+    formaPagamento.replaceChildren();
+
+    const opcaoInicialReal = document.createElement("option");
+    opcaoInicialReal.value = "";
+    opcaoInicialReal.textContent = "Selecione uma forma de pagamento";
+
+    formaPagamento.appendChild(opcaoInicialReal);
+
+    formasPagamentoDisponiveis.forEach((forma) => {
+      const opcao = document.createElement("option");
+
+      opcao.value = String(forma.id);
+      opcao.textContent = forma.nome;
+      opcao.dataset.tipo = String(forma.tipo).toLowerCase();
+
+      formaPagamento.appendChild(opcao);
+    });
+
+    if (formasPagamentoDisponiveis.length === 0) {
+      opcaoInicialReal.textContent = "Nenhuma forma de pagamento disponível";
+
+      formaPagamento.disabled = true;
+
+      throw new Error(
+        "Não existem formas de pagamento ativas no momento. Entre em contato com o estabelecimento.",
+      );
+    }
+
+    formaPagamento.disabled = false;
+
+    atualizarCampoTroco();
+
+    return true;
+  } catch (erro) {
+    formasPagamentoDisponiveis = [];
+
+    formaPagamento.replaceChildren();
+
+    const opcaoErro = document.createElement("option");
+    opcaoErro.value = "";
+    opcaoErro.textContent = "Formas de pagamento indisponíveis";
+
+    formaPagamento.appendChild(opcaoErro);
+    formaPagamento.disabled = true;
+
+    console.error("Erro ao carregar formas de pagamento:", erro);
+
+    throw erro;
+  }
+}
+
+function atualizarCampoTroco() {
+  if (!trocoGroup || !formaPagamento) return;
+
+  const tipo = obterTipoPagamentoSelecionado();
+  const mostrarTroco = tipo === "dinheiro";
+
+  trocoGroup.classList.toggle("hidden", !mostrarTroco);
+
+  const campoTroco = document.getElementById("troco");
+
+  if (campoTroco && !mostrarTroco) {
+    campoTroco.value = "";
+  }
 }
 
 // ======================================================
@@ -919,26 +1056,41 @@ function montarConfirmacao(dadosPedido = null) {
 
   const retirada = tipoEntrega.value === "retirada";
 
-  document.getElementById("confEnderecoTexto").textContent = retirada
-    ? "Retirada no estabelecimento."
-    : `${campoRua.value}, ${campoNumero.value} - ${campoBairro.value}, ${campoCidade.value}`;
+  const elementoEndereco = document.getElementById("confEnderecoTexto");
 
-  const metodo = formaPagamento.options[formaPagamento.selectedIndex].text;
+  if (elementoEndereco) {
+    elementoEndereco.textContent = retirada
+      ? "Retirada no estabelecimento."
+      : `${campoRua.value}, ${campoNumero.value} - ${campoBairro.value}, ${campoCidade.value}`;
+  }
 
-  const troco = document.getElementById("troco").value;
+  const formaSelecionada = obterFormaPagamentoSelecionada();
+  const metodo = formaSelecionada
+    ? formaSelecionada.nome
+    : "Forma de pagamento não selecionada";
 
-  document.getElementById("confPagamentoTexto").textContent =
-    metodo +
-    (formaPagamento.value === "dinheiro" && troco
-      ? ` — Troco para ${moeda(troco)}`
-      : "");
+  const troco = document.getElementById("troco")?.value || "";
+
+  const elementoPagamento = document.getElementById("confPagamentoTexto");
+
+  if (elementoPagamento) {
+    elementoPagamento.textContent =
+      metodo +
+      (obterTipoPagamentoSelecionado() === "dinheiro" && troco
+        ? ` — Troco para ${moeda(troco)}`
+        : "");
+  }
 
   const totalConfirmado =
     dadosPedido && dadosPedido.total !== undefined
       ? Number(dadosPedido.total)
       : totalPedido();
 
-  document.getElementById("confTotal").textContent = moeda(totalConfirmado);
+  const elementoTotal = document.getElementById("confTotal");
+
+  if (elementoTotal) {
+    elementoTotal.textContent = moeda(totalConfirmado);
+  }
 }
 
 // ======================================================
@@ -1000,18 +1152,23 @@ if (btnSalvarEnderecoPerfil) {
   btnSalvarEnderecoPerfil.addEventListener("click", salvarEnderecoNoPerfil);
 }
 
-campoBairro.addEventListener("input", () => {
-  enderecoSelecionadoId = null;
+if (campoBairro) {
+  campoBairro.addEventListener("input", () => {
+    enderecoSelecionadoId = null;
 
-  if (seletorEndereco) {
-    seletorEndereco.value = "";
-  }
+    if (seletorEndereco) {
+      seletorEndereco.value = "";
+    }
 
-  agendarCalculoTaxa();
-});
+    agendarCalculoTaxa();
+  });
 
-campoBairro.addEventListener("change", calcularTaxaEntrega);
-campoCep.addEventListener("change", calcularTaxaEntrega);
+  campoBairro.addEventListener("change", calcularTaxaEntrega);
+}
+
+if (campoCep) {
+  campoCep.addEventListener("change", calcularTaxaEntrega);
+}
 
 tipoEntrega.addEventListener("change", async () => {
   const retirada = tipoEntrega.value === "retirada";
@@ -1034,9 +1191,7 @@ tipoEntrega.addEventListener("change", async () => {
 // EVENTOS DE PAGAMENTO
 // ======================================================
 
-formaPagamento.addEventListener("change", () => {
-  trocoGroup.classList.toggle("hidden", formaPagamento.value !== "dinheiro");
-});
+formaPagamento.addEventListener("change", atualizarCampoTroco);
 
 // ======================================================
 // NAVEGAÇÃO ENTRE ETAPAS
@@ -1060,12 +1215,12 @@ document.getElementById("btnVoltar2").addEventListener("click", () => {
 });
 
 document.getElementById("btnProximo2").addEventListener("click", () => {
-  if (!formaPagamento.value) {
+  if (!obterFormaPagamentoSelecionada()) {
     alert("Selecione uma forma de pagamento.");
     return;
   }
 
-  if (formaPagamento.value === "dinheiro") {
+  if (obterTipoPagamentoSelecionado() === "dinheiro") {
     const trocoCampo = document.getElementById("troco");
     const troco = Number(trocoCampo.value);
 
@@ -1074,6 +1229,7 @@ document.getElementById("btnProximo2").addEventListener("click", () => {
         "O valor informado para troco precisa ser igual ou superior ao total com entrega.",
       );
 
+      trocoCampo.focus();
       return;
     }
   }
@@ -1130,8 +1286,10 @@ form.addEventListener("submit", async (evento) => {
       return;
     }
 
-    if (!formaPagamento.value) {
-      throw new Error("Selecione uma forma de pagamento.");
+    const formaSelecionada = obterFormaPagamentoSelecionada();
+
+    if (!formaSelecionada) {
+      throw new Error("Selecione uma forma de pagamento válida.");
     }
 
     const taxaFinal = entrega === "entrega" ? await calcularTaxaEntrega() : 0;
@@ -1154,6 +1312,8 @@ form.addEventListener("submit", async (evento) => {
       };
     });
 
+    const tipoPagamento = String(formaSelecionada.tipo).toLowerCase();
+
     const payload = {
       tipo_entrega: entrega,
 
@@ -1170,10 +1330,10 @@ form.addEventListener("submit", async (evento) => {
             }
           : null,
 
-      forma_pagamento: formaPagamento.value,
+      forma_pagamento_id: Number(formaSelecionada.id),
 
       troco_para:
-        formaPagamento.value === "dinheiro"
+        tipoPagamento === "dinheiro"
           ? Number(document.getElementById("troco").value || 0)
           : null,
 
@@ -1260,19 +1420,6 @@ form.addEventListener("submit", async (evento) => {
         "O pedido foi registrado, mas o carrinho não foi limpo no servidor.",
       );
     }
-
-    if (Number.isFinite(totalConfirmado)) {
-      const elementoTotal = document.getElementById("checkoutTotal");
-      const elementoConfTotal = document.getElementById("confTotal");
-
-      if (elementoTotal) {
-        elementoTotal.textContent = moeda(totalConfirmado);
-      }
-
-      if (elementoConfTotal) {
-        elementoConfTotal.textContent = moeda(totalConfirmado);
-      }
-    }
   } catch (erro) {
     console.error("Erro ao finalizar pedido:", erro);
 
@@ -1301,6 +1448,8 @@ async function iniciarCheckout() {
 
     if (!carregado) return;
 
+    await carregarFormasPagamento();
+
     await carregarEnderecosSalvos();
 
     await calcularTaxaEntrega();
@@ -1309,7 +1458,9 @@ async function iniciarCheckout() {
   } catch (erro) {
     console.error("Erro ao iniciar checkout:", erro);
 
-    alert("Não foi possível carregar o checkout. Tente novamente.");
+    alert(
+      erro.message || "Não foi possível carregar o checkout. Tente novamente.",
+    );
   }
 }
 

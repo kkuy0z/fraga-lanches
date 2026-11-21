@@ -1,328 +1,1193 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-    <link rel="manifest" href="/manifest.json">
- <meta name=theme-color content=#1a1a1a>
+    <title>Horários | Fraga Lanches Admin</title>
 
- <meta name=theme-color content=#1a1a1a>
+    <meta name="theme-color" content="#0c0c0c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin" />
 
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; base-uri 'self'; form-action 'self';"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="geolocation=(), microphone=(), camera=()"
+    />
 
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/assets/images/icons/logo.png" />
+    <link rel="apple-touch-icon" href="/assets/images/icons/logo.png" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HorÃ¡rios - Fraga Lanches Admin</title>
-    <link rel="stylesheet" href="/design-system.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0c0c0c">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin">
+    <link rel="stylesheet" href="/design-system.css" />
 
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self';">
-    <!-- Referrer Policy -->
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    <!-- Permissions Policy -->
-    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
-<link rel="icon" type="image/png" href="/assets/images/icons/logo.png">
-<link rel="apple-touch-icon" href="/assets/images/icons/logo.png">
-</head>
+    <style>
+      :root {
+        --adm-bg: #0c0c0c;
+        --adm-surface: #141414;
+        --adm-card: #191919;
+        --adm-card-elevated: #1e1e1e;
+        --adm-border: rgba(255, 255, 255, 0.08);
+        --adm-border-strong: #2c2c2c;
+        --adm-yellow: #f5c542;
+        --adm-yellow-hover: #ffda65;
+        --adm-yellow-soft: rgba(245, 197, 66, 0.14);
+        --adm-text: #f5f5f5;
+        --adm-muted: #a5a5a5;
+        --adm-danger: #fca5a5;
+        --adm-danger-bg: rgba(248, 113, 113, 0.14);
+        --adm-danger-border: rgba(248, 113, 113, 0.42);
+        --adm-info: #93c5fd;
+        --adm-info-bg: rgba(96, 165, 250, 0.14);
+        --adm-info-border: rgba(96, 165, 250, 0.38);
+      }
 
-<body>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+        width: 100%;
+        overflow-x: clip;
+      }
+
+      body {
+        display: block;
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 0;
+        overflow-x: clip;
+        background:
+          radial-gradient(
+            circle at 12% 6%,
+            rgba(245, 197, 66, 0.09),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 88% 92%,
+            rgba(245, 197, 66, 0.05),
+            transparent 42%
+          ),
+          var(--adm-bg);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+      }
+
+      body section {
+        position: static;
+        min-height: 0;
+        height: auto;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      .py-4 {
+        padding-top: 28px !important;
+        padding-bottom: 28px !important;
+      }
+
+      /* Header Administrativo */
+      .admin-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        width: 100%;
+
+        border-bottom: 1px solid var(--adm-border);
+
+        background: rgba(12, 12, 12, 0.92);
+
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+
+        width: 100%;
+        max-width: 1440px;
+        min-height: 76px;
+
+        margin: 0 auto;
+        padding: 12px 36px;
+      }
+
+      .logo a {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+
+      .logo-img {
+        width: 43px;
+        height: 43px;
+        object-fit: cover;
+
+        border: 1px solid rgba(245, 197, 66, 0.45);
+        border-radius: 50%;
+
+        box-shadow: 0 0 22px rgba(245, 197, 66, 0.08);
+      }
+
+      .logo-label {
+        color: #fff;
+        font-family: "Cinzel", serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .admin-nav {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .admin-nav a {
+        padding: 8px 14px;
+        border-radius: 9px;
+        border: 1px solid transparent;
+        color: var(--adm-muted);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-decoration: none;
+        white-space: nowrap;
+        transition:
+          color 0.2s ease,
+          background-color 0.2s ease,
+          border-color 0.2s ease;
+      }
+
+      .admin-nav a:hover {
+        color: #ffffff;
+        background-color: rgba(255, 255, 255, 0.04);
+      }
+
+      .admin-nav a.active {
+        color: var(--adm-yellow);
+        background-color: var(--adm-yellow-soft);
+        border-color: rgba(245, 197, 66, 0.36);
+      }
+
+      /* Menu do Usuário */
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .user-menu {
+        position: relative;
+      }
+
+      .user-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 5px 14px 5px 6px;
+        border: 1px solid #343434;
+        border-radius: 999px;
+        background-color: var(--adm-card);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          border-color 0.2s ease,
+          background-color 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .user-button:hover {
+        border-color: rgba(245, 197, 66, 0.55);
+        background-color: var(--adm-card-elevated);
+        color: var(--adm-yellow);
+      }
+
+      .user-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: var(--adm-yellow);
+        color: #141414;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .user-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 190px;
+        padding: 8px;
+        border: 1px solid #323232;
+        border-radius: 12px;
+        background-color: var(--adm-card);
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.85);
+        z-index: 1200;
+      }
+
+      .user-dropdown.open,
+      .user-dropdown.show {
+        display: block;
+      }
+
+      .user-dropdown-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 8px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .user-dropdown-divider {
+        height: 1px;
+        margin: 6px 0;
+        background-color: var(--adm-border);
+      }
+
+      .user-dropdown-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 9px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #e5e5e5;
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .user-dropdown-item:hover {
+        background-color: rgba(245, 197, 66, 0.1);
+        color: var(--adm-yellow);
+      }
+
+      .user-dropdown-item.btn-logout {
+        color: var(--adm-danger);
+      }
+
+      .user-dropdown-item.btn-logout:hover {
+        background-color: var(--adm-danger-bg);
+        color: var(--adm-danger);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .badge-info {
+        background-color: var(--adm-info-bg);
+        border: 1px solid var(--adm-info-border);
+        color: var(--adm-info);
+      }
+
+      /* Botão Mobile */
+      .admin-nav-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #333333;
+        border-radius: 10px;
+        background-color: var(--adm-card);
+        color: var(--adm-text);
+        cursor: pointer;
+      }
+
+      .admin-nav-toggle:hover {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      /* Conteúdo Principal */
+      .page-main.admin-main {
+        width: 100%;
+        padding: 28px 24px 84px;
+      }
+
+      .page-main > .container {
+        width: 100%;
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      .page-header {
+        padding: 6px 0 26px;
+        text-align: left;
+      }
+
+      .page-header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .page-title {
+        margin: 0 0 6px;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(36px, 5vw, 50px);
+        font-weight: 400;
+        line-height: 1.05;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .page-subtitle {
+        margin: 0;
+        color: var(--adm-muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .yellow-line {
+        width: 64px;
+        height: 3px;
+        margin-top: 14px;
+        border-radius: 999px;
+        background-color: var(--adm-yellow);
+      }
+
+      /* Card Status do Estabelecimento */
+      .status-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding: 20px 22px;
+        border: 1px solid var(--adm-border-strong);
+        border-radius: 14px;
+        background-color: var(--adm-card);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      }
+
+      .status-card-title {
+        margin: 0 0 4px;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: 18px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .status-card-subtitle {
+        margin: 0;
+        color: var(--adm-muted);
+        font-size: 12px;
+      }
+
+      .status-badge-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #323232;
+        background-color: var(--adm-surface);
+      }
+
+      .status-indicator {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background-color: var(--adm-muted);
+      }
+
+      /* Tabela */
+      .admin-table-section {
+        border: 1px solid var(--adm-border-strong);
+        border-radius: 16px;
+        background-color: var(--adm-card);
+        padding: 22px;
+        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.45);
+      }
+
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--adm-border);
+        border-radius: 12px;
+        background-color: var(--adm-surface);
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      .table th {
+        padding: 14px 16px;
+        border-bottom: 1px solid #2a2a2a;
+        background-color: #111111;
+        color: var(--adm-yellow);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+        color: #ececec;
+        font-size: 13px;
+        vertical-align: middle;
+      }
+
+      .table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .table tbody tr:hover {
+        background-color: rgba(245, 197, 66, 0.035);
+      }
+
+      /* Botões */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 40px;
+        padding: 9px 18px;
+        border-radius: 9px;
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .btn-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+
+      .btn-primary {
+        border: 1px solid var(--adm-yellow);
+        background-color: var(--adm-yellow);
+        color: #141414;
+      }
+
+      .btn-primary:hover {
+        border-color: var(--adm-yellow-hover);
+        background-color: var(--adm-yellow-hover);
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        border: 1px solid #383838;
+        background-color: #141414;
+        color: #e5e5e5;
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      .btn-danger {
+        border: 1px solid var(--adm-danger-border);
+        background-color: var(--adm-danger-bg);
+        color: var(--adm-danger);
+      }
+
+      .btn-danger:hover {
+        background-color: rgba(248, 113, 113, 0.24);
+      }
+
+      /* Estado vazio */
+      .empty-state {
+        margin-top: 24px;
+        padding: 44px 20px;
+        border: 1px solid var(--adm-border-strong);
+        border-radius: 14px;
+        background-color: var(--adm-card);
+        text-align: center;
+      }
+
+      .empty-state-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 58px;
+        height: 58px;
+        margin-bottom: 12px;
+        border-radius: 50%;
+        background-color: var(--adm-yellow-soft);
+        color: var(--adm-yellow);
+      }
+
+      .empty-state-title {
+        margin: 0 0 6px;
+        color: #ffffff;
+        font-size: 16px;
+      }
+
+      .empty-state-message {
+        margin: 0 0 18px;
+        color: var(--adm-muted);
+        font-size: 13px;
+      }
+
+      /* Modais e Formulários */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.78);
+        backdrop-filter: blur(4px);
+      }
+
+      .modal {
+        width: 100%;
+        max-width: 560px;
+        max-height: 90vh;
+        overflow-y: auto;
+        border: 1px solid #323232;
+        border-radius: 16px;
+        background-color: var(--adm-card);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.88);
+      }
+
+      .modal.modal-md {
+        max-width: 540px;
+      }
+
+      .modal.modal-sm {
+        max-width: 440px;
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--adm-border-strong);
+      }
+
+      .modal-title {
+        margin: 0;
+        color: var(--adm-yellow);
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .modal-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 1px solid #333333;
+        border-radius: 8px;
+        background-color: var(--adm-surface);
+        color: #e5e5e5;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .modal-close:hover {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      .modal-body {
+        padding: 20px;
+      }
+
+      .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--adm-border-strong);
+      }
+
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+        width: 100%;
+      }
+
+      .form-row .form-group {
+        flex: 1 1 180px;
+        width: auto;
+      }
+
+      .form-label {
+        margin: 0;
+        color: var(--adm-muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .form-input,
+      .form-select {
+        min-height: 40px;
+        padding: 8px 12px;
+        border: 1px solid #323232;
+        border-radius: 9px;
+        background-color: var(--adm-surface);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .form-input:focus,
+      .form-select:focus {
+        outline: none;
+        border-color: var(--adm-yellow);
+        box-shadow: 0 0 0 2px rgba(245, 197, 66, 0.16);
+      }
+
+      .form-help {
+        display: block;
+        margin: 6px 0 0;
+        color: var(--adm-muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .form-check {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 12px;
+        cursor: pointer;
+      }
+
+      .form-check-input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: var(--adm-yellow);
+        cursor: pointer;
+      }
+
+      .form-check-label {
+        margin: 0;
+        color: var(--adm-text);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      @media (max-width: 900px) {
+        .admin-nav-toggle {
+          display: inline-flex;
+        }
+
+        .admin-nav {
+          display: none;
+          position: fixed;
+          top: 76px;
+          left: 16px;
+          right: 16px;
+          flex-direction: column;
+          align-items: stretch;
+          padding: 12px;
+          border: 1px solid #333333;
+          border-radius: 14px;
+          background-color: var(--adm-card);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+          z-index: 1100;
+        }
+
+        .admin-nav.open,
+        .admin-nav.show {
+          display: flex;
+        }
+
+        .admin-nav a {
+          padding: 10px 14px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .page-main.admin-main {
+          padding: 20px 14px 80px;
+        }
+
+        .header-inner {
+          padding: 12px 16px;
+        }
+
+        .admin-table-section,
+        .status-card {
+          padding: 16px;
+          border-radius: 14px;
+        }
+
+        .logo-label,
+        #userName {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
     <!-- Header Admin -->
     <header class="header-fixed admin-header" role="banner">
-        <div class="header-inner">
-            <div class="logo">
-                <a href="/inicio/admin-dashboard.html">
-                    <img src="/frontend/imagens/logo.png" alt="Fraga Lanches Admin" class="logo-img">
-                    <span style="display: none; font-size: 20px; font-weight: 700; color: var(--primary);">Fraga Admin</span>
-                </a>
-            </div>
-
-            <nav class="admin-nav" id="adminNav" role="navigation" aria-label="NavegaÃ§Ã£o administrativa">
-                <a href="/inicio/admin-dashboard.html" data-page="dashboard">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-                        <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-                        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-                        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-                    </svg>
-                    Dashboard
-                </a>
-                <a href="/inicio/admin-categorias.html" data-page="categorias">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <line x1="4" y1="7" x2="4" y2="21"></line>
-                        <line x1="4" y1="7" x2="20" y2="7"></line>
-                        <line x1="8" y1="7" x2="8" y2="21"></line>
-                        <line x1="12" y1="7" x2="12" y2="21"></line>
-                        <line x1="16" y1="7" x2="16" y2="21"></line>
-                        <line x1="20" y1="7" x2="20" y2="21"></line>
-                    </svg>
-                    Categorias
-                </a>
-                <a href="/inicio/admin-produtos.html" data-page="produtos">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                    Produtos
-                </a>
-                <a href="/inicio/admin-pedidos.html" data-page="pedidos">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M16 11V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"></path>
-                        <path d="M8 7v9"></path>
-                        <path d="M12 7v9"></path>
-                        <path d="M16 7v9"></path>
-                    </svg>
-                    Pedidos
-                </a>
-                <a href="/inicio/admin-horarios.html" class="active" data-page="horarios">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    HorÃ¡rios
-                </a>
-                <a href="/inicio/admin-entrega.html" data-page="entrega">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M5 12h14"></path>
-                        <path d="M12 5v14"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    Entrega
-                </a>
-                <a href="/inicio/admin-pagamentos.html" data-page="pagamentos">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <rect x="1" y="4" width="22" height="16" rx="2"></rect>
-                        <line x1="1" y1="10" x2="23" y2="10"></line>
-                    </svg>
-                    Pagamentos
-                </a>
-                <a href="/inicio/admin-usuarios.html" data-page="usuarios">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    UsuÃ¡rios
-                </a>
-            </nav>
-
-            <div class="header-actions">
-                <div class="user-menu" id="userMenu">
-                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuÃ¡rio">
-                        <div class="user-avatar" id="userAvatar">?</div>
-                        <span id="userName">Admin</span>
-                    </button>
-                    <div class="user-dropdown" id="userDropdown" role="menu">
-                        <div class="user-dropdown-header">
-                            <span id="dropdownUserName">Admin</span>
-                            <span id="dropdownUserRole" class="badge badge-info">administrador</span>
-                        </div>
-                        <div class="user-dropdown-divider"></div>
-                        <a href="/inicio/index.html" class="user-dropdown-item" role="menuitem" target="_blank" rel="noopener noreferrer">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="margin-right: 8px;">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                <polyline points="15 3 21 3 21 9"></polyline>
-                                <line x1="10" y1="14" x2="21" y2="3"></line>
-                            </svg>
-                            Ver Site
-                        </a>
-                        <div class="user-dropdown-divider"></div>
-                        <button class="user-dropdown-item btn-logout" id="logoutBtn" role="menuitem">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="margin-right: 8px;">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                                <polyline points="16 17 21 12 16 7"></polyline>
-                                <line x1="21" y1="12" x2="9" y2="12"></line>
-                            </svg>
-                            Sair
-                        </button>
-                    </div>
-                </div>
-            </div>
+      <div class="header-inner">
+        <div class="logo">
+          <a href="/admin/admin-dashboard.html">
+            <img src="/imagens/logo.png" alt="Fraga Lanches" class="logo-img" />
+            <span class="logo-label">Fraga Admin</span>
+          </a>
         </div>
-    </header>
 
-    <!-- Mobile Nav Toggle -->
-    <button class="admin-nav-toggle" id="adminNavToggle" aria-label="Alternar menu" aria-expanded="false" style="display: none;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-    </button>
+        <nav
+          class="admin-nav"
+          id="adminNav"
+          role="navigation"
+          aria-label="Navegação administrativa"
+        >
+          <a href="/admin/admin-dashboard.html" data-page="dashboard"
+            >Dashboard</a
+          >
+          <a href="/admin/admin-pedidos.html" data-page="pedidos">Pedidos</a>
+          <a href="/admin/admin-cardapio.html" data-page="cardapio">Cardápio</a>
+          <a
+            class="active"
+            href="/admin/admin-horarios.html"
+            data-page="horarios"
+            >Horários</a
+          >
+          <a href="/admin/admin-entrega.html" data-page="entrega">Entrega</a>
+          <a href="/admin/admin-pagamentos.html" data-page="pagamentos"
+            >Pagamentos</a
+          >
+          <a href="/admin/admin-usuarios.html" data-page="usuarios">Usuários</a>
+        </nav>
+
+        <div class="header-actions">
+          <button
+            type="button"
+            class="admin-nav-toggle"
+            id="adminNavToggle"
+            aria-label="Alternar menu"
+            aria-expanded="false"
+            aria-controls="adminNav"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <div class="user-menu" id="userMenu">
+            <button
+              type="button"
+              class="user-button"
+              id="userButton"
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-label="Menu do usuário"
+            >
+              <div class="user-avatar" id="userAvatar">?</div>
+              <span id="userName">Admin</span>
+            </button>
+            <div class="user-dropdown" id="userDropdown" role="menu">
+              <div class="user-dropdown-header">
+                <span id="dropdownUserName">Admin</span>
+                <span id="dropdownUserRole" class="badge badge-info"
+                  >Administrador</span
+                >
+              </div>
+              <div class="user-dropdown-divider"></div>
+              <button
+                type="button"
+                class="user-dropdown-item btn-logout"
+                id="logoutBtn"
+                role="menuitem"
+              >
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
 
     <!-- Main Content -->
     <main class="page-main admin-main" role="main">
-        <div class="container">
-            <!-- Page Header -->
-            <div class="page-header">
-                <div class="page-header-inner">
-                    <div class="d-flex justify-between align-center" style="flex-wrap: wrap; gap: var(--space-4);">
-                        <div>
-                            <h1 class="page-title">HorÃ¡rios de Funcionamento</h1>
-                            <p class="page-subtitle">Configure os dias e horÃ¡rios de atendimento</p>
-                        </div>
-                        <button class="btn btn-primary" id="btnNovoHorario">
-                            <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
-                            Novo HorÃ¡rio
-                        </button>
-                    </div>
-                    <div class="yellow-line"></div>
-                </div>
+      <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="page-header-top">
+            <div>
+              <h1 class="page-title">Horários de Funcionamento</h1>
+              <p class="page-subtitle">
+                Configure os dias e horários de atendimento
+              </p>
+              <div class="yellow-line"></div>
             </div>
 
-            <!-- Status Atual -->
-            <div class="card" style="margin-bottom: var(--space-6); padding: var(--space-6);">
-                <div class="d-flex justify-between align-center" style="flex-wrap: wrap; gap: var(--space-4);">
-                    <div>
-                        <h3 class="card-title" style="margin-bottom: var(--space-1);">Status do Estabelecimento</h3>
-                        <p style="color: var(--color-text-muted); font-size: var(--fs-sm);">Baseado nos horÃ¡rios configurados e horÃ¡rio atual</p>
-                    </div>
-                    <div id="statusAtualContainer" class="d-flex align-center gap-3">
-                        <div class="status-indicator" id="statusIndicator" style="width: 12px; height: 12px; border-radius: 50%; background: var(--color-text-muted);"></div>
-                        <span id="statusText" style="font-weight: 600; font-size: var(--fs-lg);">Verificando...</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tabela de HorÃ¡rios -->
-            <section class="admin-table-section" aria-label="Lista de horÃ¡rios">
-                <div class="table-container">
-                    <table class="table" id="tabelaHorarios">
-                        <thead>
-                            <tr>
-                                <th>Dia da Semana</th>
-                                <th>Abre</th>
-                                <th>Fecha</th>
-                                <th>Status</th>
-                                <th>AÃ§Ãµes</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbodyHorarios">
-                            <tr>
-                                <td colspan="5" class="text-center py-4">Carregando...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Estado Vazio -->
-            <div class="empty-state hidden" id="emptyState">
-                <div class="empty-state-icon">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                </div>
-                <h2 class="empty-state-title">Nenhum horÃ¡rio cadastrado</h2>
-                <p class="empty-state-message">Adicione os horÃ¡rios de funcionamento para cada dia da semana.</p>
-                <button class="btn btn-primary" id="btnPrimeiroHorario" style="margin-top: var(--space-4);">
-                    <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
-                    Adicionar HorÃ¡rio
-                </button>
-            </div>
+            <button type="button" class="btn btn-primary" id="btnNovoHorario">
+              <svg class="btn-icon" aria-hidden="true">
+                <use href="#i-add" />
+              </svg>
+              Novo Horário
+            </button>
+          </div>
         </div>
+
+        <!-- Status Atual -->
+        <section class="status-card" aria-label="Status do estabelecimento">
+          <div>
+            <h2 class="status-card-title">Status do Estabelecimento</h2>
+            <p class="status-card-subtitle">
+              Baseado nos horários configurados e horário atual
+            </p>
+          </div>
+          <div id="statusAtualContainer" class="status-badge-box">
+            <div
+              class="status-indicator"
+              id="statusIndicator"
+              aria-hidden="true"
+            ></div>
+            <span id="statusText" style="font-weight: 600; font-size: 13px"
+              >Verificando...</span
+            >
+          </div>
+        </section>
+
+        <!-- Tabela de Horários -->
+        <section class="admin-table-section" aria-label="Lista de horários">
+          <div class="table-container">
+            <table class="table" id="tabelaHorarios">
+              <thead>
+                <tr>
+                  <th>Dia da Semana</th>
+                  <th>Abre</th>
+                  <th>Fecha</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyHorarios">
+                <tr>
+                  <td colspan="5" class="text-center py-4">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Estado Vazio -->
+        <div class="empty-state hidden" id="emptyState">
+          <div class="empty-state-icon">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <h2 class="empty-state-title">Nenhum horário cadastrado</h2>
+          <p class="empty-state-message">
+            Adicione os horários de funcionamento para cada dia da semana.
+          </p>
+          <button type="button" class="btn btn-primary" id="btnPrimeiroHorario">
+            <svg class="btn-icon" aria-hidden="true">
+              <use href="#i-add" />
+            </svg>
+            Adicionar Horário
+          </button>
+        </div>
+      </div>
     </main>
 
     <!-- Footer will be injected by shared-components.js -->
 
-    <!-- Modal Novo/Editar HorÃ¡rio -->
-    <div class="modal-overlay hidden" id="horarioModal" role="dialog" aria-modal="true" aria-labelledby="horarioModalTitulo">
-        <div class="modal modal-md">
-            <div class="modal-header">
-                <h2 class="modal-title" id="horarioModalTitulo">Novo HorÃ¡rio</h2>
-                <button class="modal-close" id="horarioModalClose" aria-label="Fechar modal">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-x" /></svg>
-                </button>
-            </div>
-            <form id="horarioForm" class="modal-body" novalidate>
-                <input type="hidden" id="horarioId" name="id">
-
-                <div class="form-group">
-                    <label for="horarioDiaSemana" class="form-label">Dia da Semana *</label>
-                    <select id="horarioDiaSemana" name="dia_semana" class="form-select" required>
-                        <option value="">Selecione o dia</option>
-                        <option value="0">Domingo</option>
-                        <option value="1">Segunda-feira</option>
-                        <option value="2">TerÃ§a-feira</option>
-                        <option value="3">Quarta-feira</option>
-                        <option value="4">Quinta-feira</option>
-                        <option value="5">Sexta-feira</option>
-                        <option value="6">SÃ¡bado</option>
-                    </select>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group" style="flex: 1;">
-                        <label for="horarioAbre" class="form-label">HorÃ¡rio de Abertura *</label>
-                        <input type="time" id="horarioAbre" name="hora_abre" class="form-input" required>
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label for="horarioFecha" class="form-label">HorÃ¡rio de Fechamento *</label>
-                        <input type="time" id="horarioFecha" name="hora_fecha" class="form-input" required>
-                    </div>
-                </div>
-
-                <div class="form-check" style="margin-top: var(--space-4);">
-                    <input type="checkbox" id="horarioFechado" name="fechado" class="form-check-input">
-                    <label for="horarioFechado" class="form-check-label">Fechado neste dia</label>
-                </div>
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="btnCancelarHorario">Cancelar</button>
-                <button type="submit" form="horarioForm" class="btn btn-primary" id="btnSalvarHorario">
-                    <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
-                    Salvar HorÃ¡rio
-                </button>
-            </div>
+    <!-- Modal Novo/Editar Horário -->
+    <div
+      class="modal-overlay hidden"
+      id="horarioModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="horarioModalTitulo"
+    >
+      <div class="modal modal-md">
+        <div class="modal-header">
+          <h2 class="modal-title" id="horarioModalTitulo">Novo Horário</h2>
+          <button
+            type="button"
+            class="modal-close"
+            id="horarioModalClose"
+            aria-label="Fechar modal"
+          >
+            &times;
+          </button>
         </div>
+
+        <form id="horarioForm" class="modal-body" novalidate>
+          <input type="hidden" id="horarioId" name="id" />
+
+          <div class="form-group">
+            <label for="horarioDiaSemana" class="form-label"
+              >Dia da Semana *</label
+            >
+            <select
+              id="horarioDiaSemana"
+              name="dia_semana"
+              class="form-select"
+              required
+            >
+              <option value="">Selecione o dia</option>
+              <option value="0">Domingo</option>
+              <option value="1">Segunda-feira</option>
+              <option value="2">Terça-feira</option>
+              <option value="3">Quarta-feira</option>
+              <option value="4">Quinta-feira</option>
+              <option value="5">Sexta-feira</option>
+              <option value="6">Sábado</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="horarioAbre" class="form-label"
+                >Horário de Abertura *</label
+              >
+              <input
+                type="time"
+                id="horarioAbre"
+                name="hora_abre"
+                class="form-input"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="horarioFecha" class="form-label"
+                >Horário de Fechamento *</label
+              >
+              <input
+                type="time"
+                id="horarioFecha"
+                name="hora_fecha"
+                class="form-input"
+                required
+              />
+            </div>
+          </div>
+
+          <label class="form-check" for="horarioFechado">
+            <input
+              type="checkbox"
+              id="horarioFechado"
+              name="fechado"
+              class="form-check-input"
+            />
+            <span class="form-check-label">Fechado neste dia</span>
+          </label>
+        </form>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="btnCancelarHorario"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            form="horarioForm"
+            class="btn btn-primary"
+            id="btnSalvarHorario"
+          >
+            <svg class="btn-icon" aria-hidden="true">
+              <use href="#i-save" />
+            </svg>
+            Salvar Horário
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Modal Confirmar ExclusÃ£o -->
-    <div class="modal-overlay hidden" id="deleteHorarioModal" role="dialog" aria-modal="true" aria-labelledby="deleteHorarioModalTitulo">
-        <div class="modal modal-sm">
-            <div class="modal-header">
-                <h2 class="modal-title" id="deleteHorarioModalTitulo">Confirmar ExclusÃ£o</h2>
-            </div>
-            <div class="modal-body">
-                <p>Tem certeza que deseja excluir o horÃ¡rio de <strong id="deleteHorarioDia"></strong>?</p>
-                <p class="form-help">Esta aÃ§Ã£o nÃ£o pode ser desfeita.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="btnCancelarDeleteHorario">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="btnConfirmarDeleteHorario">
-                    <svg class="btn-icon" aria-hidden="true"><use href="#i-trash" /></svg>
-                    Excluir
-                </button>
-            </div>
+    <!-- Modal Confirmar Exclusão -->
+    <div
+      class="modal-overlay hidden"
+      id="deleteHorarioModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="deleteHorarioModalTitulo"
+    >
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <h2 class="modal-title" id="deleteHorarioModalTitulo">
+            Confirmar Exclusão
+          </h2>
         </div>
+
+        <div class="modal-body">
+          <p>
+            Tem certeza que deseja excluir o horário de
+            <strong id="deleteHorarioDia"></strong>?
+          </p>
+          <p class="form-help">Esta ação não pode ser desfeita.</p>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            id="btnCancelarDeleteHorario"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            id="btnConfirmarDeleteHorario"
+          >
+            <svg class="btn-icon" aria-hidden="true">
+              <use href="#i-trash" />
+            </svg>
+            Excluir
+          </button>
+        </div>
+      </div>
     </div>
 
-    <script type="module" src="js/shared-components.js"></script>
-    <script type="module" src="js/admin-horarios.js"></script>
+    <script src="/admin/admin-horarios.js" defer></script>
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/service-worker.js')
-            .catch(error => console.error('[SW] Erro no registro:', error));
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/service-worker.js")
+            .catch((error) => console.error("[SW] Erro no registro:", error));
         });
       }
 
-      // Handle image error events securely (instead of inline onerror)
-      document.addEventListener('DOMContentLoaded', () => {
-        const images = document.querySelectorAll('img');
-        images.forEach(img => {
-          img.addEventListener('error', function() {
-            this.style.display = 'none';
+      document.addEventListener("DOMContentLoaded", () => {
+        const images = document.querySelectorAll("img");
+        images.forEach((img) => {
+          img.addEventListener("error", function () {
+            this.style.display = "none";
           });
         });
       });
     </script>
-<script src="/pwa.js"></script>
-</body>
-
+    <script src="/pwa.js"></script>
+  </body>
 </html>

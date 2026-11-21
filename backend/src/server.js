@@ -13,15 +13,22 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
 
 const db = require("./database");
 
+// Rotas
+const adminPagamentosRoutes = require("./routes/adminPagamentos");
+const adminHorariosRoutes = require("./routes/adminHorarios");
+const adminEntregaRoutes = require("./routes/adminEntrega");
+const adminCategoriasRoutes = require("./routes/adminCategorias");
+const adminProdutosRoutes = require("./routes/adminProdutos");
+const adminPedidosRoutes = require("./routes/adminPedidos");
+const adminDashboardRoutes = require("./routes/adminDashboard");
+const formasPagamentoRoutes = require("./routes/formasPagamento");
+
 const clientePerfilRoutes = require("./routes/clientePerfil");
 const pedidosRoutes = require("./routes/pedidos");
 const authRoutes = require("./routes/auth");
 const cardapioRoutes = require("./routes/cardapio");
 const carrinhoRoutes = require("./routes/carrinho");
-const adminCategoriasRoutes = require("./routes/adminCategorias");
-const adminProdutosRoutes = require("./routes/adminProdutos");
-const adminPedidosRoutes = require("./routes/adminPedidos");
-const adminDashboardRoutes = require("./routes/adminDashboard");
+const adminFormasPagamentoRoutes = require("./routes/adminFormasPagamento");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,17 +39,26 @@ const frontendPath = path.resolve(__dirname, "../../frontend");
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Rotas da API
-app.use("/api/cliente/perfil", clientePerfilRoutes);
-app.use("/api/cliente/pedidos", pedidosRoutes);
-app.use("/api/cliente/carrinho", carrinhoRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/cardapio", cardapioRoutes);
+// Rotas administrativas
+app.use("/api/admin/pagamentos", adminPagamentosRoutes);
+app.use("/api/admin/horarios", adminHorariosRoutes);
+app.use("/api/admin/entrega", adminEntregaRoutes);
 app.use("/api/admin/categorias", adminCategoriasRoutes);
 app.use("/api/admin/produtos", adminProdutosRoutes);
 app.use("/api/admin/pedidos", adminPedidosRoutes);
-app.use("/api/pedidos", pedidosRoutes);
 app.use("/api/admin/dashboard", adminDashboardRoutes);
+app.use("/api/admin/pagamentos", adminFormasPagamentoRoutes);
+app.use("/api/formas-pagamento", formasPagamentoRoutes);
+
+// Rotas do cliente
+app.use("/api/cliente/perfil", clientePerfilRoutes);
+app.use("/api/cliente/pedidos", pedidosRoutes);
+app.use("/api/cliente/carrinho", carrinhoRoutes);
+
+// Rotas gerais
+app.use("/api/auth", authRoutes);
+app.use("/api/cardapio", cardapioRoutes);
+app.use("/api/pedidos", pedidosRoutes);
 
 // Status do servidor e banco
 app.get("/api/status", async (req, res) => {
@@ -78,6 +94,7 @@ app.listen(PORT, () => {
   console.log("-----------------------------------");
   console.log(`Servidor: http://localhost:${PORT}`);
   console.log(`Dashboard: http://localhost:${PORT}/admin/admin-dashboard.html`);
+  console.log(`Cardápio: http://localhost:${PORT}/admin/admin-cardapio.html`);
   console.log("API: /api");
   console.log("-----------------------------------");
 });

@@ -2,7 +2,10 @@
 CREATE DATABASE fraga_db;
 USE fraga_db;
 
+-- ======================================================
 -- USUÁRIOS
+-- ======================================================
+
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -15,7 +18,10 @@ CREATE TABLE usuarios (
     data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ======================================================
 -- ENDEREÇOS
+-- ======================================================
+
 CREATE TABLE enderecos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
@@ -24,10 +30,16 @@ CREATE TABLE enderecos (
     bairro VARCHAR(100) NOT NULL,
     cidade VARCHAR(100) NOT NULL,
     complemento VARCHAR(100),
+    origem ENUM('perfil', 'pedido') NOT NULL DEFAULT 'perfil',
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
+-- ======================================================
 -- CATEGORIAS
+-- ======================================================
+
 CREATE TABLE categorias (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -35,7 +47,10 @@ CREATE TABLE categorias (
     ativo BOOLEAN DEFAULT TRUE
 );
 
+-- ======================================================
 -- PRODUTOS
+-- ======================================================
+
 CREATE TABLE produtos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     categoria_id INT NOT NULL,
@@ -44,10 +59,14 @@ CREATE TABLE produtos (
     imagem VARCHAR(255),
     preco DECIMAL(10,2) NOT NULL,
     disponivel BOOLEAN DEFAULT TRUE,
+
     FOREIGN KEY (categoria_id) REFERENCES categorias(id)
 );
 
+-- ======================================================
 -- ADICIONAIS
+-- ======================================================
+
 CREATE TABLE adicionais (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -55,7 +74,10 @@ CREATE TABLE adicionais (
     disponivel BOOLEAN DEFAULT TRUE
 );
 
+-- ======================================================
 -- ADICIONAIS DISPONÍVEIS POR PRODUTO
+-- ======================================================
+
 CREATE TABLE produto_adicionais (
     produto_id INT NOT NULL,
     adicional_id INT NOT NULL,
@@ -66,7 +88,10 @@ CREATE TABLE produto_adicionais (
     FOREIGN KEY (adicional_id) REFERENCES adicionais(id)
 );
 
+-- ======================================================
 -- PEDIDOS
+-- ======================================================
+
 CREATE TABLE pedidos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
@@ -93,7 +118,10 @@ CREATE TABLE pedidos (
     FOREIGN KEY (endereco_id) REFERENCES enderecos(id)
 );
 
+-- ======================================================
 -- ITENS DO PEDIDO
+-- ======================================================
+
 CREATE TABLE itens_pedido (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pedido_id INT NOT NULL,
@@ -108,27 +136,61 @@ CREATE TABLE itens_pedido (
     FOREIGN KEY (produto_id) REFERENCES produtos(id)
 );
 
+-- ======================================================
 -- PAGAMENTOS
+-- ======================================================
+
 CREATE TABLE pagamentos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pedido_id INT NOT NULL,
-    forma_pagamento ENUM('pix', 'cartao', 'dinheiro') NOT NULL,
+
+    forma_pagamento ENUM(
+        'pix',
+        'cartao',
+        'dinheiro',
+        'credito',
+        'debito',
+        'boleto',
+        'outro'
+    ) NOT NULL,
+
+    tipo_cartao ENUM(
+        'debito',
+        'credito',
+        'vale_refeicao'
+    ) NULL,
+
     valor DECIMAL(10,2) NOT NULL,
-    status ENUM('pendente', 'aprovado', 'recusado', 'cancelado')
-        DEFAULT 'pendente',
+
+    status ENUM(
+        'pendente',
+        'aprovado',
+        'recusado',
+        'cancelado'
+    ) DEFAULT 'pendente',
+
     codigo_transacao VARCHAR(150),
     data_pagamento DATETIME,
 
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id)
 );
 
+-- ======================================================
 -- ENTREGAS
+-- ======================================================
+
 CREATE TABLE entregas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pedido_id INT NOT NULL UNIQUE,
     entregador_id INT,
-    status ENUM('pendente', 'atribuida', 'em_andamento', 'entregue')
-        DEFAULT 'pendente',
+
+    status ENUM(
+        'pendente',
+        'atribuida',
+        'em_andamento',
+        'entregue'
+    ) DEFAULT 'pendente',
+
     data_saida DATETIME,
     data_entrega DATETIME,
 
@@ -136,7 +198,10 @@ CREATE TABLE entregas (
     FOREIGN KEY (entregador_id) REFERENCES usuarios(id)
 );
 
+-- ======================================================
 -- HISTÓRICO DOS PEDIDOS
+-- ======================================================
+
 CREATE TABLE historico_pedidos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pedido_id INT NOT NULL,
@@ -149,7 +214,10 @@ CREATE TABLE historico_pedidos (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
+-- ======================================================
 -- AVALIAÇÕES
+-- ======================================================
+
 CREATE TABLE avaliacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pedido_id INT NOT NULL UNIQUE,
@@ -157,9 +225,14 @@ CREATE TABLE avaliacoes (
     nota INT NOT NULL,
     comentario TEXT,
     data_avaliacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
+
+-- ======================================================
+-- CARRINHOS
+-- ======================================================
 
 CREATE TABLE carrinhos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -172,6 +245,10 @@ CREATE TABLE carrinhos (
         REFERENCES usuarios(id)
         ON DELETE CASCADE
 );
+
+-- ======================================================
+-- ITENS DO CARRINHO
+-- ======================================================
 
 CREATE TABLE itens_carrinho (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -189,14 +266,9 @@ CREATE TABLE itens_carrinho (
     UNIQUE (carrinho_id, produto_id)
 );
 
--- HORÁRIOS DE FUNCIONAMENTO
-CREATE TABLE horarios_funcionamento (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    dia_semana TINYINT NOT NULL,
-    horario_abertura TIME NOT NULL,
-    horario_fechamento TIME NOT NULL,
-    ativo BOOLEAN DEFAULT TRUE
-);
+-- ======================================================
+-- ADICIONAIS DOS ITENS DO CARRINHO
+-- ======================================================
 
 CREATE TABLE item_carrinho_adicionais (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -214,22 +286,107 @@ CREATE TABLE item_carrinho_adicionais (
         ON DELETE SET NULL
 );
 
+-- ======================================================
+-- HORÁRIOS DE FUNCIONAMENTO
+-- ======================================================
+
+CREATE TABLE horarios_funcionamento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    dia_semana TINYINT NOT NULL,
+    horario_abertura TIME NOT NULL,
+    horario_fechamento TIME NOT NULL,
+    ativo BOOLEAN DEFAULT TRUE
+);
+
+-- ======================================================
+-- FORMAS DE PAGAMENTO
+-- ======================================================
+
+CREATE TABLE formas_pagamento (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+
+    tipo ENUM(
+        'dinheiro',
+        'credito',
+        'debito',
+        'pix',
+        'boleto',
+        'outro'
+    ) NOT NULL,
+
+    taxa_percentual DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    prazo_recebimento INT UNSIGNED NOT NULL DEFAULT 0,
+    ordem_exibicao INT NOT NULL DEFAULT 0,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    online BOOLEAN NOT NULL DEFAULT FALSE,
+
+    data_criacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ======================================================
+-- CONFIGURAÇÕES DE ENTREGA
+-- ======================================================
+
+CREATE TABLE configuracoes_entrega (
+    id INT PRIMARY KEY,
+    taxa_padrao DECIMAL(10,2) NOT NULL DEFAULT 6.00,
+    valor_minimo DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    tempo_medio_minutos SMALLINT UNSIGNED NOT NULL DEFAULT 40,
+
+    atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
+
+INSERT INTO configuracoes_entrega (
+    id,
+    taxa_padrao,
+    valor_minimo,
+    tempo_medio_minutos
+)
+VALUES (1, 6.00, 0.00, 40.00);
+
+-- ======================================================
+-- TAXAS POR BAIRRO
+-- ======================================================
+
+CREATE TABLE bairros_entrega (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    taxa_final DECIMAL(10,2) NOT NULL,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    UNIQUE KEY uk_bairros_entrega_nome (nome)
+);
+
+-- ======================================================
 -- ÍNDICES
-CREATE INDEX idx_pedidos_usuario ON pedidos(usuario_id);
-CREATE INDEX idx_pedidos_status ON pedidos(status);
-CREATE INDEX idx_produtos_categoria ON produtos(categoria_id);
-CREATE INDEX idx_entregas_entregador ON entregas(entregador_id);
+-- ======================================================
 
-ALTER TABLE enderecos
-ADD COLUMN origem ENUM('perfil', 'pedido') NOT NULL DEFAULT 'perfil';
+CREATE INDEX idx_formas_pagamento_ativo
+    ON formas_pagamento(ativo);
 
-ALTER TABLE pagamentos
-ADD COLUMN tipo_cartao ENUM(
-    'debito',
-    'credito',
-    'vale_refeicao'
-) NULL AFTER forma_pagamento;
+CREATE INDEX idx_formas_pagamento_ordem
+    ON formas_pagamento(ordem_exibicao);
 
+CREATE INDEX idx_pedidos_usuario
+    ON pedidos(usuario_id);
 
-ALTER TABLE enderecos
-ADD COLUMN ativo BOOLEAN NOT NULL DEFAULT TRUE;
+CREATE INDEX idx_pedidos_status
+    ON pedidos(status);
+
+CREATE INDEX idx_produtos_categoria
+    ON produtos(categoria_id);
+
+CREATE INDEX idx_entregas_entregador
+    ON entregas(entregador_id);
+
+-- ======================================================
+-- FIM DO BANCO DE DADOS
+-- ======================================================

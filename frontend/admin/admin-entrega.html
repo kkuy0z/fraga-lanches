@@ -1,156 +1,915 @@
-﻿﻿<!DOCTYPE html>
+﻿﻿<!doctype html>
 <html lang="pt-BR">
   <head>
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#1a1a1a" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConfiguraÃ§Ã£o de Entrega - Fraga Lanches Admin</title>
-    <link rel="stylesheet" href="/design-system.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0c0c0c">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin">
-    <link rel="apple-touch-icon" href="/img/icon-192.svg">
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self';">
-    <!-- Referrer Policy -->
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    <!-- Permissions Policy -->
-    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
-</head>
+    <title>Configuração de Entrega | Fraga Lanches Admin</title>
 
-    <!-- Content Security Policy -->
+    <meta name="theme-color" content="#0c0c0c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin" />
+
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self';"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; base-uri 'self'; form-action 'self';"
     />
-    <!-- Referrer Policy -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <!-- Permissions Policy -->
     <meta
       http-equiv="Permissions-Policy"
       content="geolocation=(), microphone=(), camera=()"
     />
+
+    <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/png" href="/assets/images/icons/logo.png" />
     <link rel="apple-touch-icon" href="/assets/images/icons/logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/design-system.css" />
+
+    <style>
+      :root {
+        --adm-bg: #0c0c0c;
+        --adm-surface: #141414;
+        --adm-card: #191919;
+        --adm-card-elevated: #1e1e1e;
+        --adm-border: rgba(255, 255, 255, 0.08);
+        --adm-border-strong: #2c2c2c;
+        --adm-yellow: #f5c542;
+        --adm-yellow-hover: #ffda65;
+        --adm-yellow-soft: rgba(245, 197, 66, 0.14);
+        --adm-text: #f5f5f5;
+        --adm-muted: #a5a5a5;
+        --adm-danger: #fca5a5;
+        --adm-danger-bg: rgba(248, 113, 113, 0.14);
+        --adm-danger-border: rgba(248, 113, 113, 0.42);
+        --adm-info: #93c5fd;
+        --adm-info-bg: rgba(96, 165, 250, 0.14);
+        --adm-info-border: rgba(96, 165, 250, 0.38);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+        width: 100%;
+        overflow-x: clip;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      body {
+        display: block;
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: clip;
+        background:
+          radial-gradient(
+            circle at 12% 6%,
+            rgba(245, 197, 66, 0.09),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 88% 92%,
+            rgba(245, 197, 66, 0.05),
+            transparent 42%
+          ),
+          var(--adm-bg);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+      }
+
+      body section {
+        position: static;
+        min-height: 0;
+        height: auto;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      .py-4 {
+        padding-top: 28px !important;
+        padding-bottom: 28px !important;
+      }
+
+      /* HEADER ADMINISTRATIVO */
+
+      .admin-header,
+      body > header.admin-header {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9999 !important;
+        width: 100%;
+        margin: 0 !important;
+        transform: none !important;
+        border-bottom: 1px solid var(--adm-border);
+        background: rgba(12, 12, 12, 0.92);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        width: 100%;
+        max-width: 1440px;
+        min-height: 76px;
+        margin: 0 auto;
+        padding: 12px 36px;
+      }
+
+      .logo a {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+
+      .logo-img {
+        width: 43px;
+        height: 43px;
+        object-fit: cover;
+        border: 1px solid rgba(245, 197, 66, 0.45);
+        border-radius: 50%;
+        box-shadow: 0 0 22px rgba(245, 197, 66, 0.08);
+      }
+
+      .logo-label {
+        color: #fff;
+        font-family: "Cinzel", serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .admin-nav {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .admin-nav a {
+        padding: 8px 14px;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        color: var(--adm-muted);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-decoration: none;
+        white-space: nowrap;
+        transition:
+          color 0.2s ease,
+          background-color 0.2s ease,
+          border-color 0.2s ease;
+      }
+
+      .admin-nav a:hover {
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.04);
+      }
+
+      .admin-nav a.active {
+        color: var(--adm-yellow);
+        background-color: var(--adm-yellow-soft);
+        border-color: rgba(245, 197, 66, 0.36);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .user-menu {
+        position: relative;
+      }
+
+      .user-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 5px 14px 5px 6px;
+        border: 1px solid #343434;
+        border-radius: 999px;
+        background-color: var(--adm-card);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          border-color 0.2s ease,
+          background-color 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .user-button:hover {
+        border-color: rgba(245, 197, 66, 0.55);
+        background-color: var(--adm-card-elevated);
+        color: var(--adm-yellow);
+      }
+
+      .user-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: var(--adm-yellow);
+        color: #141414;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .user-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 190px;
+        padding: 8px;
+        border: 1px solid #323232;
+        border-radius: 12px;
+        background-color: var(--adm-card);
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.85);
+        z-index: 1200;
+      }
+
+      .user-dropdown.open,
+      .user-dropdown.show {
+        display: block;
+      }
+
+      .user-dropdown-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 8px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .user-dropdown-divider {
+        height: 1px;
+        margin: 6px 0;
+        background-color: var(--adm-border);
+      }
+
+      .user-dropdown-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 9px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #e5e5e5;
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .user-dropdown-item:hover {
+        background-color: rgba(245, 197, 66, 0.1);
+        color: var(--adm-yellow);
+      }
+
+      .user-dropdown-item.btn-logout {
+        color: var(--adm-danger);
+      }
+
+      .user-dropdown-item.btn-logout:hover {
+        background-color: var(--adm-danger-bg);
+        color: var(--adm-danger);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .badge-info {
+        background-color: var(--adm-info-bg);
+        border: 1px solid var(--adm-info-border);
+        color: var(--adm-info);
+      }
+
+      .admin-nav-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #333;
+        border-radius: 10px;
+        background-color: var(--adm-card);
+        color: var(--adm-text);
+        cursor: pointer;
+      }
+
+      .admin-nav-toggle:hover {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      /* CONTEÚDO PRINCIPAL */
+
+      main.page-main.admin-main {
+        display: block;
+        width: 100%;
+        margin-top: 76px !important;
+        padding: 28px 24px 84px;
+      }
+
+      .page-main > .container {
+        display: block;
+        width: 100%;
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      .page-header {
+        display: block;
+        padding: 6px 0 26px;
+        text-align: left;
+      }
+
+      .page-header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .page-title {
+        margin: 0 0 6px;
+        color: #fff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(36px, 5vw, 50px);
+        font-weight: 400;
+        line-height: 1.05;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .page-subtitle {
+        margin: 0;
+        color: var(--adm-muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .yellow-line {
+        width: 64px;
+        height: 3px;
+        margin-top: 14px;
+        border-radius: 999px;
+        background-color: var(--adm-yellow);
+      }
+
+      .admin-section-card {
+        display: block;
+        width: 100%;
+        margin-bottom: 24px;
+        padding: 24px;
+        border: 1px solid var(--adm-border-strong);
+        border-radius: 16px;
+        background-color: var(--adm-card);
+        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.45);
+      }
+
+      .section-header-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        width: 100%;
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--adm-border);
+      }
+
+      .section-title {
+        margin: 0;
+        color: #fff;
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      /* FORMULÁRIOS */
+
+      .form-config {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+        width: 100%;
+        max-width: 720px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        width: 100%;
+      }
+
+      .form-row.single-col {
+        grid-template-columns: minmax(0, 260px);
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        width: 100%;
+        margin-bottom: 0;
+      }
+
+      .modal .form-group {
+        margin-bottom: 14px;
+      }
+
+      .form-label {
+        display: block;
+        margin: 0;
+        color: var(--adm-muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .form-input,
+      .form-select {
+        display: block;
+        width: 100%;
+        min-height: 42px;
+        padding: 9px 12px;
+        border: 1px solid #323232;
+        border-radius: 9px;
+        background-color: var(--adm-surface);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+        font-size: 13px;
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .form-input:focus,
+      .form-select:focus {
+        outline: none;
+        border-color: var(--adm-yellow);
+        box-shadow: 0 0 0 2px rgba(245, 197, 66, 0.16);
+      }
+
+      .form-input::placeholder {
+        color: #777;
+      }
+
+      .form-help {
+        display: block;
+        margin: 6px 0 0;
+        color: var(--adm-muted);
+        font-size: 12px;
+        line-height: 1.45;
+      }
+
+      .form-check {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 12px;
+        cursor: pointer;
+      }
+
+      .form-check-input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: var(--adm-yellow);
+        cursor: pointer;
+      }
+
+      .form-check-label {
+        margin: 0;
+        color: var(--adm-text);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+
+      .form-actions-right {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      /* TABELA */
+
+      .table-container {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--adm-border);
+        border-radius: 12px;
+        background-color: var(--adm-surface);
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      .table th {
+        padding: 14px 16px;
+        border-bottom: 1px solid #2a2a2a;
+        background-color: #111;
+        color: var(--adm-yellow);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+        color: #ececec;
+        font-size: 13px;
+        vertical-align: middle;
+      }
+
+      .table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .table tbody tr:hover {
+        background-color: rgba(245, 197, 66, 0.035);
+      }
+
+      /* BOTÕES */
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 40px;
+        padding: 9px 18px;
+        border-radius: 9px;
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .btn-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+
+      .btn-primary {
+        border: 1px solid var(--adm-yellow);
+        background-color: var(--adm-yellow);
+        color: #141414;
+      }
+
+      .btn-primary:hover {
+        border-color: var(--adm-yellow-hover);
+        background-color: var(--adm-yellow-hover);
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        border: 1px solid #383838;
+        background-color: #141414;
+        color: #e5e5e5;
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      .btn-danger {
+        border: 1px solid var(--adm-danger-border);
+        background-color: var(--adm-danger-bg);
+        color: var(--adm-danger);
+      }
+
+      .btn-danger:hover {
+        background-color: rgba(248, 113, 113, 0.24);
+      }
+
+      /* ESTADO VAZIO */
+
+      .empty-state {
+        margin-top: 18px;
+        padding: 40px 20px;
+        border: 1px solid var(--adm-border);
+        border-radius: 12px;
+        background-color: var(--adm-surface);
+        text-align: center;
+      }
+
+      .empty-state-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 58px;
+        height: 58px;
+        margin-bottom: 12px;
+        border-radius: 50%;
+        background-color: var(--adm-yellow-soft);
+        color: var(--adm-yellow);
+      }
+
+      .empty-state-title {
+        margin: 0 0 6px;
+        color: #fff;
+        font-size: 16px;
+      }
+
+      .empty-state-message {
+        margin: 0;
+        color: var(--adm-muted);
+        font-size: 13px;
+      }
+
+      /* MODAIS */
+
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 20000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.82);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+      }
+
+      .modal-overlay.hidden {
+        display: none !important;
+      }
+
+      .modal-overlay:not(.hidden) {
+        display: flex !important;
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 20000 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: rgba(0, 0, 0, 0.82) !important;
+      }
+
+      .modal {
+        position: relative;
+        display: block;
+        width: 100%;
+        max-width: 560px;
+        max-height: 90vh;
+        max-height: 90dvh;
+        overflow-y: auto;
+        border: 1px solid #323232;
+        border-radius: 16px;
+        background-color: var(--adm-card);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.88);
+      }
+
+      .modal-overlay:not(.hidden) .modal {
+        display: block !important;
+        position: relative !important;
+        z-index: 20001 !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        width: 100% !important;
+        max-width: 540px !important;
+        max-height: 90vh !important;
+        max-height: 90dvh !important;
+        overflow-y: auto !important;
+        background: #191919 !important;
+        border: 1px solid #323232 !important;
+        border-radius: 16px !important;
+      }
+
+      .modal.modal-md {
+        max-width: 540px;
+      }
+
+      .modal.modal-sm {
+        max-width: 440px;
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--adm-border-strong);
+      }
+
+      .modal-title {
+        margin: 0;
+        color: var(--adm-yellow);
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .modal-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 1px solid #333;
+        border-radius: 8px;
+        background-color: var(--adm-surface);
+        color: #e5e5e5;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .modal-close:hover {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      .modal-body {
+        padding: 20px;
+      }
+
+      .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--adm-border-strong);
+      }
+
+      /* RESPONSIVIDADE */
+
+      @media (max-width: 900px) {
+        .admin-nav-toggle {
+          display: inline-flex;
+        }
+
+        .admin-nav {
+          display: none;
+          position: fixed;
+          top: 76px;
+          left: 16px;
+          right: 16px;
+          flex-direction: column;
+          align-items: stretch;
+          padding: 12px;
+          border: 1px solid #333;
+          border-radius: 14px;
+          background-color: var(--adm-card);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+          z-index: 1100;
+        }
+
+        .admin-nav.open,
+        .admin-nav.show {
+          display: flex;
+        }
+
+        .admin-nav a {
+          padding: 10px 14px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        main.page-main.admin-main {
+          padding: 20px 14px 80px;
+        }
+
+        .header-inner {
+          padding: 12px 16px;
+        }
+
+        .admin-section-card {
+          padding: 16px;
+          border-radius: 14px;
+        }
+
+        .form-row,
+        .form-row.single-col {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .logo-label,
+        #userName {
+          display: none;
+        }
+
+        .modal-overlay {
+          padding: 12px;
+        }
+
+        .modal-overlay:not(.hidden) .modal {
+          max-height: 94vh !important;
+          max-height: 94dvh !important;
+        }
+
+        .modal-header,
+        .modal-body,
+        .modal-footer {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+      }
+    </style>
   </head>
 
   <body>
-    <!-- Header Admin -->
+    <!-- HEADER ADMIN -->
     <header class="header-fixed admin-header" role="banner">
-        <div class="header-inner">
-            <div class="logo">
-                <a href="/inicio/admin-dashboard.html">
-                    <img src="/frontend/imagens/logo.png" alt="Fraga Lanches Admin" class="logo-img">
-                    <span style="display: none; font-size: 20px; font-weight: 700; color: var(--primary);">Fraga Admin</span>
-                </a>
-            </div>
-
-            <nav class="admin-nav" id="adminNav" role="navigation" aria-label="NavegaÃ§Ã£o administrativa">
-                <a href="/inicio/admin-dashboard.html" data-page="dashboard">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-                        <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-                        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-                        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-                    </svg>
-                    Dashboard
-                </a>
-                <a href="/inicio/admin-categorias.html" data-page="categorias">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <line x1="4" y1="7" x2="4" y2="21"></line>
-                        <line x1="4" y1="7" x2="20" y2="7"></line>
-                        <line x1="8" y1="7" x2="8" y2="21"></line>
-                        <line x1="12" y1="7" x2="12" y2="21"></line>
-                        <line x1="16" y1="7" x2="16" y2="21"></line>
-                        <line x1="20" y1="7" x2="20" y2="21"></line>
-                    </svg>
-                    Categorias
-                </a>
-                <a href="/inicio/admin-produtos.html" data-page="produtos">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                    Produtos
-                </a>
-                <a href="/inicio/admin-pedidos.html" data-page="pedidos">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M16 11V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"></path>
-                        <path d="M8 7v9"></path>
-                        <path d="M12 7v9"></path>
-                        <path d="M16 7v9"></path>
-                    </svg>
-                    Pedidos
-                </a>
-                <a href="/inicio/admin-horarios.html" data-page="horarios">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg>
-                    HorÃ¡rios
-                </a>
-                <a href="/inicio/admin-entrega.html" class="active" data-page="entrega">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M5 12h14"></path>
-                        <path d="M12 5v14"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    Entrega
-                </a>
-                <a href="/inicio/admin-pagamentos.html" data-page="pagamentos">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <rect x="1" y="4" width="22" height="16" rx="2"></rect>
-                        <line x1="1" y1="10" x2="23" y2="10"></line>
-                    </svg>
-                    Pagamentos
-                </a>
-                <a href="/inicio/admin-usuarios.html" data-page="usuarios">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    UsuÃ¡rios
-                </a>
-            </nav>
-
-            <div class="header-actions">
-                <div class="user-menu" id="userMenu">
-                    <button class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true" aria-label="Menu do usuÃ¡rio">
-                        <div class="user-avatar" id="userAvatar">?</div>
-                        <span id="userName">Admin</span>
-                    </button>
-                    <div class="user-dropdown" id="userDropdown" role="menu">
-                        <div class="user-dropdown-header">
-                            <span id="dropdownUserName">Admin</span>
-                            <span id="dropdownUserRole" class="badge badge-info">administrador</span>
-                        </div>
-                        <div class="user-dropdown-divider"></div>
-                        <a href="/inicio/index.html" class="user-dropdown-item" role="menuitem" target="_blank" rel="noopener noreferrer">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="margin-right: 8px;">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                <polyline points="15 3 21 3 21 9"></polyline>
-                                <line x1="10" y1="14" x2="21" y2="3"></line>
-                            </svg>
-                            Ver Site
-                        </a>
-                        <div class="user-dropdown-divider"></div>
-                        <button class="user-dropdown-item btn-logout" id="logoutBtn" role="menuitem">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="margin-right: 8px;">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                                <polyline points="16 17 21 12 16 7"></polyline>
-                                <line x1="21" y1="12" x2="9" y2="12"></line>
-                            </svg>
-                            Sair
-                        </button>
-                    </div>
-                </div>
-            </div>
+      <div class="header-inner">
+        <div class="logo">
+          <a href="/admin/admin-dashboard.html">
+            <img src="/imagens/logo.png" alt="Fraga Lanches" class="logo-img" />
+            <span class="logo-label">Fraga Admin</span>
+          </a>
         </div>
 
         <nav
@@ -159,149 +918,48 @@
           role="navigation"
           aria-label="Navegação administrativa"
         >
-          <a href="/inicio/admin-dashboard.html" data-page="dashboard">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-            >
-              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-            </svg>
-            Dashboard
-          </a>
-          <a href="/inicio/admin-categorias.html" data-page="categorias">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-            >
-              <line x1="4" y1="7" x2="4" y2="21"></line>
-              <line x1="4" y1="7" x2="20" y2="7"></line>
-              <line x1="8" y1="7" x2="8" y2="21"></line>
-              <line x1="12" y1="7" x2="12" y2="21"></line>
-              <line x1="16" y1="7" x2="16" y2="21"></line>
-              <line x1="20" y1="7" x2="20" y2="21"></line>
-            </svg>
-            Categorias
-          </a>
-          <a href="/inicio/admin-produtos.html" data-page="produtos">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-            >
-              <path
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-              ></path>
-            </svg>
-            Produtos
-          </a>
-          <a href="/inicio/admin-pedidos.html" data-page="pedidos">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-            >
-              <path
-                d="M16 11V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"
-              ></path>
-              <path d="M8 7v9"></path>
-              <path d="M12 7v9"></path>
-              <path d="M16 7v9"></path>
-            </svg>
-            Pedidos
-          </a>
-          <a href="/inicio/admin-horarios.html" data-page="horarios">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
-            </svg>
-            Horários
-          </a>
-          <a
-            href="/inicio/admin-entrega.html"
-            class="active"
-            data-page="entrega"
+          <a href="/admin/admin-dashboard.html" data-page="dashboard"
+            >Dashboard</a
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-            >
-              <path d="M5 12h14"></path>
-              <path d="M12 5v14"></path>
-              <circle cx="12" cy="12" r="3"></circle>
-            </svg>
-            Entrega
-          </a>
-          <a href="/inicio/admin-pagamentos.html" data-page="pagamentos">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-            >
-              <rect x="1" y="4" width="22" height="16" rx="2"></rect>
-              <line x1="1" y1="10" x2="23" y2="10"></line>
-            </svg>
-            Pagamentos
-          </a>
-          <a href="/inicio/admin-usuarios.html" data-page="usuarios">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-hidden="true"
-            >
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            Usuários
-          </a>
+          <a href="/admin/admin-pedidos.html" data-page="pedidos">Pedidos</a>
+          <a href="/admin/admin-cardapio.html" data-page="cardapio">Cardápio</a>
+          <a href="/admin/admin-horarios.html" data-page="horarios">Horários</a>
+          <a class="active" href="/admin/admin-entrega.html" data-page="entrega"
+            >Entrega</a
+          >
+          <a href="/admin/admin-pagamentos.html" data-page="pagamentos"
+            >Pagamentos</a
+          >
+          <a href="/admin/admin-usuarios.html" data-page="usuarios">Usuários</a>
         </nav>
 
         <div class="header-actions">
+          <button
+            type="button"
+            class="admin-nav-toggle"
+            id="adminNavToggle"
+            aria-label="Alternar menu"
+            aria-expanded="false"
+            aria-controls="adminNav"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
           <div class="user-menu" id="userMenu">
             <button
+              type="button"
               class="user-button"
               id="userButton"
               aria-expanded="false"
@@ -315,55 +973,16 @@
               <div class="user-dropdown-header">
                 <span id="dropdownUserName">Admin</span>
                 <span id="dropdownUserRole" class="badge badge-info"
-                  >administrador</span
+                  >Administrador</span
                 >
               </div>
               <div class="user-dropdown-divider"></div>
-              <a
-                href="/inicio/index.html"
-                class="user-dropdown-item"
-                role="menuitem"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  aria-hidden="true"
-                  style="margin-right: 8px"
-                >
-                  <path
-                    d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-                  ></path>
-                  <polyline points="15 3 21 3 21 9"></polyline>
-                  <line x1="10" y1="14" x2="21" y2="3"></line>
-                </svg>
-                Ver Site
-              </a>
-              <div class="user-dropdown-divider"></div>
               <button
+                type="button"
                 class="user-dropdown-item btn-logout"
                 id="logoutBtn"
                 role="menuitem"
               >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  aria-hidden="true"
-                  style="margin-right: 8px"
-                >
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
                 Sair
               </button>
             </div>
@@ -372,129 +991,35 @@
       </div>
     </header>
 
-    <!-- Mobile Nav Toggle -->
-    <button
-      class="admin-nav-toggle"
-      id="adminNavToggle"
-      aria-label="Alternar menu"
-      aria-expanded="false"
-      style="display: none"
-    >
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        aria-hidden="true"
-      >
-        <line x1="3" y1="6" x2="21" y2="6"></line>
-        <line x1="3" y1="12" x2="21" y2="12"></line>
-        <line x1="3" y1="18" x2="21" y2="18"></line>
-      </svg>
-    </button>
-
-    <!-- Main Content -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="page-main admin-main" role="main">
-        <div class="container">
-            <!-- Page Header -->
-            <div class="page-header">
-                <div class="page-header-inner">
-                    <div class="d-flex justify-between align-center" style="flex-wrap: wrap; gap: var(--space-4);">
-                        <div>
-                            <h1 class="page-title">ConfiguraÃ§Ã£o de Entrega</h1>
-                            <p class="page-subtitle">Gerencie taxas de entrega, valor mÃ­nimo e bairros atendidos</p>
-                        </div>
-                    </div>
-                    <div class="yellow-line"></div>
-                </div>
+      <div class="container">
+        <div class="page-header">
+          <div class="page-header-top">
+            <div>
+              <h1 class="page-title">Configuração de Entrega</h1>
+              <p class="page-subtitle">
+                Gerencie taxas de entrega, valor mínimo e bairros atendidos
+              </p>
+              <div class="yellow-line"></div>
             </div>
-
-            <!-- ConfiguraÃ§Ãµes Gerais -->
-            <section class="card" style="margin-bottom: var(--space-6);">
-                <h2 class="card-title" style="margin-bottom: var(--space-6);">ConfiguraÃ§Ãµes Gerais</h2>
-                <form id="formConfigEntrega" class="d-flex flex-col gap-4" style="max-width: 600px;">
-                    <div class="form-row">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="taxaEntrega" class="form-label">Taxa de Entrega (R$) *</label>
-                            <input type="number" id="taxaEntrega" name="taxa_entrega" class="form-input" required step="0.01" min="0" placeholder="0.00">
-                        </div>
-                        <div class="form-group" style="flex: 1;">
-                            <label for="valorMinimoEntrega" class="form-label">Valor MÃ­nimo para Entrega (R$)</label>
-                            <input type="number" id="valorMinimoEntrega" name="valor_minimo_entrega" class="form-input" step="0.01" min="0" placeholder="0.00 (0 = sem mÃ­nimo)">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group" style="flex: 1;">
-                            <label for="tempoMedioEntrega" class="form-label">Tempo MÃ©dio de Entrega (min)</label>
-                            <input type="number" id="tempoMedioEntrega" name="tempo_medio_entrega" class="form-input" min="1" placeholder="30">
-                        </div>
-                    </div>
-                    <div class="d-flex justify-end gap-2">
-                        <button type="submit" class="btn btn-primary" id="btnSalvarConfigEntrega">
-                            <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
-                            Salvar ConfiguraÃ§Ãµes
-                        </button>
-                    </div>
-                </form>
-            </section>
-
-            <!-- Taxas por Bairro -->
-            <section class="card" style="margin-bottom: var(--space-6);">
-                <div class="d-flex justify-between align-center" style="margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
-                    <h2 class="card-title" style="margin: 0;">Taxas por Bairro</h2>
-                    <button class="btn btn-primary" id="btnNovoBairro">
-                        <svg class="btn-icon" aria-hidden="true"><use href="#i-add" /></svg>
-                        Adicionar Bairro
-                    </button>
-                </div>
-
-                <div class="table-container">
-                    <table class="table" id="tabelaBairros">
-                        <thead>
-                            <tr>
-                                <th>Bairro</th>
-                                <th>Taxa Extra (R$)</th>
-                                <th>Status</th>
-                                <th>AÃ§Ãµes</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbodyBairros">
-                            <tr>
-                                <td colspan="4" class="text-center py-4">Carregando...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="empty-state hidden" id="emptyStateBairros" style="padding: var(--space-8);">
-                    <div class="empty-state-icon">
-                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                            <circle cx="12" cy="10" r="3"></circle>
-                        </svg>
-                    </div>
-                    <h2 class="empty-state-title">Nenhum bairro cadastrado</h2>
-                    <p class="empty-state-message">A taxa de entrega padrÃ£o serÃ¡ aplicada. Adicione bairros com taxas diferenciadas.</p>
-                </div>
-            </section>
+          </div>
         </div>
 
-        <!-- Configurações Gerais -->
-        <section class="card" style="margin-bottom: var(--space-6)">
-          <h2 class="card-title" style="margin-bottom: var(--space-6)">
-            Configurações Gerais
-          </h2>
-          <form
-            id="formConfigEntrega"
-            class="d-flex flex-col gap-4"
-            style="max-width: 600px"
-          >
+        <!-- CONFIGURAÇÕES GERAIS -->
+        <section
+          class="admin-section-card"
+          aria-label="Configurações gerais de entrega"
+        >
+          <div class="section-header-bar">
+            <h2 class="section-title">Configurações Gerais</h2>
+          </div>
+
+          <form id="formConfigEntrega" class="form-config">
             <div class="form-row">
-              <div class="form-group" style="flex: 1">
+              <div class="form-group">
                 <label for="taxaEntrega" class="form-label"
-                  >Taxa de Entrega (R$) *</label
+                  >Taxa de Entrega Padrão (R$) *</label
                 >
                 <input
                   type="number"
@@ -507,7 +1032,8 @@
                   placeholder="0.00"
                 />
               </div>
-              <div class="form-group" style="flex: 1">
+
+              <div class="form-group">
                 <label for="valorMinimoEntrega" class="form-label"
                   >Valor Mínimo para Entrega (R$)</label
                 >
@@ -522,8 +1048,9 @@
                 />
               </div>
             </div>
-            <div class="form-row">
-              <div class="form-group" style="flex: 1">
+
+            <div class="form-row single-col">
+              <div class="form-group">
                 <label for="tempoMedioEntrega" class="form-label"
                   >Tempo Médio de Entrega (min)</label
                 >
@@ -537,7 +1064,8 @@
                 />
               </div>
             </div>
-            <div class="d-flex justify-end gap-2">
+
+            <div class="form-actions-right">
               <button
                 type="submit"
                 class="btn btn-primary"
@@ -552,18 +1080,14 @@
           </form>
         </section>
 
-        <!-- Taxas por Bairro -->
-        <section class="card" style="margin-bottom: var(--space-6)">
-          <div
-            class="d-flex justify-between align-center"
-            style="
-              margin-bottom: var(--space-6);
-              flex-wrap: wrap;
-              gap: var(--space-4);
-            "
-          >
-            <h2 class="card-title" style="margin: 0">Taxas por Bairro</h2>
-            <button class="btn btn-primary" id="btnNovoBairro">
+        <!-- TAXAS POR BAIRRO -->
+        <section
+          class="admin-section-card"
+          aria-label="Taxas de entrega por bairro"
+        >
+          <div class="section-header-bar">
+            <h2 class="section-title">Taxas por Bairro</h2>
+            <button type="button" class="btn btn-primary" id="btnNovoBairro">
               <svg class="btn-icon" aria-hidden="true">
                 <use href="#i-add" />
               </svg>
@@ -576,7 +1100,7 @@
               <thead>
                 <tr>
                   <th>Bairro</th>
-                  <th>Taxa Extra (R$)</th>
+                  <th>Taxa Final (R$)</th>
                   <th>Status</th>
                   <th>Ações</th>
                 </tr>
@@ -589,19 +1113,15 @@
             </table>
           </div>
 
-          <div
-            class="empty-state hidden"
-            id="emptyStateBairros"
-            style="padding: var(--space-8)"
-          >
+          <div class="empty-state hidden" id="emptyStateBairros">
             <div class="empty-state-icon">
               <svg
-                width="36"
-                height="36"
+                width="32"
+                height="32"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="1.5"
+                stroke-width="1.8"
                 aria-hidden="true"
               >
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -618,44 +1138,28 @@
       </div>
     </main>
 
-    <!-- Footer will be injected by shared-components.js -->
-
-    <!-- Modal Novo/Editar Bairro -->
-    <div class="modal-overlay hidden" id="bairroModal" role="dialog" aria-modal="true" aria-labelledby="bairroModalTitulo">
-        <div class="modal modal-md">
-            <div class="modal-header">
-                <h2 class="modal-title" id="bairroModalTitulo">Novo Bairro</h2>
-                <button class="modal-close" id="bairroModalClose" aria-label="Fechar modal">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><use href="#i-x" /></svg>
-                </button>
-            </div>
-            <form id="bairroForm" class="modal-body" novalidate>
-                <input type="hidden" id="bairroId" name="id">
-
-                <div class="form-group">
-                    <label for="bairroNome" class="form-label">Nome do Bairro *</label>
-                    <input type="text" id="bairroNome" name="bairro" class="form-input" required maxlength="80" placeholder="Ex: Centro, Jardim AmÃ©rica">
-                </div>
-
-                <div class="form-group">
-                    <label for="bairroTaxaExtra" class="form-label">Taxa Extra (R$) *</label>
-                    <input type="number" id="bairroTaxaExtra" name="taxa_extra" class="form-input" required step="0.01" min="0" placeholder="0.00" value="0">
-                    <p class="form-help">Valor adicional Ã  taxa de entrega padrÃ£o. Use 0 para taxa normal.</p>
-                </div>
-
-                <div class="form-check" style="margin-top: var(--space-4);">
-                    <input type="checkbox" id="bairroAtivo" name="ativo" class="form-check-input" checked>
-                    <label for="bairroAtivo" class="form-check-label">Bairro ativo (disponÃ­vel para entrega)</label>
-                </div>
-            </form>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="btnCancelarBairro">Cancelar</button>
-                <button type="submit" form="bairroForm" class="btn btn-primary" id="btnSalvarBairro">
-                    <svg class="btn-icon" aria-hidden="true"><use href="#i-save" /></svg>
-                    Salvar Bairro
-                </button>
-            </div>
+    <!-- MODAL NOVO/EDITAR BAIRRO -->
+    <div
+      class="modal-overlay hidden"
+      id="bairroModal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="bairroModalTitulo"
+    >
+      <div class="modal modal-md">
+        <div class="modal-header">
+          <h2 class="modal-title" id="bairroModalTitulo">Novo Bairro</h2>
+          <button
+            type="button"
+            class="modal-close"
+            id="bairroModalClose"
+            aria-label="Fechar modal"
+          >
+            &times;
+          </button>
         </div>
+
         <form id="bairroForm" class="modal-body" novalidate>
           <input type="hidden" id="bairroId" name="id" />
 
@@ -674,7 +1178,7 @@
 
           <div class="form-group">
             <label for="bairroTaxaExtra" class="form-label"
-              >Taxa Extra (R$) *</label
+              >Taxa Final (R$) *</label
             >
             <input
               type="number"
@@ -688,11 +1192,12 @@
               value="0"
             />
             <p class="form-help">
-              Valor adicional à taxa de entrega padrão. Use 0 para taxa normal.
+              Informe o valor total da taxa de entrega para este bairro. Esse
+              valor substitui a taxa padrão.
             </p>
           </div>
 
-          <div class="form-check" style="margin-top: var(--space-4)">
+          <label class="form-check" for="bairroAtivo">
             <input
               type="checkbox"
               id="bairroAtivo"
@@ -700,11 +1205,12 @@
               class="form-check-input"
               checked
             />
-            <label for="bairroAtivo" class="form-check-label"
-              >Bairro ativo (disponível para entrega)</label
+            <span class="form-check-label"
+              >Bairro ativo (disponível para entrega)</span
             >
-          </div>
+          </label>
         </form>
+
         <div class="modal-footer">
           <button
             type="button"
@@ -728,24 +1234,22 @@
       </div>
     </div>
 
-    <!-- Modal Confirmar ExclusÃ£o -->
-    <div class="modal-overlay hidden" id="deleteBairroModal" role="dialog" aria-modal="true" aria-labelledby="deleteBairroModalTitulo">
-        <div class="modal modal-sm">
-            <div class="modal-header">
-                <h2 class="modal-title" id="deleteBairroModalTitulo">Confirmar ExclusÃ£o</h2>
-            </div>
-            <div class="modal-body">
-                <p>Tem certeza que deseja excluir o bairro <strong id="deleteBairroNome"></strong>?</p>
-                <p class="form-help">Esta aÃ§Ã£o nÃ£o pode ser desfeita.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="btnCancelarDeleteBairro">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="btnConfirmarDeleteBairro">
-                    <svg class="btn-icon" aria-hidden="true"><use href="#i-trash" /></svg>
-                    Excluir
-                </button>
-            </div>
+    <!-- MODAL CONFIRMAR EXCLUSÃO -->
+    <div
+      class="modal-overlay hidden"
+      id="deleteBairroModal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="deleteBairroModalTitulo"
+    >
+      <div class="modal modal-sm">
+        <div class="modal-header">
+          <h2 class="modal-title" id="deleteBairroModalTitulo">
+            Confirmar Exclusão
+          </h2>
         </div>
+
         <div class="modal-body">
           <p>
             Tem certeza que deseja excluir o bairro
@@ -753,6 +1257,7 @@
           </p>
           <p class="form-help">Esta ação não pode ser desfeita.</p>
         </div>
+
         <div class="modal-footer">
           <button
             type="button"
@@ -775,8 +1280,8 @@
       </div>
     </div>
 
-    <script type="module" src="js/shared-components.js"></script>
-    <script type="module" src="js/admin-entrega.js"></script>
+    <script src="./admin-entrega.js?v=2"></script>
+
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -786,9 +1291,9 @@
         });
       }
 
-      // Handle image error events securely (instead of inline onerror)
       document.addEventListener("DOMContentLoaded", () => {
         const images = document.querySelectorAll("img");
+
         images.forEach((img) => {
           img.addEventListener("error", function () {
             this.style.display = "none";
@@ -796,7 +1301,5 @@
         });
       });
     </script>
-<script src="/pwa.js"></script>
-</body>
-
+  </body>
 </html>

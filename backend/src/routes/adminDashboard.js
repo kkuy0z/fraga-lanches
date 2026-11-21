@@ -1,3 +1,5 @@
+"use strict";
+
 const express = require("express");
 const router = express.Router();
 
@@ -6,11 +8,15 @@ const autenticarAdmin = require("../middleware/autenticarAdmin");
 
 router.use(autenticarAdmin);
 
+// ======================================================
 // GET /api/admin/dashboard
+// ======================================================
+
 router.get("/", async (req, res) => {
   try {
     const [
       [pedidosHoje],
+      [faturamentoHoje],
       [pedidosEntregues],
       [pedidosPendentes],
       [produtosAtivos],
@@ -18,80 +24,131 @@ router.get("/", async (req, res) => {
       [clientesCadastrados],
       [pedidosRecentes],
     ] = await Promise.all([
-      // Pedidos realizados hoje
-      db.query(`
-                SELECT COUNT(*) AS total
-                FROM pedidos
-                WHERE data_pedido >= CURDATE()
-                  AND data_pedido < CURDATE() + INTERVAL 1 DAY
-            `),
+      // ------------------------------------------------
+      // PEDIDOS REALIZADOS HOJE
+      // ------------------------------------------------
 
-      // Pedidos concluídos
       db.query(`
-                SELECT COUNT(*) AS total
-                FROM pedidos
-                WHERE status = 'concluido'
-            `),
+        SELECT COUNT(*) AS total
+        FROM pedidos
+        WHERE data_pedido >= CURDATE()
+          AND data_pedido < CURDATE() + INTERVAL 1 DAY
+      `),
 
-      // Pedidos ainda em andamento
-      db.query(`
-                SELECT COUNT(*) AS total
-                FROM pedidos
-                WHERE status IN (
-                    'novo',
-                    'em_preparo',
-                    'pronto',
-                    'saiu_para_entrega'
-                )
-            `),
+      // ------------------------------------------------
+      // FATURAMENTO DE HOJE
+      // Somente pagamentos aprovados.
+      // Pedidos cancelados não entram no faturamento.
+      // EXISTS evita duplicação caso existam vários
+      // registros de pagamento associados ao pedido.
+      // ------------------------------------------------
 
-      // Produtos disponíveis
       db.query(`
-                SELECT COUNT(*) AS total
-                FROM produtos
-                WHERE disponivel = 1
-            `),
+        SELECT COALESCE(SUM(p.total), 0) AS total
+        FROM pedidos p
+        WHERE p.data_pedido >= CURDATE()
+          AND p.data_pedido < CURDATE() + INTERVAL 1 DAY
+          AND p.status <> 'cancelado'
+          AND EXISTS (
+            SELECT 1
+            FROM pagamentos pg
+            WHERE pg.pedido_id = p.id
+              AND pg.status = 'aprovado'
+          )
+      `),
 
-      // Categorias ativas
-      db.query(`
-                SELECT COUNT(*) AS total
-                FROM categorias
-                WHERE ativo = 1
-            `),
+      // ------------------------------------------------
+      // PEDIDOS CONCLUÍDOS
+      // ------------------------------------------------
 
-      // Clientes cadastrados e ativos
       db.query(`
-                SELECT COUNT(*) AS total
-                FROM usuarios
-                WHERE tipo = 'cliente'
-                  AND ativo = 1
-            `),
+        SELECT COUNT(*) AS total
+        FROM pedidos
+        WHERE status = 'concluido'
+      `),
 
-      // Últimos 8 pedidos
+      // ------------------------------------------------
+      // PEDIDOS PENDENTES / EM ANDAMENTO
+      // ------------------------------------------------
+
       db.query(`
-                SELECT
-                    p.id,
-                    p.data_pedido,
-                    p.status,
-                    p.total,
-                    u.nome AS cliente
-                FROM pedidos p
-                INNER JOIN usuarios u
-                    ON u.id = p.usuario_id
-                ORDER BY p.data_pedido DESC, p.id DESC
-                LIMIT 8
-            `),
+        SELECT COUNT(*) AS total
+        FROM pedidos
+        WHERE status IN (
+          'novo',
+          'em_preparo',
+          'pronto',
+          'saiu_para_entrega'
+        )
+      `),
+
+      // ------------------------------------------------
+      // PRODUTOS DISPONÍVEIS
+      // ------------------------------------------------
+
+      db.query(`
+        SELECT COUNT(*) AS total
+        FROM produtos
+        WHERE disponivel = 1
+      `),
+
+      // ------------------------------------------------
+      // CATEGORIAS ATIVAS
+      // ------------------------------------------------
+
+      db.query(`
+        SELECT COUNT(*) AS total
+        FROM categorias
+        WHERE ativo = 1
+      `),
+
+      // ------------------------------------------------
+      // CLIENTES CADASTRADOS
+      // ------------------------------------------------
+
+      db.query(`
+        SELECT COUNT(*) AS total
+        FROM usuarios
+        WHERE tipo = 'cliente'
+          AND ativo = 1
+      `),
+
+      // ------------------------------------------------
+      // ÚLTIMOS 8 PEDIDOS
+      // ------------------------------------------------
+
+      db.query(`
+        SELECT
+          p.id,
+          p.data_pedido,
+          p.status,
+          p.total,
+          COALESCE(u.nome, 'Cliente não informado') AS cliente
+        FROM pedidos p
+        LEFT JOIN usuarios u
+          ON u.id = p.usuario_id
+        ORDER BY
+          p.data_pedido DESC,
+          p.id DESC
+        LIMIT 8
+      `),
     ]);
+
+    // ==================================================
+    // RESPOSTA
+    // ==================================================
 
     res.json({
       estatisticas: {
-        pedidosHoje: Number(pedidosHoje[0].total),
-        pedidosEntregues: Number(pedidosEntregues[0].total),
-        pedidosPendentes: Number(pedidosPendentes[0].total),
-        produtosAtivos: Number(produtosAtivos[0].total),
-        categorias: Number(categoriasAtivas[0].total),
-        clientes: Number(clientesCadastrados[0].total),
+        pedidosHoje: Number(pedidosHoje[0].total || 0),
+        faturamentoHoje: Number(faturamentoHoje[0].total || 0),
+        pedidosEntregues: Number(pedidosEntregues[0].total || 0),
+        pedidosPendentes: Number(pedidosPendentes[0].total || 0),
+        produtosAtivos: Number(produtosAtivos[0].total || 0),
+        categorias: Number(categoriasAtivas[0].total || 0),
+        clientes: Number(clientesCadastrados[0].total || 0),
       },
+
       pedidosRecentes,
     });
   } catch (erro) {

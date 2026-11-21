@@ -1,130 +1,540 @@
-﻿﻿<!DOCTYPE html>
+﻿﻿<!doctype html>
 <html lang="pt-BR">
   <head>
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#1a1a1a" />
-
-    <meta name="theme-color" content="#1a1a1a" />
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Login Administrativo | Fraga Lanches</title>
 
-    <link rel="stylesheet" href="/design-system.css">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="icon" href="/assets/images/icons/logo.png">
-    <link rel="apple-touch-icon" href="/assets/images/icons/logo.png">
-    <link rel="stylesheet" href="/design-system.css">
+    <meta name="theme-color" content="#0c0c0c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin" />
 
-    <meta name="theme-color" content="#0c0c0c">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin">
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; base-uri 'self'; form-action 'self';"
+    />
 
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self';">
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="geolocation=(), microphone=(), camera=()"
+    />
 
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/assets/images/icons/logo.png" />
+    <link rel="apple-touch-icon" href="/assets/images/icons/logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/design-system.css" />
+
+    <style>
+      :root {
+        --adm-bg: #0c0c0c;
+        --adm-card: #191919;
+        --adm-input-bg: #121212;
+        --adm-border: rgba(255, 255, 255, 0.09);
+        --adm-border-strong: #2e2e2e;
+        --adm-yellow: #f5c542;
+        --adm-yellow-hover: #ffda65;
+        --adm-text: #f5f5f5;
+        --adm-muted: #a5a5a5;
+        --adm-danger: #fca5a5;
+        --adm-danger-bg: rgba(248, 113, 113, 0.12);
+        --adm-danger-border: rgba(248, 113, 113, 0.4);
+        --adm-success: #86efac;
+        --adm-success-bg: rgba(74, 222, 128, 0.12);
+        --adm-success-border: rgba(74, 222, 128, 0.4);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+        width: 100%;
+        overflow-x: clip;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        min-height: 100dvh;
+        width: 100%;
+        margin: 0;
+        padding: 24px 16px;
+        overflow-x: clip;
+        background:
+          radial-gradient(
+            circle at 20% 12%,
+            rgba(245, 197, 66, 0.1),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 82% 88%,
+            rgba(245, 197, 66, 0.06),
+            transparent 42%
+          ),
+          var(--adm-bg);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+      }
+
+      .page-main {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .page-main > .container {
+        width: 100%;
+        max-width: 440px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      .text-center {
+        text-align: center;
+      }
+
+      /* Logo */
+      .logo-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        border-radius: 50%;
+        transition:
+          transform 0.2s ease,
+          filter 0.2s ease;
+      }
+
+      .logo-link:hover {
+        transform: scale(1.03);
+        filter: drop-shadow(0 0 14px rgba(245, 197, 66, 0.28));
+      }
+
+      .logo-img {
+        width: 84px;
+        height: 84px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid rgba(245, 197, 66, 0.45);
+        background-color: var(--adm-card);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
+      }
+
+      /* Card de login */
+      .card {
+        width: 100%;
+        padding: 28px 26px;
+        border: 1px solid rgba(245, 197, 66, 0.22);
+        border-radius: 16px;
+        background-color: var(--adm-card);
+        box-shadow:
+          0 22px 54px rgba(0, 0, 0, 0.78),
+          0 0 0 1px rgba(255, 255, 255, 0.03);
+      }
+
+      .card-header {
+        margin-bottom: 22px;
+      }
+
+      .card-title {
+        margin: 0 0 8px;
+        color: #ffffff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(28px, 5vw, 34px);
+        font-weight: 400;
+        line-height: 1.08;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .card-title::after {
+        content: "";
+        display: block;
+        width: 48px;
+        height: 3px;
+        margin: 10px auto 0;
+        border-radius: 999px;
+        background-color: var(--adm-yellow);
+      }
+
+      .card-header p {
+        margin: 10px 0 0;
+        color: var(--adm-muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      /* Formulário */
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        margin-bottom: 16px;
+      }
+
+      .form-label {
+        color: #e4e4e4;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .form-input {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 14px;
+        border: 1px solid var(--adm-border-strong);
+        border-radius: 10px;
+        background-color: var(--adm-input-bg);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+        font-size: 13px;
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease,
+          background-color 0.2s ease;
+      }
+
+      .form-input::placeholder {
+        color: #777777;
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--adm-yellow);
+        background-color: #151515;
+        box-shadow: 0 0 0 3px rgba(245, 197, 66, 0.15);
+      }
+
+      /* Campo senha com botão mostrar/ocultar */
+      .input-with-icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
+
+      .input-with-icon .form-input {
+        padding-right: 44px;
+      }
+
+      .input-icon-btn {
+        position: absolute;
+        right: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--adm-muted);
+        cursor: pointer;
+        transition:
+          color 0.2s ease,
+          background-color 0.2s ease,
+          border-color 0.2s ease;
+      }
+
+      .input-icon-btn:hover {
+        color: var(--adm-yellow);
+        background-color: rgba(245, 197, 66, 0.08);
+        border-color: rgba(245, 197, 66, 0.25);
+      }
+
+      .input-icon-btn:focus-visible {
+        outline: none;
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      /* Checkbox Lembrar-me */
+      .form-check {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .form-check-input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: var(--adm-yellow);
+        cursor: pointer;
+      }
+
+      .form-check-label {
+        color: var(--adm-muted);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      /* Mensagem de feedback */
+      #mensagemLogin {
+        margin: 0 0 16px;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.45;
+        text-align: center;
+      }
+
+      #mensagemLogin:empty {
+        display: none;
+      }
+
+      #mensagemLogin:not(:empty) {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--adm-danger-border);
+        background-color: var(--adm-danger-bg);
+        color: var(--adm-danger);
+      }
+
+      #mensagemLogin.is-success:not(:empty) {
+        border-color: var(--adm-success-border);
+        background-color: var(--adm-success-bg);
+        color: var(--adm-success);
+      }
+
+      /* Botões */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease,
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-block {
+        width: 100%;
+      }
+
+      .btn-lg {
+        min-height: 46px;
+        font-size: 13px;
+      }
+
+      .btn-primary {
+        border: 1px solid var(--adm-yellow);
+        background-color: var(--adm-yellow);
+        color: #141414;
+        box-shadow: 0 6px 18px rgba(245, 197, 66, 0.18);
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        border-color: var(--adm-yellow-hover);
+        background-color: var(--adm-yellow-hover);
+        transform: translateY(-1px);
+      }
+
+      .btn-outline {
+        border: 1px solid #363636;
+        background-color: #141414;
+        color: #e4e4e4;
+      }
+
+      .btn-outline:hover:not(:disabled) {
+        border-color: rgba(245, 197, 66, 0.55);
+        color: var(--adm-yellow);
+        background-color: rgba(245, 197, 66, 0.06);
+      }
+
+      /* Rodapé interno do card e copyright */
+      .card-footer-link {
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid var(--adm-border);
+      }
+
+      .card-footer-link p {
+        margin: 0 0 10px;
+        color: var(--adm-muted);
+        font-size: 12px;
+      }
+
+      .copyright {
+        margin: 18px 0 0;
+        color: #7c7c7c;
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 18px 14px;
+        }
+
+        .card {
+          padding: 22px 18px;
+          border-radius: 14px;
+        }
+
+        .logo-img {
+          width: 72px;
+          height: 72px;
+        }
+      }
+    </style>
 
     <script src="/admin/admin-login.js" defer></script>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <main class="page-main">
-
-        <div class="container">
-
-            <div class="text-center">
-                <a href="/inicio.html">
-                    <img src="/frontend/imagens/logo.png" alt="Fraga Lanches" class="logo-img">
-                </a>
-            </div>
-
-            <article class="card">
-
-                <header class="text-center">
-                    <h1 class="card-title">
-                        Painel Administrativo
-                    </h1>
-
-                    <p>
-                        FaÃ§a login para acessar o painel de controle.
-                    </p>
-                </header>
-
-                <form id="formLogin" novalidate>
-
-                    <div class="form-group">
-                        <label for="email" class="form-label">
-                            E-mail *
-                        </label>
-
-                        <input type="email" id="email" name="email" class="form-input" required autocomplete="username"
-                            placeholder="admin@fragalanches.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="senha" class="form-label">
-                            Senha *
-                        </label>
-
-                        <div class="input-with-icon">
-                            <input type="password" id="senha" name="senha" class="form-input" required
-                                autocomplete="current-password" placeholder="Digite sua senha">
-
-                            <button type="button" class="input-icon-btn" id="toggleSenha" aria-label="Mostrar senha">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" aria-hidden="true">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-check">
-                            <input type="checkbox" id="lembrar" name="lembrar" class="form-check-input">
-
-                            <span class="form-check-label">
-                                Lembrar-me
-                            </span>
-                        </label>
-                    </div>
-
-                    <p id="mensagemLogin" role="alert" aria-live="polite"></p>
-
-                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="btnLogin">
-                        Entrar
-                    </button>
-
-                </form>
-
-                <div class="text-center">
-                    <p>NÃ£o Ã© administrador?</p>
-
-                    <a href="/inicio.html" class="btn btn-outline btn-block">
-                        Voltar ao site
-                    </a>
-                </div>
-
-            </article>
-
-            <p class="text-center">
-                Â© 2026 Fraga Lanches - Todos os direitos reservados.
-            </p>
-
+      <div class="container">
+        <div class="text-center">
+          <a
+            href="/inicio.html"
+            aria-label="Voltar ao início"
+            class="logo-link"
+          >
+            <img src="/imagens/logo.png" alt="Fraga Lanches" class="logo-img" />
+          </a>
         </div>
 
+        <article class="card">
+          <header class="card-header text-center">
+            <h1 class="card-title">Painel Administrativo</h1>
+
+            <p>Faça login para acessar o painel de controle.</p>
+          </header>
+
+          <form id="formLogin" novalidate>
+            <div class="form-group">
+              <label for="email" class="form-label"> E-mail * </label>
+
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input"
+                required
+                autocomplete="username"
+                placeholder="admin@fragalanches.com"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="senha" class="form-label"> Senha * </label>
+
+              <div class="input-with-icon">
+                <input
+                  type="password"
+                  id="senha"
+                  name="senha"
+                  class="form-input"
+                  required
+                  autocomplete="current-password"
+                  placeholder="Digite sua senha"
+                />
+
+                <button
+                  type="button"
+                  class="input-icon-btn"
+                  id="toggleSenha"
+                  aria-label="Mostrar senha"
+                  aria-pressed="false"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                    ></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-check">
+                <input
+                  type="checkbox"
+                  id="lembrar"
+                  name="lembrar"
+                  class="form-check-input"
+                />
+
+                <span class="form-check-label"> Lembrar-me </span>
+              </label>
+            </div>
+
+            <p id="mensagemLogin" role="alert" aria-live="polite"></p>
+
+            <button
+              type="submit"
+              class="btn btn-primary btn-block btn-lg"
+              id="btnLogin"
+            >
+              Entrar
+            </button>
+          </form>
+
+          <div class="card-footer-link text-center">
+            <p>Não é administrador?</p>
+
+            <a href="/inicio.html" class="btn btn-outline btn-block">
+              Voltar ao site
+            </a>
+          </div>
+        </article>
+
+        <p class="copyright text-center">
+          © 2026 Fraga Lanches - Todos os direitos reservados.
+        </p>
+      </div>
     </main>
-
-</body>
-
+  </body>
 </html>

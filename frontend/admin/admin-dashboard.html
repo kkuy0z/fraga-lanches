@@ -1,447 +1,910 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Dashboard | Fraga Lanches Admin</title>
+
+    <meta name="theme-color" content="#0c0c0c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin" />
+
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; base-uri 'self'; form-action 'self';"
+    />
+
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="geolocation=(), microphone=(), camera=()"
+    />
+
     <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#1a1a1a" />
+    <link rel="icon" href="/imagens/logo.png" />
+    <link rel="apple-touch-icon" href="/imagens/logo.png" />
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <title>Dashboard Admin - Fraga Lanches</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
 
-    <link rel="stylesheet" href="/design-system.css">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="/design-system.css" />
 
-    <meta name="theme-color" content="#0c0c0c">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin">
+    <style>
+      :root {
+        --adm-bg: #0c0c0c;
+        --adm-surface: #141414;
+        --adm-card: #191919;
+        --adm-card-elevated: #1e1e1e;
+        --adm-border: rgba(255, 255, 255, 0.08);
+        --adm-border-strong: #2c2c2c;
+        --adm-yellow: #f5c542;
+        --adm-yellow-hover: #ffda65;
+        --adm-yellow-soft: rgba(245, 197, 66, 0.14);
+        --adm-text: #f5f5f5;
+        --adm-muted: #a5a5a5;
+        --adm-danger: #fca5a5;
+        --adm-danger-bg: rgba(248, 113, 113, 0.14);
+        --adm-info: #93c5fd;
+        --adm-info-bg: rgba(96, 165, 250, 0.14);
+        --adm-info-border: rgba(96, 165, 250, 0.38);
+      }
 
-    <link rel="apple-touch-icon" href="/assets/images/icons/logo.png">
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
 
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; base-uri 'self'; form-action 'self';">
+      html {
+        min-height: 100%;
+        width: 100%;
+        overflow-x: clip;
+      }
 
-    <meta name="referrer" content="strict-origin-when-cross-origin">
+      body {
+        display: block;
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 0;
+        overflow-x: clip;
+        background:
+          radial-gradient(
+            circle at 12% 6%,
+            rgba(245, 197, 66, 0.09),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 88% 92%,
+            rgba(245, 197, 66, 0.05),
+            transparent 42%
+          ),
+          var(--adm-bg);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+      }
 
-    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
-</head>
+      body section {
+        position: static;
+        min-height: 0;
+        height: auto;
+      }
 
-<body>
+      .hidden {
+        display: none !important;
+      }
 
-    <!-- Header Admin -->
+      .text-center {
+        text-align: center;
+      }
+
+      .py-4 {
+        padding-top: 28px !important;
+        padding-bottom: 28px !important;
+      }
+
+      /* HEADER ADMINISTRATIVO */
+
+      .admin-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        width: 100%;
+        border-bottom: 1px solid var(--adm-border);
+        background: rgba(12, 12, 12, 0.92);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        width: 100%;
+        max-width: 1440px;
+        min-height: 76px;
+        margin: 0 auto;
+        padding: 12px 36px;
+      }
+
+      .logo a {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+
+      .logo-img {
+        width: 43px;
+        height: 43px;
+        object-fit: cover;
+        border: 1px solid rgba(245, 197, 66, 0.45);
+        border-radius: 50%;
+        box-shadow: 0 0 22px rgba(245, 197, 66, 0.08);
+      }
+
+      .logo-label {
+        color: #fff;
+        font-family: "Cinzel", serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .admin-nav {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .admin-nav a {
+        padding: 8px 14px;
+        border-radius: 9px;
+        border: 1px solid transparent;
+        color: var(--adm-muted);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-decoration: none;
+        white-space: nowrap;
+        transition:
+          color 0.2s ease,
+          background-color 0.2s ease,
+          border-color 0.2s ease;
+      }
+
+      .admin-nav a:hover {
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.04);
+      }
+
+      .admin-nav a.active {
+        color: var(--adm-yellow);
+        background-color: var(--adm-yellow-soft);
+        border-color: rgba(245, 197, 66, 0.36);
+      }
+
+      /* MENU DO USUÃRIO */
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .user-menu {
+        position: relative;
+      }
+
+      .user-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 5px 14px 5px 6px;
+        border: 1px solid #343434;
+        border-radius: 999px;
+        background-color: var(--adm-card);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          border-color 0.2s ease,
+          background-color 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .user-button:hover {
+        border-color: rgba(245, 197, 66, 0.55);
+        background-color: var(--adm-card-elevated);
+        color: var(--adm-yellow);
+      }
+
+      .user-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: var(--adm-yellow);
+        color: #141414;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .user-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 190px;
+        padding: 8px;
+        border: 1px solid #323232;
+        border-radius: 12px;
+        background-color: var(--adm-card);
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.85);
+        z-index: 1200;
+      }
+
+      .user-dropdown.open,
+      .user-dropdown.show {
+        display: block;
+      }
+
+      .user-dropdown-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 8px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .user-dropdown-divider {
+        height: 1px;
+        margin: 6px 0;
+        background-color: var(--adm-border);
+      }
+
+      .user-dropdown-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 9px 10px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #e5e5e5;
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          color 0.2s ease;
+      }
+
+      .user-dropdown-item:hover {
+        background-color: rgba(245, 197, 66, 0.1);
+        color: var(--adm-yellow);
+      }
+
+      .user-dropdown-item.btn-logout {
+        color: var(--adm-danger);
+      }
+
+      .user-dropdown-item.btn-logout:hover {
+        background-color: var(--adm-danger-bg);
+        color: var(--adm-danger);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .badge-info {
+        background-color: var(--adm-info-bg);
+        border: 1px solid var(--adm-info-border);
+        color: var(--adm-info);
+      }
+
+      /* BOTÃƒO MOBILE */
+
+      .admin-nav-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #333;
+        border-radius: 10px;
+        background-color: var(--adm-card);
+        color: var(--adm-text);
+        cursor: pointer;
+      }
+
+      .admin-nav-toggle:hover {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      /* CONTEÃšDO PRINCIPAL */
+
+      .page-main.admin-main {
+        width: 100%;
+        padding: 28px 24px 84px;
+      }
+
+      .page-main > .container {
+        width: 100%;
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      .page-header {
+        padding: 6px 0 26px;
+        text-align: left;
+      }
+
+      .page-header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .page-title {
+        margin: 0 0 6px;
+        color: #fff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(36px, 5vw, 50px);
+        font-weight: 400;
+        line-height: 1.05;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .page-subtitle {
+        margin: 0;
+        color: var(--adm-muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .yellow-line {
+        width: 64px;
+        height: 3px;
+        margin-top: 14px;
+        border-radius: 999px;
+        background-color: var(--adm-yellow);
+      }
+
+      /* CARDS DE MÃ‰TRICAS */
+
+      .dashboard-metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .metric-card {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 20px;
+        border: 1px solid var(--adm-border-strong);
+        border-radius: 14px;
+        background-color: var(--adm-card);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        transition:
+          border-color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .metric-card:hover {
+        border-color: rgba(245, 197, 66, 0.35);
+        transform: translateY(-2px);
+      }
+
+      .metric-label {
+        margin: 0 0 8px;
+        color: var(--adm-muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .metric-value {
+        margin: 0 0 6px;
+        color: #fff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(26px, 3vw, 34px);
+        font-weight: 400;
+        line-height: 1.1;
+        letter-spacing: 0.02em;
+      }
+
+      .metric-subtext {
+        margin: 0;
+        color: var(--adm-muted);
+        font-size: 11px;
+        line-height: 1.4;
+      }
+
+      .metric-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+        border-radius: 11px;
+        background-color: var(--adm-yellow-soft);
+        border: 1px solid rgba(245, 197, 66, 0.28);
+        color: var(--adm-yellow);
+      }
+
+      /* SEÃ‡Ã•ES E TABELA */
+
+      .admin-table-section {
+        border: 1px solid var(--adm-border-strong);
+        border-radius: 16px;
+        background-color: var(--adm-card);
+        padding: 22px;
+        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.45);
+      }
+
+      .section-header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .section-title {
+        margin: 0;
+        color: #fff;
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .table-container {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid var(--adm-border);
+        border-radius: 12px;
+        background-color: var(--adm-surface);
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      .table th {
+        padding: 14px 16px;
+        border-bottom: 1px solid #2a2a2a;
+        background-color: #111;
+        color: var(--adm-yellow);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+        color: #ececec;
+        font-size: 13px;
+        vertical-align: middle;
+      }
+
+      .table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .table tbody tr:hover {
+        background-color: rgba(245, 197, 66, 0.035);
+      }
+
+      /* BOTÃ•ES */
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 40px;
+        padding: 9px 18px;
+        border-radius: 9px;
+        font-family: "Montserrat", sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+          background-color 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .btn-primary {
+        border: 1px solid var(--adm-yellow);
+        background-color: var(--adm-yellow);
+        color: #141414;
+      }
+
+      .btn-primary:hover {
+        border-color: var(--adm-yellow-hover);
+        background-color: var(--adm-yellow-hover);
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        border: 1px solid #383838;
+        background-color: #141414;
+        color: #e5e5e5;
+      }
+
+      .btn-secondary:hover {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      /* RESPONSIVIDADE */
+
+      @media (max-width: 1100px) {
+        .dashboard-metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 900px) {
+        .admin-nav-toggle {
+          display: inline-flex;
+        }
+
+        .admin-nav {
+          display: none;
+          position: fixed;
+          top: 76px;
+          left: 16px;
+          right: 16px;
+          flex-direction: column;
+          align-items: stretch;
+          padding: 12px;
+          border: 1px solid #333;
+          border-radius: 14px;
+          background-color: var(--adm-card);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+          z-index: 1100;
+        }
+
+        .admin-nav.open,
+        .admin-nav.show {
+          display: flex;
+        }
+
+        .admin-nav a {
+          padding: 10px 14px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .page-main.admin-main {
+          padding: 20px 14px 80px;
+        }
+
+        .header-inner {
+          padding: 12px 16px;
+        }
+
+        .dashboard-metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .admin-table-section {
+          padding: 16px;
+          border-radius: 14px;
+        }
+
+        .logo-label,
+        #userName {
+          display: none;
+        }
+      }
+    </style>
+
+    <script src="/admin/admin-dashboard.js" defer></script>
+  </head>
+
+  <body>
+    <!-- HEADER ADMINISTRATIVO -->
     <header class="header-fixed admin-header" role="banner">
-
-        <div class="header-inner">
-
-            <div class="logo">
-                <a href="/admin/admin-dashboard.html">
-                    <img src="/assets/images/icons/logo.png" alt="Fraga Lanches Admin" class="logo-img">
-                </a>
-            </div>
-
-            <!-- Navegação administrativa -->
-            <nav class="admin-nav" id="adminNav" role="navigation" aria-label="Navegação administrativa">
-
-                <a href="/admin/admin-dashboard.html" class="active" data-page="dashboard">
-                    Dashboard
-                </a>
-
-                <a href="/admin/admin-categorias.html" data-page="categorias">
-                    Categorias
-                </a>
-
-                <a href="/admin/admin-produtos.html" data-page="produtos">
-                    Produtos
-                </a>
-
-                <a href="/admin/admin-pedidos.html" data-page="pedidos">
-                    Pedidos
-                </a>
-
-                <a href="/admin/admin-horarios.html" data-page="horarios">
-                    Horários
-                </a>
-
-                <a href="/admin/admin-entrega.html" data-page="entrega">
-                    Entrega
-                </a>
-
-                <a href="/admin/admin-pagamentos.html" data-page="pagamentos">
-                    Pagamentos
-                </a>
-
-                <a href="/admin/admin-usuarios.html" data-page="usuarios">
-                    Usuários
-                </a>
-
-            </nav>
-
-            <!-- Menu do usuário -->
-            <div class="header-actions">
-
-                <div class="user-menu" id="userMenu">
-
-                    <button type="button" class="user-button" id="userButton" aria-expanded="false" aria-haspopup="true"
-                        aria-label="Menu do usuário">
-
-                        <div class="user-avatar" id="userAvatar">?</div>
-
-                        <span id="userName">Admin</span>
-
-                    </button>
-
-                    <div class="user-dropdown" id="userDropdown" role="menu">
-
-                        <div class="user-dropdown-header">
-
-                            <span id="dropdownUserName">Admin</span>
-
-                            <span class="badge badge-info">
-                                Administrador
-                            </span>
-
-                        </div>
-
-                        <div class="user-dropdown-divider"></div>
-
-                        <a href="/inicio.html" class="user-dropdown-item" role="menuitem" target="_blank"
-                            rel="noopener noreferrer">
-                            Ver Site
-                        </a>
-
-                        <div class="user-dropdown-divider"></div>
-
-                        <button type="button" class="user-dropdown-item btn-logout" id="logoutBtn" role="menuitem">
-                            Sair
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+      <div class="header-inner">
+        <div class="logo">
+          <a href="/admin/admin-dashboard.html">
+            <img src="/imagens/logo.png" alt="Fraga Lanches" class="logo-img" />
+            <span class="logo-label">Fraga Admin</span>
+          </a>
         </div>
 
+        <nav
+          class="admin-nav"
+          id="adminNav"
+          role="navigation"
+          aria-label="Navegação administrativa"
+        >
+          <a
+            class="active"
+            href="/admin/admin-dashboard.html"
+            data-page="dashboard"
+            >Dashboard</a
+          >
+          <a href="/admin/admin-pedidos.html" data-page="pedidos">Pedidos</a>
+          <a href="/admin/admin-cardapio.html" data-page="cardapio">Cardápio</a>
+          <a href="/admin/admin-horarios.html" data-page="horarios">Horários</a>
+          <a href="/admin/admin-entrega.html" data-page="entrega">Entrega</a>
+          <a href="/admin/admin-pagamentos.html" data-page="pagamentos"
+            >Pagamentos</a
+          >
+          <a href="/admin/admin-usuarios.html" data-page="usuarios">Usuários</a>
+        </nav>
+
+        <div class="header-actions">
+          <button
+            type="button"
+            class="admin-nav-toggle"
+            id="adminNavToggle"
+            aria-label="Alternar menu"
+            aria-expanded="false"
+            aria-controls="adminNav"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <div class="user-menu" id="userMenu">
+            <button
+              type="button"
+              class="user-button"
+              id="userButton"
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-label="Menu do usuário"
+            >
+              <div class="user-avatar" id="userAvatar">?</div>
+              <span id="userName">Admin</span>
+            </button>
+            <div class="user-dropdown" id="userDropdown" role="menu">
+              <div class="user-dropdown-header">
+                <span id="dropdownUserName">Admin</span>
+                <span id="dropdownUserRole" class="badge badge-info"
+                  >Administrador</span
+                >
+              </div>
+              <div class="user-dropdown-divider"></div>
+              <button
+                type="button"
+                class="user-dropdown-item btn-logout"
+                id="logoutBtn"
+                role="menuitem"
+              >
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
 
-    <!-- Botão menu mobile -->
-    <button type="button" class="admin-nav-toggle" id="adminNavToggle" aria-label="Alternar menu" aria-expanded="false">
-
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            aria-hidden="true">
-
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-
-        </svg>
-
-    </button>
-
-    <!-- Conteúdo principal -->
+    <!-- CONTEÃšDO PRINCIPAL -->
     <main class="page-main admin-main" role="main">
-
-        <div class="container">
-
-            <!-- Cabeçalho -->
-            <div class="page-header">
-
-                <div class="page-header-inner">
-
-                    <h1 class="page-title">
-                        Dashboard
-                    </h1>
-
-                    <p class="page-subtitle">
-                        Visão geral do sistema
-                    </p>
-
-                    <div class="yellow-line"></div>
-
-                </div>
-
+      <div class="container">
+        <div class="page-header">
+          <div class="page-header-top">
+            <div>
+              <h1 class="page-title">Dashboard</h1>
+              <p class="page-subtitle">
+                Resumo operacional de pedidos, faturamento e catálogo.
+              </p>
+              <div class="yellow-line"></div>
             </div>
 
-            <!-- Estatísticas -->
-            <section class="stats-grid" aria-label="Estatísticas gerais" style="
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-                    gap: var(--space-5);
-                    margin-bottom: var(--space-8);
-                ">
-
-                <!-- Pedidos hoje -->
-                <article class="card stat-card"
-                    style="display:flex; align-items:center; gap:var(--space-5); padding:var(--space-6);">
-
-                    <div class="stat-icon stat-icon-primary"
-                        style="flex-shrink:0; width:56px; height:56px; border-radius:var(--radius-md); background:var(--color-accent-weak); color:var(--color-accent); display:grid; place-items:center;">
-
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-
-                            <path d="M16 11V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5">
-                            </path>
-                            <path d="M8 7v9"></path>
-                            <path d="M12 7v9"></path>
-                            <path d="M16 7v9"></path>
-
-                        </svg>
-
-                    </div>
-
-                    <div class="stat-content">
-
-                        <p class="stat-label">Pedidos Hoje</p>
-
-                        <p class="stat-value" id="statPedidosHoje">—</p>
-
-                    </div>
-
-                </article>
-
-                <!-- Pedidos entregues -->
-                <article class="card stat-card"
-                    style="display:flex; align-items:center; gap:var(--space-5); padding:var(--space-6);">
-
-                    <div class="stat-icon stat-icon-success"
-                        style="flex-shrink:0; width:56px; height:56px; border-radius:var(--radius-md); background:var(--color-success-bg); color:var(--color-success); display:grid; place-items:center;">
-
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-
-                        </svg>
-
-                    </div>
-
-                    <div class="stat-content">
-
-                        <p class="stat-label">Pedidos Entregues</p>
-
-                        <p class="stat-value" id="statPedidosEntregues">—</p>
-
-                    </div>
-
-                </article>
-
-                <!-- Pedidos pendentes -->
-                <article class="card stat-card"
-                    style="display:flex; align-items:center; gap:var(--space-5); padding:var(--space-6);">
-
-                    <div class="stat-icon stat-icon-warning"
-                        style="flex-shrink:0; width:56px; height:56px; border-radius:var(--radius-md); background:rgba(255,152,0,.15); color:var(--color-warning); display:grid; place-items:center;">
-
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-
-                            <path
-                                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
-                            </path>
-                            <line x1="12" y1="9" x2="12" y2="13"></line>
-                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-
-                        </svg>
-
-                    </div>
-
-                    <div class="stat-content">
-
-                        <p class="stat-label">Pedidos Pendentes</p>
-
-                        <p class="stat-value" id="statPedidosPendentes">—</p>
-
-                    </div>
-
-                </article>
-
-                <!-- Produtos ativos -->
-                <article class="card stat-card"
-                    style="display:flex; align-items:center; gap:var(--space-5); padding:var(--space-6);">
-
-                    <div class="stat-icon stat-icon-info"
-                        style="flex-shrink:0; width:56px; height:56px; border-radius:var(--radius-md); background:var(--color-accent-weak); color:var(--color-accent); display:grid; place-items:center;">
-
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-
-                            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-
-                        </svg>
-
-                    </div>
-
-                    <div class="stat-content">
-
-                        <p class="stat-label">Produtos Ativos</p>
-
-                        <p class="stat-value" id="statProdutosAtivos">—</p>
-
-                    </div>
-
-                </article>
-
-                <!-- Categorias -->
-                <article class="card stat-card"
-                    style="display:flex; align-items:center; gap:var(--space-5); padding:var(--space-6);">
-
-                    <div class="stat-icon stat-icon-neutral"
-                        style="flex-shrink:0; width:56px; height:56px; border-radius:var(--radius-md); background:rgba(255,255,255,.05); color:var(--color-text-muted); display:grid; place-items:center;">
-
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-
-                            <line x1="4" y1="7" x2="4" y2="21"></line>
-                            <line x1="4" y1="7" x2="20" y2="7"></line>
-                            <line x1="8" y1="7" x2="8" y2="21"></line>
-                            <line x1="12" y1="7" x2="12" y2="21"></line>
-                            <line x1="16" y1="7" x2="16" y2="21"></line>
-                            <line x1="20" y1="7" x2="20" y2="21"></line>
-
-                        </svg>
-
-                    </div>
-
-                    <div class="stat-content">
-
-                        <p class="stat-label">Categorias</p>
-
-                        <p class="stat-value" id="statCategorias">—</p>
-
-                    </div>
-
-                </article>
-
-                <!-- Clientes -->
-                <article class="card stat-card"
-                    style="display:flex; align-items:center; gap:var(--space-5); padding:var(--space-6);">
-
-                    <div class="stat-icon stat-icon-danger"
-                        style="flex-shrink:0; width:56px; height:56px; border-radius:var(--radius-md); background:var(--color-error-bg); color:var(--color-error); display:grid; place-items:center;">
-
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-
-                        </svg>
-
-                    </div>
-
-                    <div class="stat-content">
-
-                        <p class="stat-label">Clientes Cadastrados</p>
-
-                        <p class="stat-value" id="statClientes">—</p>
-
-                    </div>
-
-                </article>
-
-            </section>
-
-            <!-- Pedidos recentes -->
-            <section class="admin-table-section" aria-label="Pedidos recentes">
-
-                <div class="d-flex justify-between align-center"
-                    style="margin-bottom:var(--space-4); flex-wrap:wrap; gap:var(--space-4);">
-
-                    <h2 class="card-title" style="margin:0;">
-                        Pedidos Recentes
-                    </h2>
-
-                    <a href="/admin/admin-pedidos.html" class="btn btn-outline btn-sm">
-                        Ver Todos
-                    </a>
-
-                </div>
-
-                <div class="table-container">
-
-                    <table class="table" id="tabelaPedidosRecentes">
-
-                        <thead>
-                            <tr>
-                                <th>Pedido</th>
-                                <th>Cliente</th>
-                                <th>Data/Hora</th>
-                                <th>Status</th>
-                                <th>Total</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-
-                        <tbody id="tbodyPedidosRecentes">
-
-                            <tr>
-                                <td colspan="6" class="text-center py-4">
-                                    Carregando pedidos...
-                                </td>
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </section>
-
-            <!-- Ações rápidas -->
-            <section style="margin-top:var(--space-8);">
-
-                <h2 class="card-title" style="margin-bottom:var(--space-4);">
-                    Ações Rápidas
-                </h2>
-
-                <div class="d-flex gap-2" style="flex-wrap:wrap;">
-
-                    <a href="/admin/admin-produtos.html" class="btn btn-primary">
-                        Novo Produto
-                    </a>
-
-                    <a href="/admin/admin-categorias.html" class="btn btn-secondary">
-                        Nova Categoria
-                    </a>
-
-                    <a href="/admin/admin-usuarios.html" class="btn btn-outline">
-                        Novo Usuário
-                    </a>
-
-                    <a href="/admin/admin-horarios.html" class="btn btn-outline">
-                        Configurar Horários
-                    </a>
-
-                </div>
-
-            </section>
-
+            <a href="/admin/admin-pedidos.html" class="btn btn-primary">
+              Ver todos os pedidos
+            </a>
+          </div>
         </div>
 
+        <!-- MÃ‰TRICAS -->
+        <section class="dashboard-metrics" aria-label="Indicadores principais">
+          <article class="metric-card">
+            <div>
+              <p class="metric-label">Pedidos hoje</p>
+              <p class="metric-value" id="metricPedidosHoje">0</p>
+              <p class="metric-subtext" id="metricPedidosSub">
+                Atualizado em tempo real
+              </p>
+            </div>
+
+            <div class="metric-icon" aria-hidden="true">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"
+                ></path>
+                <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+              </svg>
+            </div>
+          </article>
+
+          <article class="metric-card">
+            <div>
+              <p class="metric-label">Faturamento hoje</p>
+              <p class="metric-value" id="metricFaturamentoHoje">R$ 0,00</p>
+              <p class="metric-subtext" id="metricFaturamentoSub">
+                Pedidos confirmados
+              </p>
+            </div>
+
+            <div class="metric-icon" aria-hidden="true">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"></path>
+              </svg>
+            </div>
+          </article>
+
+          <article class="metric-card">
+            <div>
+              <p class="metric-label">Em preparo / pendentes</p>
+              <p class="metric-value" id="metricPendentes">0</p>
+              <p class="metric-subtext" id="metricPendentesSub">
+                Aguardando aÃ§Ã£o
+              </p>
+            </div>
+
+            <div class="metric-icon" aria-hidden="true">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+          </article>
+
+          <article class="metric-card">
+            <div>
+              <p class="metric-label">Produtos ativos</p>
+              <p class="metric-value" id="metricProdutosAtivos">0</p>
+              <p class="metric-subtext" id="metricProdutosSub">No cardÃ¡pio</p>
+            </div>
+
+            <div class="metric-icon" aria-hidden="true">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <path d="M16 10a4 4 0 01-8 0"></path>
+              </svg>
+            </div>
+          </article>
+        </section>
+
+        <!-- ULTIMOS PEDIDOS -->
+        <section class="admin-table-section" aria-label="Últimos pedidos">
+          <div class="section-header-row">
+            <h2 class="section-title">Últimos pedidos</h2>
+
+            <a href="/admin/admin-cardapio.html" class="btn btn-secondary">
+              Gerenciar produtos
+            </a>
+          </div>
+
+          <div class="table-container">
+            <table class="table" id="tabelaUltimosPedidos">
+              <thead>
+                <tr>
+                  <th>Pedido</th>
+                  <th>Cliente</th>
+                  <th>Data/Hora</th>
+                  <th>Status</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+
+              <tbody id="tbodyUltimosPedidos">
+                <tr>
+                  <td colspan="5" class="text-center py-4">
+                    Carregando resumo...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
     </main>
-
-    <!-- Scripts -->
-    <script src="/admin/admin-dashboard.js"></script>
-
-    <script>
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", () => {
-                navigator.serviceWorker.register("/sw.js")
-                    .catch(error => {
-                        console.error("Erro no Service Worker:", error);
-                    });
-            });
-        }
-    </script>
-
-</body>
-
+  </body>
 </html>
