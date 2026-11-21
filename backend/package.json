@@ -22,6 +22,7 @@
     "nodemailer": "latest",
     "socket.io": "latest",
     "web-push": "latest",
+    "ws": "^8.23.0",
     "zod": "latest"
   },
   "devDependencies": {

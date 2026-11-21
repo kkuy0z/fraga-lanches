@@ -1,5 +1,5 @@
 
-CREATE DATABASE fraga_db;
+CREATE DATABASE IF NOT EXISTS fraga_db;
 USE fraga_db;
 
 -- ======================================================
@@ -194,6 +194,9 @@ CREATE TABLE entregas (
     data_saida DATETIME,
     data_entrega DATETIME,
 
+    -- NOVO: confirmação do recebimento pelo cliente
+    data_confirmacao_recebimento DATETIME NULL,
+
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id),
     FOREIGN KEY (entregador_id) REFERENCES usuarios(id)
 );
@@ -363,6 +366,31 @@ CREATE TABLE bairros_entrega (
         ON UPDATE CURRENT_TIMESTAMP,
 
     UNIQUE KEY uk_bairros_entrega_nome (nome)
+);
+
+-- ======================================================
+-- NOTIFICAÇÕES DOS CLIENTES
+-- ======================================================
+
+CREATE TABLE notificacoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    pedido_id INT NOT NULL,
+
+    tipo VARCHAR(50) NOT NULL,
+    titulo VARCHAR(120) NOT NULL,
+    mensagem VARCHAR(255) NOT NULL,
+
+    lida BOOLEAN NOT NULL DEFAULT FALSE,
+    data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- Evita notificações duplicadas do mesmo tipo para o pedido
+    UNIQUE KEY uk_notificacao_pedido_tipo (pedido_id, tipo),
+
+    INDEX idx_notificacoes_usuario_data (usuario_id, data_criacao),
+
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(id)
 );
 
 -- ======================================================

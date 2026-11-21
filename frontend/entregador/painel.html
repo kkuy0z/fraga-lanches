@@ -1,48 +1,918 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <link rel="manifest" href="/manifest.json">
- <meta name=theme-color content=#1a1a1a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
- <meta name=theme-color content=#1a1a1a>
-    
- 
-    
- 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/design-system.css">
+    <meta name="theme-color" content="#0c0c0c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches" />
+
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" href="/design-system.css" />
+
+    <link rel="icon" type="image/png" href="/assets/images/icons/logo.png" />
+    <link rel="apple-touch-icon" href="/assets/images/icons/logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <title>Painel do Entregador | Fraga Lanches</title>
-<link rel="icon" type="image/png" href="/assets/images/icons/logo.png">
-<link rel="apple-touch-icon" href="/assets/images/icons/logo.png">
-</head>
-<body>
-    <header>
-        <h1>Fraga Lanches</h1>
-        <button id="btn-sair">Sair</button>
+
+    <style>
+      :root {
+        --ent-bg: #0c0c0c;
+        --ent-surface: #141414;
+        --ent-card: #191919;
+        --ent-card-elevated: #1e1e1e;
+        --ent-border: rgba(255, 255, 255, 0.08);
+        --ent-border-strong: #2c2c2c;
+        --ent-yellow: #f5c542;
+        --ent-yellow-hover: #ffda65;
+        --ent-yellow-soft: rgba(245, 197, 66, 0.14);
+        --ent-text: #f5f5f5;
+        --ent-muted: #a5a5a5;
+        --ent-danger: #fca5a5;
+        --ent-danger-bg: rgba(248, 113, 113, 0.14);
+        --ent-danger-border: rgba(248, 113, 113, 0.42);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+        width: 100%;
+        overflow-x: clip;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 0;
+        overflow-x: clip;
+        background:
+          radial-gradient(
+            circle at 12% 6%,
+            rgba(245, 197, 66, 0.09),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 88% 92%,
+            rgba(245, 197, 66, 0.05),
+            transparent 42%
+          ),
+          var(--ent-bg);
+        color: var(--ent-text);
+        font-family: "Montserrat", sans-serif;
+      }
+
+      body section {
+        position: static;
+        min-height: 0;
+        height: auto;
+      }
+
+      /* ==========================================
+         HEADER
+      ========================================== */
+      .ent-header {
+        position: relative;
+        z-index: 10;
+        flex: 0 0 auto;
+        width: 100%;
+        border-bottom: 1px solid var(--ent-border);
+        background: rgba(12, 12, 12, 0.95);
+      }
+
+      .ent-header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        width: 100%;
+        max-width: 1680px;
+        min-height: 56px;
+        margin: 0 auto;
+        padding: 8px 28px;
+      }
+
+      .ent-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+
+      .ent-brand-img {
+        width: 34px;
+        height: 34px;
+        object-fit: cover;
+        border: 1px solid rgba(245, 197, 66, 0.45);
+        border-radius: 50%;
+        background: #191919;
+        box-shadow: 0 0 22px rgba(245, 197, 66, 0.08);
+      }
+
+      .ent-brand-title {
+        margin: 0;
+        color: #fff;
+        font-family: "Cinzel", serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .ent-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .ent-user-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 12px;
+        border: 1px solid #343434;
+        border-radius: 4px;
+        background: var(--ent-card);
+        color: var(--ent-text);
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .ent-user-badge::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ent-yellow);
+      }
+
+      .btn-sair {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 32px;
+        padding: 5px 14px;
+        border: 1px solid var(--ent-danger-border);
+        border-radius: 4px;
+        background: var(--ent-danger-bg);
+        color: var(--ent-danger);
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+          background-color 0.2s,
+          border-color 0.2s,
+          transform 0.2s;
+      }
+
+      .btn-sair:hover {
+        background: rgba(248, 113, 113, 0.24);
+        transform: translateY(-1px);
+      }
+
+      /* ==========================================
+         CONTEÚDO PRINCIPAL — TELAS QUADRADAS E MESMA ALTURA
+      ========================================== */
+      main.ent-main {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 14px 28px 28px !important;
+      }
+
+      .ent-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        width: 100%;
+        max-width: 1680px;
+        margin: 0 auto;
+      }
+
+      .ent-page-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex: 0 0 auto;
+        width: 100% !important;
+        padding: 2px 0 18px !important;
+        text-align: center !important;
+      }
+
+      .ent-page-title {
+        margin: 0 0 4px;
+        color: #fff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(28px, 3.2vw, 36px);
+        font-weight: 400;
+        line-height: 1.05;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-align: center;
+      }
+
+      .ent-page-subtitle {
+        margin: 0;
+        color: var(--ent-muted);
+        font-size: 12px;
+        line-height: 1.4;
+        text-align: center;
+      }
+
+      .yellow-line {
+        width: 56px;
+        height: 3px;
+        margin: 8px auto 0;
+        background: var(--ent-yellow);
+      }
+
+      /* Grade com quadrados do mesmo tamanho */
+      .ent-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        align-items: stretch !important;
+        gap: 24px !important;
+        width: 100% !important;
+      }
+
+      .ent-card {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        padding: 22px 24px !important;
+        border: 1px solid var(--ent-border-strong) !important;
+        border-radius: 4px !important;
+        background: rgba(20, 20, 20, 0.88) !important;
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.45);
+      }
+
+      .ent-card-header {
+        flex: 0 0 auto;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--ent-border);
+      }
+
+      .ent-card-title {
+        margin: 0 0 3px;
+        color: #fff;
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .ent-card-desc {
+        margin: 0;
+        color: var(--ent-muted);
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      .ent-entregas-box {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        width: 100%;
+        padding: 16px;
+        border: 1px solid var(--ent-border);
+        border-radius: 4px;
+        background: var(--ent-surface);
+        color: var(--ent-muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .ent-entregas-box > p:first-child {
+        margin-top: 0;
+      }
+
+      .ent-entregas-box > p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* ==========================================
+         FORMULÁRIO DE PERFIL
+      ========================================== */
+      #formPerfil {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        flex: 1 1 auto;
+        gap: 18px;
+      }
+
+      .perfil-campos {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .perfil-linha-dupla {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin: 0;
+      }
+
+      .form-group label {
+        color: var(--ent-muted);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .form-group input {
+        width: 100%;
+        min-height: 38px;
+        padding: 8px 12px;
+        border: 1px solid #323232;
+        border-radius: 4px;
+        background: var(--ent-surface);
+        color: var(--ent-text);
+        font-family: inherit;
+        font-size: 12px;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: var(--ent-yellow);
+        box-shadow: 0 0 0 2px rgba(245, 197, 66, 0.16);
+      }
+
+      .form-group input[readonly] {
+        color: var(--ent-muted);
+        background: #101010;
+        border-color: #262626;
+        cursor: not-allowed;
+      }
+
+      .form-group input::placeholder {
+        color: #777;
+      }
+
+      .form-group small {
+        color: var(--ent-muted);
+        font-size: 10px;
+        line-height: 1.4;
+      }
+
+      .perfil-rodape {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--ent-border);
+      }
+
+      #btnSalvarPerfil {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: auto;
+        min-height: 34px;
+        padding: 7px 16px;
+        border: 1px solid var(--ent-yellow);
+        border-radius: 4px;
+        background: var(--ent-yellow);
+        color: #141414;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+          background-color 0.2s,
+          border-color 0.2s,
+          transform 0.2s;
+      }
+
+      #btnSalvarPerfil:hover {
+        border-color: var(--ent-yellow-hover);
+        background: var(--ent-yellow-hover);
+        transform: translateY(-1px);
+      }
+
+      #btnSalvarPerfil:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      #mensagemPerfil {
+        margin: 0;
+        min-height: 16px;
+        color: var(--ent-yellow);
+        font-size: 11px;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+
+      /* ==========================================
+         ENTREGAS — QUADRADAS E BOTÕES EM CADA CANTO
+      ========================================== */
+      .entrega-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        flex: 1 1 auto;
+        gap: 14px;
+        margin-bottom: 14px;
+        padding: 18px;
+        border: 1px solid var(--ent-border-strong);
+        border-radius: 4px;
+        background: var(--ent-card);
+      }
+
+      .entrega-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .entrega-topo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--ent-border);
+      }
+
+      .entrega-topo > div {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .entrega-topo > div > strong {
+        color: #fff;
+        font-size: 15px;
+      }
+
+      .entrega-status {
+        width: fit-content;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: var(--ent-yellow-soft);
+        color: var(--ent-yellow);
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .entrega-total {
+        color: var(--ent-yellow);
+        font-size: 14px;
+        white-space: nowrap;
+      }
+
+      .entrega-detalhes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        padding: 10px 12px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .entrega-info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .entrega-info h4 {
+        margin: 0;
+        color: var(--ent-yellow);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .entrega-info p {
+        margin: 0;
+        color: var(--ent-text);
+        font-size: 11px;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+      }
+
+      .entrega-itens {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .entrega-itens li {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 6px;
+        color: var(--ent-text);
+        font-size: 11px;
+      }
+
+      .entrega-itens li small {
+        flex-basis: 100%;
+        color: var(--ent-muted);
+        font-size: 10px;
+      }
+
+      .entrega-horarios {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--ent-border);
+      }
+
+      .entrega-horarios p {
+        margin: 0;
+        color: var(--ent-muted);
+        font-size: 10px;
+      }
+
+      /* Container dos botões afastados em cada canto */
+      .entrega-botoes-cantos {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+        gap: 16px !important;
+        width: 100% !important;
+        margin-top: 4px !important;
+        padding-top: 12px !important;
+        border-top: 1px solid var(--ent-border) !important;
+      }
+
+      .entrega-botoes-cantos > a,
+      .entrega-botoes-cantos > button,
+      .entrega-item > a.ent-btn,
+      .entrega-item > button.ent-btn,
+      .ent-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        width: auto !important;
+        min-height: 34px;
+        padding: 7px 14px;
+        border: 1px solid var(--ent-yellow);
+        border-radius: 4px;
+        background: var(--ent-yellow);
+        color: #141414;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-align: center;
+        text-decoration: none;
+        text-transform: uppercase;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+          background-color 0.2s,
+          border-color 0.2s,
+          transform 0.2s;
+      }
+
+      .ent-btn:hover {
+        background: var(--ent-yellow-hover);
+        border-color: var(--ent-yellow-hover);
+        transform: translateY(-1px);
+      }
+
+      .ent-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .ent-btn-finalizar {
+        border-color: #86efac;
+        background: #86efac;
+        color: #111827;
+      }
+
+      .ent-btn-finalizar:hover {
+        border-color: #bbf7d0;
+        background: #bbf7d0;
+      }
+
+      .ent-aviso,
+      .ent-concluida {
+        margin: 6px 0 0;
+        padding: 8px 12px;
+        border-radius: 4px;
+        background: var(--ent-yellow-soft);
+        color: var(--ent-yellow);
+        font-size: 11px;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .ent-concluida {
+        background: rgba(134, 239, 172, 0.12);
+        color: #86efac;
+      }
+
+      .ent-vazio {
+        padding: 24px 12px;
+        text-align: center;
+      }
+
+      .ent-vazio strong {
+        color: var(--ent-text);
+        font-size: 13px;
+      }
+
+      .ent-vazio p {
+        margin: 8px 0 0;
+        color: var(--ent-muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .ent-erro {
+        color: var(--ent-danger);
+        font-size: 12px;
+      }
+
+      @media (max-width: 1024px) {
+        .ent-grid {
+          grid-template-columns: minmax(0, 1fr) !important;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .ent-header-inner {
+          padding: 10px 14px;
+        }
+
+        .ent-brand-title {
+          font-size: 12px;
+          letter-spacing: 0.08em;
+        }
+
+        main.ent-main {
+          padding: 14px 12px 32px !important;
+        }
+
+        .ent-card {
+          padding: 16px !important;
+        }
+
+        .perfil-linha-dupla,
+        .entrega-detalhes-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .entrega-item {
+          padding: 14px;
+        }
+
+        .entrega-topo {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .entrega-botoes-cantos {
+          flex-direction: column !important;
+          align-items: stretch !important;
+        }
+
+        .entrega-botoes-cantos > a,
+        .entrega-botoes-cantos > button {
+          width: 100% !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="ent-header" role="banner">
+      <div class="ent-header-inner">
+        <a href="#" class="ent-brand">
+          <img
+            src="/imagens/logo.png"
+            alt="Fraga Lanches"
+            class="ent-brand-img"
+          />
+          <h1 class="ent-brand-title">Fraga Lanches</h1>
+        </a>
+
+        <div class="ent-header-actions">
+          <span id="nome-usuario" class="ent-user-badge">Entregador</span>
+          <button type="button" id="btn-sair" class="btn-sair">Sair</button>
+        </div>
+      </div>
     </header>
-    <main>
-        <h2>ÃƒÂrea do Entregador</h2>
-<p>Gerencie suas entregas.</p>
-<section>
-    <h3>Entregas disponÃƒÂ­veis</h3>
-    <div id="entregas">
-        <p>Aguardando integraÃƒÂ§ÃƒÂ£o com a rota de entregas.</p>
-    </div>
-</section>
+
+    <main class="ent-main" role="main">
+      <div class="ent-container">
+        <div class="ent-page-header">
+          <h2 class="ent-page-title">Área do Entregador</h2>
+          <p class="ent-page-subtitle">
+            Gerencie suas entregas e informações pessoais.
+          </p>
+          <div class="yellow-line"></div>
+        </div>
+
+        <div class="ent-grid">
+          <!-- ENTREGAS -->
+          <section class="ent-card" aria-labelledby="tituloEntregas">
+            <div class="ent-card-header">
+              <h3 class="ent-card-title" id="tituloEntregas">
+                Minhas entregas
+              </h3>
+              <p class="ent-card-desc">
+                Acompanhe os pedidos atribuídos à sua rota.
+              </p>
+            </div>
+
+            <div id="entregas" class="ent-entregas-box">
+              <p>Aguardando integração com a rota de entregas.</p>
+            </div>
+          </section>
+
+          <!-- PERFIL -->
+          <section
+            id="secaoPerfil"
+            class="ent-card"
+            aria-labelledby="tituloPerfil"
+          >
+            <div class="ent-card-header">
+              <h3 class="ent-card-title" id="tituloPerfil">Meu perfil</h3>
+              <p class="ent-card-desc">
+                Consulte e atualize suas informações pessoais.
+              </p>
+            </div>
+
+            <form id="formPerfil">
+              <div class="perfil-campos">
+                <div class="perfil-linha-dupla">
+                  <div class="form-group">
+                    <label for="perfilNome">Nome completo</label>
+                    <input
+                      type="text"
+                      id="perfilNome"
+                      name="nome"
+                      maxlength="100"
+                      minlength="2"
+                      autocomplete="name"
+                      required
+                    />
+                  </div>
+
+                  <div class="form-group">
+                    <label for="perfilTelefone">Telefone</label>
+                    <input
+                      type="tel"
+                      id="perfilTelefone"
+                      name="telefone"
+                      maxlength="20"
+                      autocomplete="tel"
+                      placeholder="(31) 99999-9999"
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="perfilEmail">E-mail</label>
+                  <input
+                    type="email"
+                    id="perfilEmail"
+                    name="email"
+                    readonly
+                    autocomplete="email"
+                  />
+                  <small>
+                    O e-mail é utilizado para acessar sua conta e não pode ser
+                    alterado por aqui.
+                  </small>
+                </div>
+
+                <div class="form-group">
+                  <label for="perfilTipo">Tipo de conta</label>
+                  <input
+                    type="text"
+                    id="perfilTipo"
+                    value="Entregador"
+                    readonly
+                  />
+                </div>
+              </div>
+
+              <div class="perfil-rodape">
+                <button type="submit" id="btnSalvarPerfil">
+                  Salvar alterações
+                </button>
+                <p id="mensagemPerfil" role="status" aria-live="polite"></p>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
     </main>
+
     <script src="painel.js"></script>
-<script src="/pwa.js"></script>
 
-<script>
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js")
-            .catch(erro => console.error("Erro ao registrar Service Worker:", erro));
-    });
-}
-</script>
-</body>
+    <script>
+      function agruparBotoesPedidoEmCantos() {
+        const entregasContainer = document.getElementById("entregas");
+        if (!entregasContainer) return;
+
+        entregasContainer.querySelectorAll(".entrega-item").forEach((item) => {
+          const acoes = Array.from(item.children).filter(
+            (el) => el.tagName === "A" || el.tagName === "BUTTON",
+          );
+          if (acoes.length < 2) return;
+
+          let wrapper = item.querySelector(".entrega-botoes-cantos");
+          if (!wrapper) {
+            wrapper = document.createElement("div");
+            wrapper.className = "entrega-botoes-cantos";
+            item.appendChild(wrapper);
+          }
+
+          acoes.forEach((btn) => wrapper.appendChild(btn));
+        });
+      }
+
+      const observerEntregas = new MutationObserver(
+        agruparBotoesPedidoEmCantos,
+      );
+      document.addEventListener("DOMContentLoaded", () => {
+        agruparBotoesPedidoEmCantos();
+        const entregasContainer = document.getElementById("entregas");
+        if (entregasContainer) {
+          observerEntregas.observe(entregasContainer, {
+            childList: true,
+            subtree: true,
+          });
+        }
+      });
+
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js").catch((erro) => {
+            console.error("Erro ao registrar Service Worker:", erro);
+          });
+        });
+      }
+    </script>
+  </body>
 </html>
-
-

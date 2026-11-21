@@ -770,12 +770,23 @@ router.get("/meus", async (req, res) => {
         p.taxa_entrega,
         p.desconto,
         p.total,
+
         pg.forma_pagamento,
-        pg.status AS status_pagamento
+        pg.status AS status_pagamento,
+
+        (
+          SELECT COALESCE(SUM(ip.quantidade), 0)
+          FROM itens_pedido ip
+          WHERE ip.pedido_id = p.id
+        ) AS quantidade_itens
+
       FROM pedidos p
+
       LEFT JOIN pagamentos pg
         ON pg.pedido_id = p.id
+
       WHERE p.usuario_id = ?
+
       ORDER BY p.data_pedido DESC`,
       [req.usuario.id],
     );

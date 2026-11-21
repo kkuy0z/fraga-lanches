@@ -2,6 +2,7 @@
 
 const API = "/api/admin/pedidos";
 const API_AUTH = "/api/auth";
+const API_ATRIBUICOES = "/api/admin/atribuicoes";
 
 // ======================================================
 // ELEMENTOS
@@ -45,7 +46,11 @@ const STATUS = {
 const FORMAS_PAGAMENTO = {
   pix: "PIX",
   cartao: "Cartão",
+  credito: "Crédito",
+  debito: "Débito",
   dinheiro: "Dinheiro",
+  boleto: "Boleto",
+  outro: "Outro",
 };
 
 const STATUS_PAGAMENTO = {
@@ -327,12 +332,12 @@ async function carregarPedidos() {
   if (!tbody) return;
 
   tbody.innerHTML = `
-        <tr>
-            <td colspan="8" class="text-center py-4">
-                Carregando pedidos...
-            </td>
-        </tr>
-    `;
+    <tr>
+      <td colspan="8" class="text-center py-4">
+        Carregando pedidos...
+      </td>
+    </tr>
+  `;
 
   emptyState?.classList.add("hidden");
 
@@ -378,12 +383,12 @@ async function carregarPedidos() {
     console.error("Erro ao carregar pedidos:", erro);
 
     tbody.innerHTML = `
-            <tr>
-                <td colspan="8" class="text-center py-4">
-                    ${escaparHTML(erro.message)}
-                </td>
-            </tr>
-        `;
+      <tr>
+        <td colspan="8" class="text-center py-4">
+          ${escaparHTML(erro.message)}
+        </td>
+      </tr>
+    `;
 
     emptyState?.classList.add("hidden");
   }
@@ -425,82 +430,80 @@ function renderizarPedidos() {
         : "badge-secondary";
 
       return `
-            <tr>
-                <td>
-                    <strong>#${id}</strong>
-                </td>
+        <tr>
+          <td>
+            <strong>#${id}</strong>
+          </td>
 
-                <td>
-                    ${escaparHTML(pedido.cliente_nome)}
-                </td>
+          <td>
+            ${escaparHTML(pedido.cliente_nome)}
+          </td>
 
-                <td>
-                    ${escaparHTML(formatarData(pedido.data_pedido))}
-                </td>
+          <td>
+            ${escaparHTML(formatarData(pedido.data_pedido))}
+          </td>
 
-                <td>
-                    ${
-                      pedido.tipo_entrega === "entrega" ? "Entrega" : "Retirada"
-                    }
-                </td>
+          <td>
+            ${pedido.tipo_entrega === "entrega" ? "Entrega" : "Retirada"}
+          </td>
 
-                <td>
-                    <span class="badge ${obterClasseStatus(pedido.status)}">
-                        ${escaparHTML(obterStatus(pedido.status))}
-                    </span>
-                </td>
+          <td>
+            <span class="badge ${obterClasseStatus(pedido.status)}">
+              ${escaparHTML(obterStatus(pedido.status))}
+            </span>
+          </td>
 
-                <td>
-                    <div>
-                        <strong>
-                            ${escaparHTML(formaPagamento)}
-                        </strong>
+          <td>
+            <div>
+              <strong>
+                ${escaparHTML(formaPagamento)}
+              </strong>
 
-                        <br>
+              <br>
 
-                        <span class="badge ${classePagamento}">
-                            ${escaparHTML(statusPagamento)}
-                        </span>
-                    </div>
-                </td>
+              <span class="badge ${classePagamento}">
+                ${escaparHTML(statusPagamento)}
+              </span>
+            </div>
+          </td>
 
-                <td>
-                    <strong>
-                        ${formatarMoeda(pedido.total)}
-                    </strong>
-                </td>
+          <td>
+            <strong>
+              ${formatarMoeda(pedido.total)}
+            </strong>
+          </td>
 
-                <td>
-                    <div class="d-flex" style="gap: 8px; flex-wrap: wrap;">
+          <td>
+            <div class="d-flex" style="gap: 8px; flex-wrap: wrap;">
 
-                        <button
-                            type="button"
-                            class="btn btn-secondary btn-sm"
-                            data-acao="detalhes"
-                            data-id="${id}"
-                        >
-                            Detalhes
-                        </button>
+              <button
+                type="button"
+                class="btn btn-secondary btn-sm"
+                data-acao="detalhes"
+                data-id="${id}"
+              >
+                Detalhes
+              </button>
 
-                        ${
-                          ["concluido", "cancelado"].includes(pedido.status)
-                            ? ""
-                            : `
-                                <button
-                                    type="button"
-                                    class="btn btn-primary btn-sm"
-                                    data-acao="status"
-                                    data-id="${id}"
-                                >
-                                    Status
-                                </button>
-                            `
-                        }
+              ${
+                ["concluido", "cancelado"].includes(pedido.status)
+                  ? ""
+                  : `
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-sm"
+                      data-acao="status"
+                      data-id="${id}"
+                    >
+                      Status
+                    </button>
+                  `
+              }
 
-                    </div>
-                </td>
-            </tr>
-        `;
+            </div>
+          </td>
+        </tr>
+      `;
     })
     .join("");
 
@@ -518,7 +521,6 @@ function abrirModalStatus(id) {
 
   if (!pedido || !statusModal || !statusForm) {
     mostrarMensagem("Não foi possível abrir o modal do pedido.");
-
     return;
   }
 
@@ -557,7 +559,6 @@ async function alterarStatus(evento) {
 
   if (pedido.status === status) {
     mostrarMensagem("Selecione um status diferente do atual.");
-
     return;
   }
 
@@ -581,7 +582,6 @@ async function alterarStatus(evento) {
     mostrarMensagem(resultado.mensagem || "Status atualizado com sucesso!");
   } catch (erro) {
     console.error("Erro ao alterar status:", erro);
-
     mostrarMensagem(erro.message);
   } finally {
     if (btn) {
@@ -602,8 +602,8 @@ async function abrirDetalhes(id) {
 
   try {
     pedidoModalBody.innerHTML = `
-            <p>Carregando detalhes...</p>
-        `;
+      <p>Carregando detalhes...</p>
+    `;
 
     pedidoModalTitulo.textContent = `Pedido #${id}`;
 
@@ -632,360 +632,543 @@ async function abrirDetalhes(id) {
           .join(", ")
       : "Retirada no estabelecimento";
 
-    // PAGAMENTO MAIS RECENTE
     const pagamentoAtual = pagamentos[0] || null;
 
     pedidoModalBody.innerHTML = `
-            <div class="pedido-detalhes">
+      <div class="pedido-detalhes">
 
-                <!-- CLIENTE -->
+        <!-- CLIENTE -->
 
-                <div class="form-row">
+        <div class="form-row">
 
-                    <div class="form-group">
-                        <strong>Cliente</strong>
-                        <p>
-                            ${escaparHTML(pedido.cliente_nome)}
-                        </p>
-                    </div>
+          <div class="form-group">
+            <strong>Cliente</strong>
+            <p>
+              ${escaparHTML(pedido.cliente_nome)}
+            </p>
+          </div>
 
-                    <div class="form-group">
-                        <strong>Telefone</strong>
-                        <p>
-                            ${escaparHTML(pedido.cliente_telefone || "-")}
-                        </p>
-                    </div>
+          <div class="form-group">
+            <strong>Telefone</strong>
+            <p>
+              ${escaparHTML(pedido.cliente_telefone || "-")}
+            </p>
+          </div>
 
-                </div>
+        </div>
 
-                <div class="form-row">
+        <div class="form-row">
 
-                    <div class="form-group">
-                        <strong>E-mail</strong>
-                        <p>
-                            ${escaparHTML(pedido.cliente_email || "-")}
-                        </p>
-                    </div>
+          <div class="form-group">
+            <strong>E-mail</strong>
+            <p>
+              ${escaparHTML(pedido.cliente_email || "-")}
+            </p>
+          </div>
 
-                    <div class="form-group">
-                        <strong>Data do pedido</strong>
-                        <p>
-                            ${escaparHTML(formatarData(pedido.data_pedido))}
-                        </p>
-                    </div>
+          <div class="form-group">
+            <strong>Data do pedido</strong>
+            <p>
+              ${escaparHTML(formatarData(pedido.data_pedido))}
+            </p>
+          </div>
 
-                </div>
+        </div>
 
-                <div class="form-group">
-                    <strong>Endereço / Entrega</strong>
-                    <p>
-                        ${escaparHTML(endereco)}
-                    </p>
-                </div>
+        <div class="form-group">
+          <strong>Endereço / Entrega</strong>
+          <p>
+            ${escaparHTML(endereco)}
+          </p>
+        </div>
 
-                <div class="form-group">
-                    <strong>Status do pedido</strong>
-                    <p>
-                        <span class="badge ${obterClasseStatus(pedido.status)}">
-                            ${escaparHTML(obterStatus(pedido.status))}
-                        </span>
-                    </p>
-                </div>
+        <div class="form-group">
+          <strong>Status do pedido</strong>
+          <p>
+            <span class="badge ${obterClasseStatus(pedido.status)}">
+              ${escaparHTML(obterStatus(pedido.status))}
+            </span>
+          </p>
+        </div>
 
-                <hr>
+        ${
+          pedido.tipo_entrega === "entrega"
+            ? `
+              <hr>
 
-                <!-- ITENS -->
+              <h3>Entregador responsável</h3>
 
-                <h3>Itens do pedido</h3>
+              <div
+                id="areaAtribuicao"
+                data-pedido-id="${Number(pedido.id)}"
+                class="form-group"
+              >
+                Carregando informações da entrega...
+              </div>
+            `
+            : ""
+        }
 
-                ${
-                  itens.length
-                    ? `
-                    <div class="table-container">
+        <hr>
 
-                        <table class="table">
+        <!-- ITENS -->
 
-                            <thead>
-                                <tr>
-                                    <th>Produto</th>
-                                    <th>Quantidade</th>
-                                    <th>Preço</th>
-                                    <th>Subtotal</th>
-                                </tr>
-                            </thead>
+        <h3>Itens do pedido</h3>
 
-                            <tbody>
+        ${
+          itens.length
+            ? `
+              <div class="table-container">
+                <table class="table">
 
-                                ${itens
-                                  .map(
-                                    (item) => `
-                                    <tr>
+                  <thead>
+                    <tr>
+                      <th>Produto</th>
+                      <th>Quantidade</th>
+                      <th>Preço</th>
+                      <th>Subtotal</th>
+                    </tr>
+                  </thead>
 
-                                        <td>
-                                            <strong>
-                                                ${escaparHTML(item.nome_produto)}
-                                            </strong>
+                  <tbody>
+                    ${itens
+                      .map(
+                        (item) => `
+                          <tr>
+                            <td>
+                              <strong>
+                                ${escaparHTML(item.nome_produto)}
+                              </strong>
 
-                                            ${
-                                              item.personalizacao
-                                                ? `<p>${escaparHTML(item.personalizacao)}</p>`
-                                                : ""
-                                            }
-                                        </td>
+                              ${
+                                item.personalizacao
+                                  ? `<p>${escaparHTML(item.personalizacao)}</p>`
+                                  : ""
+                              }
+                            </td>
 
-                                        <td>
-                                            ${Number(item.quantidade)}
-                                        </td>
+                            <td>
+                              ${Number(item.quantidade)}
+                            </td>
 
-                                        <td>
-                                            ${formatarMoeda(item.preco_unitario)}
-                                        </td>
+                            <td>
+                              ${formatarMoeda(item.preco_unitario)}
+                            </td>
 
-                                        <td>
-                                            ${formatarMoeda(item.subtotal)}
-                                        </td>
-
-                                    </tr>
-                                `,
-                                  )
-                                  .join("")}
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-                `
-                    : `
-                    <p>Nenhum item encontrado.</p>
-                `
-                }
-
-                <hr>
-
-                <!-- RESUMO FINANCEIRO -->
-
-                <h3>Resumo financeiro</h3>
-
-                <p>
-                    Subtotal:
-                    <strong>${formatarMoeda(pedido.subtotal)}</strong>
-                </p>
-
-                <p>
-                    Taxa de entrega:
-                    <strong>${formatarMoeda(pedido.taxa_entrega)}</strong>
-                </p>
-
-                <p>
-                    Desconto:
-                    <strong>${formatarMoeda(pedido.desconto)}</strong>
-                </p>
-
-                <h3>
-                    Total: ${formatarMoeda(pedido.total)}
-                </h3>
-
-                <hr>
-
-                <!-- PAGAMENTO -->
-
-                <h3>Pagamento</h3>
-
-                ${
-                  pagamentoAtual
-                    ? `
-
-                    <div class="form-group">
-
-                        <p>
-                            Forma de pagamento:
-                            <strong>
-                                ${escaparHTML(
-                                  obterFormaPagamento(
-                                    pagamentoAtual.forma_pagamento,
-                                  ),
-                                )}
-                            </strong>
-                        </p>
-
-                        ${
-                          pagamentoAtual.tipo_cartao
-                            ? `
-                            <p>
-                                Tipo de cartão:
-                                <strong>
-                                    ${escaparHTML(
-                                      obterTipoCartao(
-                                        pagamentoAtual.tipo_cartao,
-                                      ),
-                                    )}
-                                </strong>
-                            </p>
-                        `
-                            : ""
-                        }
-
-                        <p>
-                            Valor registrado:
-                            <strong>
-                                ${formatarMoeda(pagamentoAtual.valor)}
-                            </strong>
-                        </p>
-
-                        <p>
-                            Situação:
-
-                            <span class="badge ${obterClasseStatusPagamento(pagamentoAtual.status)}">
-                                ${escaparHTML(
-                                  obterStatusPagamento(pagamentoAtual.status),
-                                )}
-                            </span>
-                        </p>
-
-                        <p>
-                            Código da transação:
-                            <strong>
-                                ${escaparHTML(pagamentoAtual.codigo_transacao || "Não informado")}
-                            </strong>
-                        </p>
-
-                        <p>
-                            Data do pagamento:
-                            ${escaparHTML(
-                              formatarData(pagamentoAtual.data_pagamento),
-                            )}
-                        </p>
-
-                    </div>
-
-                    ${
-                      pagamentos.length > 1
-                        ? `
-
-                        <h4>Registros anteriores</h4>
-
-                        ${pagamentos
-                          .slice(1)
-                          .map(
-                            (pagamento) => `
-                            <div class="form-group">
-
-                                <p>
-                                    ${escaparHTML(
-                                      obterFormaPagamento(
-                                        pagamento.forma_pagamento,
-                                      ),
-                                    )}
-                                    -
-                                    ${formatarMoeda(pagamento.valor)}
-                                </p>
-
-                                <p>
-                                    Status:
-                                    ${escaparHTML(
-                                      obterStatusPagamento(pagamento.status),
-                                    )}
-                                </p>
-
-                                <small>
-                                    ${escaparHTML(
-                                      formatarData(pagamento.data_pagamento),
-                                    )}
-                                </small>
-
-                            </div>
+                            <td>
+                              ${formatarMoeda(item.subtotal)}
+                            </td>
+                          </tr>
                         `,
-                          )
-                          .join("")}
+                      )
+                      .join("")}
+                  </tbody>
 
-                    `
-                        : ""
-                    }
+                </table>
+              </div>
+            `
+            : `
+              <p>Nenhum item encontrado.</p>
+            `
+        }
 
-                `
-                    : `
-                    <div class="form-group">
-                        <p>
-                            <strong>Forma de pagamento:</strong>
-                            Não informado
-                        </p>
+        <hr>
 
-                        <p>
-                            <strong>Situação:</strong>
-                            Nenhum pagamento registrado.
-                        </p>
-                    </div>
-                `
-                }
+        <!-- RESUMO FINANCEIRO -->
 
-                <hr>
+        <h3>Resumo financeiro</h3>
 
-                <!-- OBSERVAÇÕES -->
+        <p>
+          Subtotal:
+          <strong>${formatarMoeda(pedido.subtotal)}</strong>
+        </p>
 
-                <h3>Observações</h3>
+        <p>
+          Taxa de entrega:
+          <strong>${formatarMoeda(pedido.taxa_entrega)}</strong>
+        </p>
+
+        <p>
+          Desconto:
+          <strong>${formatarMoeda(pedido.desconto)}</strong>
+        </p>
+
+        <h3>
+          Total: ${formatarMoeda(pedido.total)}
+        </h3>
+
+        <hr>
+
+        <!-- PAGAMENTO -->
+
+        <h3>Pagamento</h3>
+
+        ${
+          pagamentoAtual
+            ? `
+              <div class="form-group">
 
                 <p>
-                    ${escaparHTML(pedido.observacoes || "Nenhuma observação.")}
+                  Forma de pagamento:
+                  <strong>
+                    ${escaparHTML(
+                      obterFormaPagamento(pagamentoAtual.forma_pagamento),
+                    )}
+                  </strong>
                 </p>
 
-                <hr>
-
-                <!-- HISTÓRICO -->
-
-                <h3>Histórico do pedido</h3>
-
                 ${
-                  historico.length
-                    ? historico
-                        .map(
-                          (item) => `
-                    <div class="form-group">
-
+                  pagamentoAtual.tipo_cartao
+                    ? `
+                      <p>
+                        Tipo de cartão:
                         <strong>
-                            ${escaparHTML(obterStatus(item.status_novo))}
+                          ${escaparHTML(
+                            obterTipoCartao(pagamentoAtual.tipo_cartao),
+                          )}
                         </strong>
-
-                        <p>
-                            ${escaparHTML(
-                              item.status_anterior
-                                ? obterStatus(item.status_anterior)
-                                : "Criação do pedido",
-                            )}
-
-                            →
-
-                            ${escaparHTML(obterStatus(item.status_novo))}
-                        </p>
-
-                        <small>
-                            ${escaparHTML(item.usuario_nome || "Sistema")}
-                            •
-                            ${escaparHTML(formatarData(item.data_alteracao))}
-                        </small>
-
-                    </div>
-                `,
-                        )
-                        .join("")
-                    : `
-                    <p>Nenhuma alteração registrada.</p>
-                `
+                      </p>
+                    `
+                    : ""
                 }
 
-            </div>
-        `;
+                <p>
+                  Valor registrado:
+                  <strong>
+                    ${formatarMoeda(pagamentoAtual.valor)}
+                  </strong>
+                </p>
+
+                <p>
+                  Situação:
+
+                  <span class="badge ${obterClasseStatusPagamento(pagamentoAtual.status)}">
+                    ${escaparHTML(obterStatusPagamento(pagamentoAtual.status))}
+                  </span>
+                </p>
+
+                <p>
+                  Código da transação:
+                  <strong>
+                    ${escaparHTML(
+                      pagamentoAtual.codigo_transacao || "Não informado",
+                    )}
+                  </strong>
+                </p>
+
+                <p>
+                  Data do pagamento:
+                  ${escaparHTML(formatarData(pagamentoAtual.data_pagamento))}
+                </p>
+
+              </div>
+
+              ${
+                pagamentos.length > 1
+                  ? `
+                    <h4>Registros anteriores</h4>
+
+                    ${pagamentos
+                      .slice(1)
+                      .map(
+                        (pagamento) => `
+                          <div class="form-group">
+
+                            <p>
+                              ${escaparHTML(
+                                obterFormaPagamento(pagamento.forma_pagamento),
+                              )}
+                              -
+                              ${formatarMoeda(pagamento.valor)}
+                            </p>
+
+                            <p>
+                              Status:
+                              ${escaparHTML(
+                                obterStatusPagamento(pagamento.status),
+                              )}
+                            </p>
+
+                            <small>
+                              ${escaparHTML(
+                                formatarData(pagamento.data_pagamento),
+                              )}
+                            </small>
+
+                          </div>
+                        `,
+                      )
+                      .join("")}
+                  `
+                  : ""
+              }
+            `
+            : `
+              <div class="form-group">
+                <p>
+                  <strong>Forma de pagamento:</strong>
+                  Não informado
+                </p>
+
+                <p>
+                  <strong>Situação:</strong>
+                  Nenhum pagamento registrado.
+                </p>
+              </div>
+            `
+        }
+
+        <hr>
+
+        <!-- OBSERVAÇÕES -->
+
+        <h3>Observações</h3>
+
+        <p>
+          ${escaparHTML(pedido.observacoes || "Nenhuma observação.")}
+        </p>
+
+        <hr>
+
+        <!-- HISTÓRICO -->
+
+        <h3>Histórico do pedido</h3>
+
+        ${
+          historico.length
+            ? historico
+                .map(
+                  (item) => `
+                    <div class="form-group">
+
+                      <strong>
+                        ${escaparHTML(obterStatus(item.status_novo))}
+                      </strong>
+
+                      <p>
+                        ${escaparHTML(
+                          item.status_anterior
+                            ? obterStatus(item.status_anterior)
+                            : "Criação do pedido",
+                        )}
+
+                        →
+
+                        ${escaparHTML(obterStatus(item.status_novo))}
+                      </p>
+
+                      <small>
+                        ${escaparHTML(item.usuario_nome || "Sistema")}
+                        •
+                        ${escaparHTML(formatarData(item.data_alteracao))}
+                      </small>
+
+                    </div>
+                  `,
+                )
+                .join("")
+            : `
+              <p>Nenhuma alteração registrada.</p>
+            `
+        }
+
+      </div>
+    `;
+
+    // Configura a atribuição depois de renderizar os detalhes.
+    if (pedido.tipo_entrega === "entrega") {
+      await configurarAtribuicao(pedido);
+    }
   } catch (erro) {
     console.error("Erro ao carregar detalhes:", erro);
 
     pedidoModalBody.innerHTML = `
-            <p>${escaparHTML(erro.message)}</p>
-        `;
+      <p>${escaparHTML(erro.message)}</p>
+    `;
   }
 }
 
 function fecharModalDetalhes() {
   fecharElementoModal(pedidoModal);
+}
+
+// ======================================================
+// ATRIBUIÇÃO DE ENTREGADORES
+// ======================================================
+
+async function configurarAtribuicao(pedido) {
+  const area = document.getElementById("areaAtribuicao");
+
+  if (!area) return;
+
+  try {
+    const resultadoEntrega = await requisicao(
+      `${API_ATRIBUICOES}/${pedido.id}`,
+    );
+
+    const entrega = resultadoEntrega.entrega;
+
+    let informacaoAtual = "";
+
+    if (entrega && entrega.entregador_nome) {
+      informacaoAtual = `
+        <p>
+          <strong>Entregador atual:</strong>
+          ${escaparHTML(entrega.entregador_nome)}
+        </p>
+
+        <p>
+          <strong>Situação da entrega:</strong>
+          ${escaparHTML(entrega.status)}
+        </p>
+      `;
+    } else {
+      informacaoAtual = `
+        <p>Nenhum entregador atribuído.</p>
+      `;
+    }
+
+    if (pedido.status !== "pronto") {
+      area.innerHTML = `
+        ${informacaoAtual}
+
+        <p>
+          A atribuição fica disponível quando o pedido estiver
+          com status <strong>Pronto</strong>.
+        </p>
+      `;
+
+      return;
+    }
+
+    if (entrega && !["pendente", "atribuida"].includes(entrega.status)) {
+      area.innerHTML = `
+        ${informacaoAtual}
+
+        <p>
+          Esta entrega já foi iniciada ou finalizada.
+          Não é possível alterar o entregador.
+        </p>
+      `;
+
+      return;
+    }
+
+    const resultadoEntregadores = await requisicao(
+      `${API_ATRIBUICOES}/entregadores`,
+    );
+
+    const entregadores = resultadoEntregadores.entregadores || [];
+
+    if (!entregadores.length) {
+      area.innerHTML = `
+        ${informacaoAtual}
+
+        <p>
+          Não existem entregadores ativos cadastrados.
+        </p>
+      `;
+
+      return;
+    }
+
+    const opcoes = entregadores
+      .map((entregador) => {
+        const selecionado =
+          entrega && Number(entrega.entregador_id) === Number(entregador.id)
+            ? "selected"
+            : "";
+
+        return `
+          <option
+            value="${Number(entregador.id)}"
+            ${selecionado}
+          >
+            ${escaparHTML(entregador.nome)}
+          </option>
+        `;
+      })
+      .join("");
+
+    area.innerHTML = `
+      ${informacaoAtual}
+
+      <label for="selectEntregador">
+        Selecionar entregador
+      </label>
+
+      <select
+        id="selectEntregador"
+        class="form-control"
+      >
+        <option value="">Selecione um entregador</option>
+        ${opcoes}
+      </select>
+
+      <button
+        type="button"
+        id="btnAtribuirEntregador"
+        class="btn btn-primary"
+        style="margin-top: 12px;"
+      >
+        ${entrega ? "Atualizar atribuição" : "Atribuir entrega"}
+      </button>
+    `;
+
+    document
+      .getElementById("btnAtribuirEntregador")
+      ?.addEventListener("click", () => atribuirEntregador(pedido.id));
+  } catch (erro) {
+    console.error("Erro ao configurar atribuição:", erro);
+
+    area.innerHTML = `
+      <p>${escaparHTML(erro.message)}</p>
+    `;
+  }
+}
+
+async function atribuirEntregador(pedidoId) {
+  const select = document.getElementById("selectEntregador");
+  const botao = document.getElementById("btnAtribuirEntregador");
+
+  const entregadorId = Number(select?.value);
+
+  if (!entregadorId) {
+    mostrarMensagem("Selecione um entregador.");
+    return;
+  }
+
+  if (!confirm("Deseja atribuir este pedido ao entregador selecionado?")) {
+    return;
+  }
+
+  if (botao) {
+    botao.disabled = true;
+    botao.textContent = "Atribuindo...";
+  }
+
+  try {
+    const resultado = await requisicao(API_ATRIBUICOES, {
+      method: "POST",
+      body: JSON.stringify({
+        pedidoId: Number(pedidoId),
+        entregadorId,
+      }),
+    });
+
+    mostrarMensagem(resultado.mensagem || "Entregador atribuído com sucesso!");
+
+    await carregarPedidos();
+    await abrirDetalhes(pedidoId);
+  } catch (erro) {
+    console.error("Erro ao atribuir entregador:", erro);
+    mostrarMensagem(erro.message);
+
+    if (botao) {
+      botao.disabled = false;
+      botao.textContent = "Atribuir entrega";
+    }
+  }
 }
 
 // ======================================================

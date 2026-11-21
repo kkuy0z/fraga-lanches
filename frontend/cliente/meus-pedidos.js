@@ -5,6 +5,11 @@
 // ======================================================
 
 const API = "/api/pedidos";
+const API_NOTIFICACOES = "/api/cliente/notificacoes";
+
+const INTERVALO_FALLBACK = 15000;
+const RECONEXAO_INICIAL = 1000;
+const RECONEXAO_MAXIMA = 30000;
 
 const STATUS_CANCELAVEIS = ["novo", "em_preparo"];
 
@@ -29,7 +34,17 @@ const pedidoModalCancelar = document.getElementById("pedidoModalCancelar");
 // ======================================================
 
 let pedidos = [];
+let notificacoes = [];
 let pedidoAtualId = null;
+
+let atualizacaoEmAndamento = false;
+
+let conexaoWebSocket = null;
+let temporizadorFallback = null;
+let temporizadorReconexao = null;
+let intervaloReconexao = RECONEXAO_INICIAL;
+
+let reconexaoAgendada = false;
 
 // ======================================================
 // FUNÇÕES AUXILIARES
@@ -72,6 +87,19 @@ function normalizarStatus(status) {
     .toLowerCase();
 }
 
+function statusTexto(status) {
+  const statusMap = {
+    novo: "Novo",
+    em_preparo: "Em preparo",
+    pronto: "Pronto",
+    saiu_para_entrega: "Saiu para entrega",
+    concluido: "Concluído",
+    cancelado: "Cancelado",
+  };
+
+  return statusMap[normalizarStatus(status)] || status || "-";
+}
+
 function podeCancelarPedido(status) {
   return STATUS_CANCELAVEIS.includes(normalizarStatus(status));
 }
@@ -110,6 +138,21 @@ function obterDataPedido(pedido) {
 
 function obterTotalPedido(pedido) {
   return pedido.total ?? pedido.valor_total ?? 0;
+}
+
+function obterNotificacaoEntrega(pedidoId) {
+  return notificacoes.find(
+    (notificacao) =>
+      Number(notificacao.pedido_id) === Number(pedidoId) &&
+      notificacao.tipo === "entrega_informada",
+  );
+}
+
+function podeConfirmarRecebimento(pedido) {
+  return (
+    normalizarStatus(pedido.status) === "saiu_para_entrega" &&
+    Boolean(obterNotificacaoEntrega(pedido.id))
+  );
 }
 
 // ======================================================
@@ -151,7 +194,7 @@ async function requisicao(url, opcoes = {}) {
 }
 
 // ======================================================
-// NOTIFICAÇÕES
+// MENSAGENS
 // ======================================================
 
 function mostrarMensagem(mensagem, tipo = "info") {
@@ -195,17 +238,37 @@ function mostrarMensagem(mensagem, tipo = "info") {
 }
 
 // ======================================================
+// CARREGAR NOTIFICAÇÕES
+// ======================================================
+
+async function carregarNotificacoes() {
+  const dados = await requisicao(API_NOTIFICACOES);
+
+  notificacoes = Array.isArray(dados)
+    ? dados
+    : Array.isArray(dados.notificacoes)
+      ? dados.notificacoes
+      : [];
+
+  return notificacoes;
+}
+
+// ======================================================
 // CARREGAR PEDIDOS
 // ======================================================
 
-async function carregarPedidos() {
+async function carregarPedidos(silencioso = false) {
   if (!tabelaPedidos) return;
 
-  tabelaPedidos.innerHTML = `
-    <tr>
-      <td colspan="6">Carregando pedidos...</td>
-    </tr>
-  `;
+  if (!silencioso) {
+    tabelaPedidos.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center;padding:24px">
+          Carregando pedidos...
+        </td>
+      </tr>
+    `;
+  }
 
   try {
     const dados = await requisicao(`${API}/meus`);
@@ -220,13 +283,250 @@ async function carregarPedidos() {
   } catch (erro) {
     console.error("Erro ao carregar pedidos:", erro);
 
-    tabelaPedidos.innerHTML = `
-      <tr>
-        <td colspan="6">${escaparHTML(erro.message)}</td>
-      </tr>
-    `;
+    if (!silencioso) {
+      tabelaPedidos.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center;padding:24px">
+            ${escaparHTML(erro.message)}
+          </td>
+        </tr>
+      `;
+    }
   }
 }
+
+// ======================================================
+// ATUALIZAÇÃO DOS DADOS
+// ======================================================
+
+async function atualizarAcompanhamento() {
+  if (atualizacaoEmAndamento) return;
+
+  if (document.visibilityState !== "visible") return;
+
+  atualizacaoEmAndamento = true;
+
+  try {
+    const notificacoesAnteriores = new Set(
+      notificacoes
+        .filter((item) => item.tipo === "entrega_informada")
+        .map((item) => Number(item.pedido_id)),
+    );
+
+    await carregarNotificacoes();
+    await carregarPedidos(true);
+
+    const novasNotificacoes = notificacoes.filter(
+      (item) =>
+        item.tipo === "entrega_informada" &&
+        !notificacoesAnteriores.has(Number(item.pedido_id)),
+    );
+
+    novasNotificacoes.forEach((notificacao) => {
+      mostrarMensagem(
+        `O entregador informou que o pedido #${notificacao.pedido_id} foi entregue. Confirme o recebimento.`,
+        "sucesso",
+      );
+    });
+
+    if (pedidoAtualId) {
+      const pedidoAtual = pedidos.find(
+        (pedido) => Number(pedido.id) === Number(pedidoAtualId),
+      );
+
+      if (
+        pedidoAtual &&
+        pedidoModal &&
+        !pedidoModal.classList.contains("hidden")
+      ) {
+        atualizarBotaoCancelar(pedidoAtual);
+      }
+    }
+  } catch (erro) {
+    console.error("Erro ao atualizar acompanhamento:", erro);
+  } finally {
+    atualizacaoEmAndamento = false;
+  }
+}
+
+// ======================================================
+// WEBSOCKET
+// ======================================================
+
+function obterURLWebSocket() {
+  const protocolo = window.location.protocol === "https:" ? "wss:" : "ws:";
+
+  return `${protocolo}//${window.location.host}/ws`;
+}
+
+function conectarWebSocket() {
+  if (document.visibilityState !== "visible") return;
+
+  if (
+    conexaoWebSocket &&
+    (conexaoWebSocket.readyState === WebSocket.OPEN ||
+      conexaoWebSocket.readyState === WebSocket.CONNECTING)
+  ) {
+    return;
+  }
+
+  if (reconexaoAgendada) return;
+
+  reconexaoAgendada = true;
+
+  try {
+    const socket = new WebSocket(obterURLWebSocket());
+
+    conexaoWebSocket = socket;
+
+    socket.addEventListener("open", () => {
+      console.log("[WebSocket] Conectado ao servidor.");
+
+      reconexaoAgendada = false;
+      intervaloReconexao = RECONEXAO_INICIAL;
+
+      // Com a conexão ativa, não precisamos do fallback.
+      if (temporizadorFallback) {
+        clearInterval(temporizadorFallback);
+        temporizadorFallback = null;
+      }
+
+      // Recupera alterações que possam ter ocorrido durante a desconexão.
+      atualizarAcompanhamento();
+    });
+
+    socket.addEventListener("message", (evento) => {
+      processarEventoWebSocket(evento.data);
+    });
+
+    socket.addEventListener("error", (erro) => {
+      console.error("[WebSocket] Erro na conexão:", erro);
+    });
+
+    socket.addEventListener("close", () => {
+      console.warn("[WebSocket] Conexão encerrada.");
+
+      reconexaoAgendada = false;
+
+      if (conexaoWebSocket === socket) {
+        conexaoWebSocket = null;
+      }
+
+      iniciarFallback();
+      agendarReconexao();
+    });
+  } catch (erro) {
+    console.error("[WebSocket] Não foi possível conectar:", erro);
+
+    reconexaoAgendada = false;
+
+    iniciarFallback();
+    agendarReconexao();
+  }
+}
+
+// ======================================================
+// PROCESSAR EVENTOS RECEBIDOS
+// ======================================================
+
+function processarEventoWebSocket(mensagem) {
+  let dados;
+
+  try {
+    dados = JSON.parse(mensagem);
+  } catch (erro) {
+    console.error("[WebSocket] Mensagem inválida:", erro);
+    return;
+  }
+
+  if (!dados || !dados.evento) return;
+
+  switch (dados.evento) {
+    case "conexao_estabelecida":
+      console.log("[WebSocket] Autenticação confirmada.");
+      break;
+
+    case "pedido_atualizado":
+      mostrarMensagem(
+        dados.mensagem ||
+          `O pedido #${dados.pedidoId} foi atualizado: ${statusTexto(dados.status)}.`,
+        "info",
+      );
+
+      atualizarAcompanhamento();
+      break;
+
+    case "entrega_informada":
+      // A notificação persistida no MySQL será carregada pela API.
+      // Isso evita duplicar avisos se a conexão for restabelecida.
+      atualizarAcompanhamento();
+      break;
+
+    default:
+      console.log("[WebSocket] Evento recebido:", dados.evento);
+      break;
+  }
+}
+
+// ======================================================
+// RECONEXÃO AUTOMÁTICA
+// ======================================================
+
+function agendarReconexao() {
+  if (temporizadorReconexao) {
+    clearTimeout(temporizadorReconexao);
+  }
+
+  if (document.visibilityState !== "visible") return;
+
+  const atraso = intervaloReconexao;
+
+  intervaloReconexao = Math.min(intervaloReconexao * 2, RECONEXAO_MAXIMA);
+
+  temporizadorReconexao = setTimeout(() => {
+    temporizadorReconexao = null;
+    conectarWebSocket();
+  }, atraso);
+}
+
+// ======================================================
+// FALLBACK REST
+// ======================================================
+
+function iniciarFallback() {
+  if (temporizadorFallback) return;
+
+  console.warn(
+    "[Acompanhamento] WebSocket desconectado. Ativando atualização de segurança.",
+  );
+
+  temporizadorFallback = setInterval(() => {
+    if (!conexaoWebSocket || conexaoWebSocket.readyState !== WebSocket.OPEN) {
+      atualizarAcompanhamento();
+    }
+  }, INTERVALO_FALLBACK);
+}
+
+function pararFallback() {
+  if (temporizadorFallback) {
+    clearInterval(temporizadorFallback);
+    temporizadorFallback = null;
+  }
+}
+
+// ======================================================
+// VISIBILIDADE DA PÁGINA
+// ======================================================
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    atualizarAcompanhamento();
+
+    if (!conexaoWebSocket || conexaoWebSocket.readyState === WebSocket.CLOSED) {
+      conectarWebSocket();
+    }
+  }
+});
 
 // ======================================================
 // RENDERIZAR PEDIDOS
@@ -267,42 +567,68 @@ function renderizarPedidos() {
     return true;
   });
 
+  const emptyState = document.getElementById("emptyState");
+
   if (!filtrados.length) {
     tabelaPedidos.innerHTML = `
       <tr>
-        <td colspan="6">Nenhum pedido encontrado.</td>
+        <td colspan="6" style="text-align:center;padding:24px">
+          Nenhum pedido encontrado.
+        </td>
       </tr>
     `;
+
+    emptyState?.classList.remove("hidden");
 
     return;
   }
 
+  emptyState?.classList.add("hidden");
+
   tabelaPedidos.innerHTML = filtrados
-    .map(
-      (pedido) => `
+    .map((pedido) => {
+      const confirmar = podeConfirmarRecebimento(pedido);
+
+      return `
         <tr>
           <td>#${escaparHTML(pedido.id)}</td>
 
-          <td>${formatarData(obterDataPedido(pedido))}</td>
+          <td>${escaparHTML(formatarData(obterDataPedido(pedido)))}</td>
+
+          <td>${escaparHTML(statusTexto(pedido.status))}</td>
+
+          <td>${escaparHTML(pedido.quantidade_itens ?? pedido.total_itens ?? "-")}</td>
 
           <td>${formatarMoeda(obterTotalPedido(pedido))}</td>
 
-          <td>${escaparHTML(pedido.status || "-")}</td>
-
-          <td>${escaparHTML(pedido.forma_pagamento || "-")}</td>
-
           <td>
-            <button
-              type="button"
-              class="btn btn-primary btn-ver-pedido"
-              data-id="${escaparHTML(pedido.id)}"
-            >
-              Ver detalhes
-            </button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button
+                type="button"
+                class="btn btn-secondary btn-ver-pedido"
+                data-id="${escaparHTML(pedido.id)}"
+              >
+                Ver detalhes
+              </button>
+
+              ${
+                confirmar
+                  ? `
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-confirmar-entrega"
+                      data-id="${escaparHTML(pedido.id)}"
+                    >
+                      Confirmar recebimento
+                    </button>
+                  `
+                  : ""
+              }
+            </div>
           </td>
         </tr>
-      `,
-    )
+      `;
+    })
     .join("");
 }
 
@@ -332,16 +658,13 @@ function renderizarItens(itens) {
 
           return `
             <li class="item-pedido-detalhe">
-
               <div class="item-pedido-principal">
                 <strong>
                   ${escaparHTML(quantidade)}x
                   ${escaparHTML(nome)}
                 </strong>
 
-                <span>
-                  ${formatarMoeda(subtotal)}
-                </span>
+                <span>${formatarMoeda(subtotal)}</span>
               </div>
 
               ${
@@ -362,7 +685,6 @@ function renderizarItens(itens) {
                   `
                   : ""
               }
-
             </li>
           `;
         })
@@ -388,16 +710,14 @@ function renderizarHistorico(historico) {
           const statusNovo = item.status_novo || item.status;
 
           const descricao = statusAnterior
-            ? `${statusAnterior} → ${statusNovo}`
-            : `Pedido registrado: ${statusNovo}`;
+            ? `${statusTexto(statusAnterior)} → ${statusTexto(statusNovo)}`
+            : `Pedido registrado: ${statusTexto(statusNovo)}`;
 
           return `
             <li>
               <strong>${escaparHTML(descricao)}</strong>
 
-              <span>
-                ${formatarData(item.data_alteracao)}
-              </span>
+              <span>${escaparHTML(formatarData(item.data_alteracao))}</span>
             </li>
           `;
         })
@@ -414,10 +734,8 @@ async function abrirDetalhes(id) {
   try {
     const dados = await requisicao(`${API}/${encodeURIComponent(id)}`);
 
-    // O backend retorna pedido, itens e historico separadamente.
     const pedido = dados.pedido || dados;
 
-    // Compatibilidade com o formato atual do backend.
     const itens = Array.isArray(dados.itens)
       ? dados.itens
       : Array.isArray(pedido.itens)
@@ -434,6 +752,8 @@ async function abrirDetalhes(id) {
 
     atualizarBotaoCancelar(pedido);
 
+    const notificacaoEntrega = obterNotificacaoEntrega(pedido.id);
+
     pedidoModalBody.innerHTML = `
       <div class="pedido-detalhes">
 
@@ -441,12 +761,36 @@ async function abrirDetalhes(id) {
 
         <p>
           <strong>Status:</strong>
-          ${escaparHTML(pedido.status || "-")}
+          ${escaparHTML(statusTexto(pedido.status))}
         </p>
+
+        ${
+          notificacaoEntrega &&
+          normalizarStatus(pedido.status) === "saiu_para_entrega"
+            ? `
+              <section>
+                <h3>Confirmação de recebimento</h3>
+
+                <p>
+                  O entregador informou que seu pedido foi entregue.
+                  Confirme abaixo se você realmente recebeu o pedido.
+                </p>
+
+                <button
+                  type="button"
+                  class="btn btn-primary btn-confirmar-entrega"
+                  data-id="${escaparHTML(pedido.id)}"
+                >
+                  Confirmar recebimento
+                </button>
+              </section>
+            `
+            : ""
+        }
 
         <p>
           <strong>Data:</strong>
-          ${formatarData(obterDataPedido(pedido))}
+          ${escaparHTML(formatarData(obterDataPedido(pedido)))}
         </p>
 
         <p>
@@ -490,10 +834,64 @@ async function abrirDetalhes(id) {
     `;
 
     pedidoModal?.classList.remove("hidden");
+    pedidoModal?.setAttribute("aria-hidden", "false");
   } catch (erro) {
     console.error("Erro ao abrir detalhes:", erro);
 
     mostrarMensagem(erro.message, "erro");
+  }
+}
+
+// ======================================================
+// CONFIRMAR RECEBIMENTO
+// ======================================================
+
+async function confirmarRecebimento(pedidoId) {
+  const confirmado = window.confirm(
+    `Você confirma que recebeu o pedido #${pedidoId}?`,
+  );
+
+  if (!confirmado) return;
+
+  const botoes = document.querySelectorAll(
+    `.btn-confirmar-entrega[data-id="${CSS.escape(String(pedidoId))}"]`,
+  );
+
+  botoes.forEach((botao) => {
+    botao.disabled = true;
+    botao.textContent = "Confirmando...";
+  });
+
+  try {
+    await requisicao(
+      `${API_NOTIFICACOES}/pedidos/${encodeURIComponent(pedidoId)}/confirmar-recebimento`,
+      {
+        method: "PATCH",
+      },
+    );
+
+    mostrarMensagem(
+      "Recebimento confirmado! Seu pedido foi concluído.",
+      "sucesso",
+    );
+
+    await atualizarAcompanhamento();
+
+    if (pedidoAtualId) {
+      await abrirDetalhes(pedidoAtualId);
+    }
+  } catch (erro) {
+    console.error("Erro ao confirmar recebimento:", erro);
+
+    mostrarMensagem(
+      `Não foi possível confirmar o recebimento: ${erro.message}`,
+      "erro",
+    );
+
+    botoes.forEach((botao) => {
+      botao.disabled = false;
+      botao.textContent = "Confirmar recebimento";
+    });
   }
 }
 
@@ -549,7 +947,12 @@ async function cancelarPedidoAtual() {
     mostrarMensagem("Pedido cancelado com sucesso!", "sucesso");
 
     await carregarPedidos();
-    await abrirDetalhes(pedidoAtualId);
+
+    const id = pedidoAtualId;
+
+    if (id) {
+      await abrirDetalhes(id);
+    }
   } catch (erro) {
     console.error("Erro ao cancelar pedido:", erro);
 
@@ -568,6 +971,7 @@ function fecharModal() {
   pedidoAtualId = null;
 
   pedidoModal?.classList.add("hidden");
+  pedidoModal?.setAttribute("aria-hidden", "true");
 
   if (pedidoModalCancelar) {
     pedidoModalCancelar.classList.add("hidden");
@@ -580,11 +984,26 @@ function fecharModal() {
 // ======================================================
 
 tabelaPedidos?.addEventListener("click", (evento) => {
-  const botao = evento.target.closest(".btn-ver-pedido");
+  const botaoConfirmar = evento.target.closest(".btn-confirmar-entrega");
+
+  if (botaoConfirmar) {
+    confirmarRecebimento(botaoConfirmar.dataset.id);
+    return;
+  }
+
+  const botaoDetalhes = evento.target.closest(".btn-ver-pedido");
+
+  if (botaoDetalhes) {
+    abrirDetalhes(botaoDetalhes.dataset.id);
+  }
+});
+
+pedidoModalBody?.addEventListener("click", (evento) => {
+  const botao = evento.target.closest(".btn-confirmar-entrega");
 
   if (!botao) return;
 
-  abrirDetalhes(botao.dataset.id);
+  confirmarRecebimento(botao.dataset.id);
 });
 
 pedidoModalCancelar?.addEventListener("click", cancelarPedidoAtual);
@@ -614,8 +1033,46 @@ btnLimparFiltros?.addEventListener("click", () => {
 // INICIALIZAÇÃO
 // ======================================================
 
+async function inicializar() {
+  try {
+    await carregarNotificacoes();
+  } catch (erro) {
+    console.error("Erro ao carregar notificações:", erro);
+  }
+
+  await carregarPedidos();
+
+  conectarWebSocket();
+
+  // Caso o WebSocket não consiga conectar, REST mantém
+  // o acompanhamento funcionando como alternativa.
+  if (!conexaoWebSocket || conexaoWebSocket.readyState !== WebSocket.OPEN) {
+    iniciarFallback();
+  }
+}
+
+// ======================================================
+// ENCERRAMENTO
+// ======================================================
+
+window.addEventListener("beforeunload", () => {
+  pararFallback();
+
+  if (temporizadorReconexao) {
+    clearTimeout(temporizadorReconexao);
+  }
+
+  if (conexaoWebSocket) {
+    conexaoWebSocket.close();
+  }
+});
+
+// ======================================================
+// EXECUÇÃO
+// ======================================================
+
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", carregarPedidos);
+  document.addEventListener("DOMContentLoaded", inicializar);
 } else {
-  carregarPedidos();
+  inicializar();
 }
