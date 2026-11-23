@@ -32,7 +32,7 @@ import { AsYouType, parsePhoneNumberFromString } from "https://cdn.jsdelivr.net/
 
     campo.addEventListener("input", () => {
       const internacional = campo.value.trim().startsWith("+");
-      const digitos = campo.value.replace(/\D/g, "").slice(0, internacional ? 15 : 11);
+      const digitos = campo.value.replace(/\D/g, "").slice(0, 16);
       campo.value = new AsYouType(internacional ? undefined : "BR")
         .input((internacional ? "+" : "") + digitos);
       campo.setCustomValidity("");

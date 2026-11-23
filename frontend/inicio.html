@@ -1407,13 +1407,9 @@
             <div class="gold-line"></div>
           </div>
 
-          <div class="reviews-placeholder">
+          <div class="reviews-placeholder" id="avaliacoesPublicas" aria-live="polite">
             <div class="reviews-stars" aria-hidden="true">★★★★★</div>
-
-            <p>
-              As avaliações dos clientes aparecerão aqui depois de serem
-              analisadas e aprovadas pela equipe do Fraga Lanches.
-            </p>
+            <p>Carregando avaliações aprovadas...</p>
           </div>
         </div>
       </section>
@@ -1603,6 +1599,53 @@
           });
         });
       }
+    </script>
+    <script>
+      // Exibe somente avaliações moderadas e aprovadas pela equipe.
+      (async function carregarAvaliacoesPublicas() {
+        const area = document.getElementById("avaliacoesPublicas");
+        if (!area) return;
+
+        const escapar = (valor) => String(valor ?? "").replace(/[&<>"']/g, (c) => ({
+          "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+        })[c]);
+
+        try {
+          const resposta = await fetch("/api/avaliacoes/publicas", {
+            headers: { Accept: "application/json" },
+            cache: "no-store"
+          });
+          if (!resposta.ok) throw new Error("Falha ao consultar avaliações.");
+          const dados = await resposta.json();
+          const avaliacoes = Array.isArray(dados.avaliacoes) ? dados.avaliacoes : [];
+
+          if (!avaliacoes.length) {
+            area.innerHTML = '<div class="reviews-stars" aria-hidden="true">★★★★★</div><p>Ainda não há avaliações aprovadas para exibir. Seja o primeiro a compartilhar sua experiência!</p>';
+            return;
+          }
+
+          area.style.display = "grid";
+          area.style.gridTemplateColumns = "repeat(auto-fit, minmax(min(100%, 220px), 1fr))";
+          area.style.alignItems = "stretch";
+          area.style.gap = "14px";
+          area.style.maxWidth = "100%";
+          area.innerHTML = avaliacoes.map((avaliacao) => {
+            const primeiroNome = String(avaliacao.cliente_nome || "Cliente").trim().split(/\s+/)[0];
+            const nota = Math.max(1, Math.min(5, Number(avaliacao.nota) || 0));
+            const estrelas = "★".repeat(nota) + "☆".repeat(5 - nota);
+            const data = avaliacao.data_avaliacao ? new Date(avaliacao.data_avaliacao).toLocaleDateString("pt-BR") : "";
+            return '<article class="review-card" style="min-width:0;padding:22px;border:1px solid var(--gold-border);border-radius:var(--radius);background:linear-gradient(145deg,#1b1b1b,#131313);text-align:left">' +
+              '<div class="reviews-stars" style="margin-bottom:10px;font-size:18px;letter-spacing:.12em">' + estrelas + '</div>' +
+              '<p style="margin:0 0 16px;color:#ddd;font-size:13px;line-height:1.7;overflow-wrap:anywhere">“' + escapar(avaliacao.comentario) + '”</p>' +
+              '<strong style="color:#fff;font-size:12px">' + escapar(primeiroNome) + '</strong>' +
+              (data ? '<small style="display:block;margin-top:4px;color:#999">' + escapar(data) + '</small>' : '') +
+              '</article>';
+          }).join("");
+        } catch (erro) {
+          console.error("[Avaliações públicas]", erro);
+          area.innerHTML = '<div class="reviews-stars" aria-hidden="true">★★★★★</div><p>Não foi possível carregar as avaliações neste momento.</p>';
+        }
+      })();
     </script>
   </body>
 </html>
