@@ -1,11 +1,11 @@
 "use strict";
 
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const db = require("../database");
 const QRCode = require("qrcode");
 const crypto = require("crypto");
 const router = express.Router();
+const autenticarCliente = require("../../../_shared/autenticar")(["cliente"]);
 
 const STATUS_PEDIDO = "novo";
 const STATUS_PAGAMENTO = "pendente";
@@ -237,63 +237,6 @@ async function obterConfiguracaoEntrega(conexao, bairro) {
 // ======================================================
 // AUTENTICAÇÃO
 // ======================================================
-
-async function autenticarCliente(req, res, next) {
-  const token = lerCookie(req, "fraga_session");
-
-  if (!token) {
-    return res.status(401).json({
-      mensagem: "Você precisa fazer login.",
-    });
-  }
-
-  try {
-    const usuario = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (usuario.tipo !== "cliente") {
-      return res.status(403).json({
-        mensagem: "Esta operação é exclusiva para clientes.",
-      });
-    }
-
-    const [usuarios] = await db.query(
-      `SELECT id, nome, email, ativo
-       FROM usuarios
-       WHERE id = ?
-       LIMIT 1`,
-      [usuario.id],
-    );
-
-    if (
-      !usuarios.length ||
-      usuarios[0].ativo === false ||
-      Number(usuarios[0].ativo) !== 1
-    ) {
-      return res.status(401).json({
-        mensagem: "Usuário não encontrado ou inativo.",
-      });
-    }
-
-    req.usuario = usuarios[0];
-
-    return next();
-  } catch (erro) {
-    if (
-      erro.name === "JsonWebTokenError" ||
-      erro.name === "TokenExpiredError"
-    ) {
-      return res.status(401).json({
-        mensagem: "Sessão inválida ou expirada.",
-      });
-    }
-
-    console.error("Erro na autenticação:", erro);
-
-    return res.status(500).json({
-      mensagem: "Erro ao verificar autenticação.",
-    });
-  }
-}
 
 // ======================================================
 // PIX - BR CODE COM VALOR DO PEDIDO
