@@ -1,4 +1,4 @@
-const CACHE_NAME = "fraga-lanches-v4";
+const CACHE_NAME = "fraga-lanches-v5";
 
 const ARQUIVOS = [
   "/inicio.html",
@@ -93,7 +93,7 @@ self.addEventListener("fetch", (event) => {
         const arquivoSalvo = await caches.match(requisicao);
 
         if (arquivoSalvo) {
-          return salva;
+          return arquivoSalvo;
         }
 
         if (requisicao.mode === "navigate") {
