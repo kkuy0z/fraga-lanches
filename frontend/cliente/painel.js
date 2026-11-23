@@ -397,7 +397,7 @@ if (document.readyState === "loading") {
                     item.addEventListener("click", async function () {
                         try {
                             const resposta = await fetch(
-                                "/api/notificacoes/" +
+                                "/api/cliente/notificacoes/" +
                                 encodeURIComponent(notificacao.id) +
                                 "/lida",
                                 {
