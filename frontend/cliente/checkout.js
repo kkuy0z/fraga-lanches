@@ -107,6 +107,7 @@ let pixIntencaoTerminal = false;
 let pixCarrinhoLimpo = false;
 let pixConsultaEmAndamento = false;
 let pixRespostaInconsistente = false;
+let cepVerificado = false;
 
 // ======================================================
 // UTILITÁRIOS
@@ -1885,6 +1886,13 @@ function validarEndereco() {
     return true;
   }
 
+  const cep = campoCep?.value.replace(/\\D/g, "") || "";
+  if (cep.length !== 8 || !cepVerificado) {
+    alert("Consulte e valide um CEP real antes de continuar.");
+    campoCep?.focus();
+    return false;
+  }
+
   const campos = ["rua", "numero", "bairro", "cidade"];
 
   for (const id of campos) {
@@ -2034,6 +2042,7 @@ async function buscarCep() {
     campoRua.value = dados.logradouro || "";
     campoBairro.value = dados.bairro || "";
     campoCidade.value = dados.localidade || "";
+    cepVerificado = true;
 
     enderecoSelecionadoId = null;
 
@@ -2043,6 +2052,7 @@ async function buscarCep() {
 
     await calcularTaxaEntrega();
   } catch (erro) {
+    cepVerificado = false;
     alert(erro.message || "Não foi possível consultar o CEP.");
   }
 }
@@ -2084,6 +2094,10 @@ if (campoBairro) {
 }
 
 if (campoCep) {
+  campoCep.addEventListener("input", () => {
+    campoCep.value = campoCep.value.replace(/\\D/g, "").slice(0, 8);
+    cepVerificado = false;
+  });
   campoCep.addEventListener("change", calcularTaxaEntrega);
 }
 
