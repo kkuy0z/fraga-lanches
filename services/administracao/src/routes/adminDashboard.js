@@ -17,6 +17,8 @@ router.get("/", async (req, res) => {
     const [
       [pedidosHoje],
       [faturamentoHoje],
+      [pedidosTotal],
+      [faturamentoTotal],
       [pedidosEntregues],
       [pedidosPendentes],
       [produtosAtivos],
@@ -54,6 +56,22 @@ router.get("/", async (req, res) => {
             FROM pagamentos pg
             WHERE pg.pedido_id = p.id
               AND pg.status = 'aprovado'
+          )
+      `),
+
+      // ------------------------------------------------
+      // TOTAL DE PEDIDOS REGISTRADOS
+      // ------------------------------------------------
+      db.query(`SELECT COUNT(*) AS total FROM pedidos`),
+
+      // FATURAMENTO ACUMULADO: somente pagamentos aprovados.
+      db.query(`
+        SELECT COALESCE(SUM(p.total), 0) AS total
+        FROM pedidos p
+        WHERE p.status <> 'cancelado'
+          AND EXISTS (
+            SELECT 1 FROM pagamentos pg
+            WHERE pg.pedido_id = p.id AND pg.status = 'aprovado'
           )
       `),
 
@@ -142,6 +160,8 @@ router.get("/", async (req, res) => {
       estatisticas: {
         pedidosHoje: Number(pedidosHoje[0].total || 0),
         faturamentoHoje: Number(faturamentoHoje[0].total || 0),
+        pedidosTotal: Number(pedidosTotal[0].total || 0),
+        faturamentoTotal: Number(faturamentoTotal[0].total || 0),
         pedidosEntregues: Number(pedidosEntregues[0].total || 0),
         pedidosPendentes: Number(pedidosPendentes[0].total || 0),
         produtosAtivos: Number(produtosAtivos[0].total || 0),
