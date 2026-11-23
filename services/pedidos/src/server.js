@@ -17,8 +17,11 @@ const db = require("./database");
 
 const pedidosRoutes = require("./routes/pedidos");
 const adminPedidosRoutes = require("./routes/adminPedidos");
+const { iniciarExpiracaoPix, pararExpiracaoPix } = require("./services/expiracaoPix");
 
 const app = express();
+
+iniciarExpiracaoPix();
 const PORT = Number(process.env.PEDIDOS_PORT || 4003);
 
 app.use(express.json());
@@ -112,6 +115,7 @@ async function encerrar(sinal) {
 
   servidor.close(async () => {
     try {
+      pararExpiracaoPix();
       await db.end();
       console.log("[Pedidos] Banco desconectado.");
       process.exit(0);
