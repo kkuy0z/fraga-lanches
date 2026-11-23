@@ -1,10 +1,11 @@
-const CACHE_NAME = "fraga-lanches-v3";
+const CACHE_NAME = "fraga-lanches-v4";
 
 const ARQUIVOS = [
   "/inicio.html",
   "/manifest.json",
   "/design-system.css",
   "/responsive.css",
+  "/telefone.js",
   "/cliente/painel.html",
   "/cliente/painel.js",
   "/cliente/cardapio.html",
@@ -91,7 +92,7 @@ self.addEventListener("fetch", (event) => {
       .catch(async () => {
         const arquivoSalvo = await caches.match(requisicao);
 
-        if (salva) {
+        if (arquivoSalvo) {
           return salva;
         }
 
