@@ -7,6 +7,7 @@
 const API_AUTH = "/api/auth";
 const API_PERFIL = "/api/entregador/perfil";
 const API_ENTREGAS = "/api/entregador/entregas";
+const API_FINANCEIRO = "/api/entregador/financeiro";
 
 let usuarioAtual = null;
 let atualizandoEntregas = false;
@@ -670,9 +671,10 @@ async function iniciarPainel() {
 
   if (!autorizado) return;
 
-  await Promise.all([carregarPerfil(), carregarEntregas()]);
+  await Promise.all([carregarPerfil(), carregarEntregas(), carregarFinanceiro()]);
 
   window.setInterval(carregarEntregas, 15000);
+  window.setInterval(carregarFinanceiro, 30000);
 }
 
 document.addEventListener("DOMContentLoaded", iniciarPainel);
