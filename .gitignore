@@ -1,0 +1,21 @@
+# Segredos e configuracoes locais
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependencias
+node_modules/
+**/node_modules/
+
+# Logs e temporarios
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Arquivos locais
+uploads/
+storage/
