@@ -6,8 +6,11 @@ if (campoTelefone) {
     campoTelefone.addEventListener("input", () => {
         const valor = campoTelefone.value;
         const internacional = valor.trim().startsWith("+");
+        const digitos = valor.replace(/\\D/g, "").slice(0, internacional ? 15 : 13);
+        const valorLimitado = (internacional ? "+" : "") + digitos;
         const formatador = new AsYouType(internacional ? undefined : "BR");
-        campoTelefone.value = formatador.input(valor);
+
+        campoTelefone.value = formatador.input(valorLimitado);
         campoTelefone.setCustomValidity("");
     });
 
@@ -60,7 +63,11 @@ if (formCadastro) {
             )
             : null;
 
-        if (!telefoneParseado || !telefoneParseado.isValid()) {
+        if (
+            !telefoneParseado ||
+            !telefoneParseado.isValid() ||
+            telefoneParseado.number.replace(/\\D/g, "").length > 15
+        ) {
             mostrarErro(
                 "erro-telefone",
                 "Número com formato inválido ou incompatível com as regras de numeração. Confira o DDD e o código do país."
