@@ -21,9 +21,13 @@ async function requisitarAuth(caminho) {
 async function consultarUsuarios(ids) {
   const unicos = [...new Set((ids || []).map(Number))].filter((id) => Number.isSafeInteger(id) && id > 0);
   if (!unicos.length) return [];
-  if (unicos.length > 100) throw new Error("A consulta de usuários aceita no máximo 100 IDs.");
-  const dados = await requisitarAuth(`/internal/users?ids=${encodeURIComponent(unicos.join(","))}`);
-  return Array.isArray(dados.usuarios) ? dados.usuarios : [];
+  const lotes = [];
+  for (let i = 0; i < unicos.length; i += 100) lotes.push(unicos.slice(i, i + 100));
+  const respostas = await Promise.all(lotes.map(async (lote) => {
+    const dados = await requisitarAuth(`/internal/users?ids=${encodeURIComponent(lote.join(","))}`);
+    return Array.isArray(dados.usuarios) ? dados.usuarios : [];
+  }));
+  return respostas.flat();
 }
 
 async function contarUsuarios(tipo, ativo = null) {
