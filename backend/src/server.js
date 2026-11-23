@@ -62,7 +62,7 @@ const servicos = [
   {
     nome: "Avaliacoes",
     target: "http://127.0.0.1:4007",
-    paths: ["/api/admin/avaliacoes", "/api/cliente/avaliacoes"],
+    paths: ["/api/avaliacoes/publicas", "/api/admin/avaliacoes", "/api/cliente/avaliacoes"],
   },
   {
     nome: "Administracao",
