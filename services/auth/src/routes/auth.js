@@ -86,7 +86,11 @@ router.post("/cadastro", async (req, res) => {
                 telefoneInformado.startsWith("+") ? undefined : "BR"
             );
 
-            if (!telefoneParseado || !telefoneParseado.isValid()) {
+            if (
+                !telefoneParseado ||
+                !telefoneParseado.isValid() ||
+                telefoneParseado.number.replace(/\\D/g, "").length > 15
+            ) {
                 return res.status(400).json({
                     mensagem: "Informe um número de telefone válido. Confira o DDD e o código do país."
                 });
