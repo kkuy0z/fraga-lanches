@@ -424,7 +424,7 @@ if (document.readyState === "loading") {
 
         async function carregarNotificacoes() {
             try {
-                const resposta = await fetch("/api/notificacoes", {
+                const resposta = await fetch("/api/cliente/notificacoes", {
                     method: "GET",
                     credentials: "same-origin",
                     headers: {
@@ -454,6 +454,9 @@ if (document.readyState === "loading") {
             }
         }
 
+        carregarNotificacoes();
+        window.setInterval(carregarNotificacoes, 15000);
+
         botao.addEventListener("click", function (evento) {
             evento.stopPropagation();
 
@@ -474,7 +477,7 @@ if (document.readyState === "loading") {
 
         marcarTodas.addEventListener("click", async function () {
             try {
-                const resposta = await fetch("/api/notificacoes/lidas", {
+                const resposta = await fetch("/api/cliente/notificacoes/lidas", {
                     method: "PATCH",
                     credentials: "same-origin"
                 });
