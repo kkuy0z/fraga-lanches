@@ -1,9 +1,11 @@
 "use strict";
 
 const express = require("express");
+const { createProxyMiddleware } = require("http-proxy-middleware");
 const dotenv = require("dotenv");
 const path = require("path");
 const http = require("http");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { WebSocketServer, WebSocket } = require("ws");
 
@@ -22,30 +24,9 @@ const { iniciarExpiracaoPix } = require("./services/expiracaoPix");
 // ======================================================
 // ROTAS
 // ======================================================
-const atendentePedidosRoutes = require("./routes/atendentePedidos");
 
-const cozinhaRoutes = require("./routes/cozinha");
 
-const adminAvaliacoesRoutes = require("./routes/adminAvaliacoes");
-const adminAtribuicoesRoutes = require("./routes/adminAtribuicoes");
-const entregadorRoutes = require("./routes/entregador");
-const clienteNotificacoesRoutes = require("./routes/clienteNotificacoes");
 
-const adminHorariosRoutes = require("./routes/adminHorarios");
-const adminEntregaRoutes = require("./routes/adminEntrega");
-const adminCategoriasRoutes = require("./routes/adminCategorias");
-const adminProdutosRoutes = require("./routes/adminProdutos");
-const adminPedidosRoutes = require("./routes/adminPedidos");
-const adminDashboardRoutes = require("./routes/adminDashboard");
-const notificacoesRoutes = require("./routes/notificacoes");
-const clienteAvaliacoesRoutes = require("./routes/clienteAvaliacoes");
-const formasPagamentoRoutes = require("./routes/formasPagamento");
-const clientePerfilRoutes = require("./routes/clientePerfil");
-const pedidosRoutes = require("./routes/pedidos");
-const authRoutes = require("./routes/auth");
-const cardapioRoutes = require("./routes/cardapio");
-const carrinhoRoutes = require("./routes/carrinho");
-const adminFormasPagamentoRoutes = require("./routes/adminFormasPagamento");
 
 // ======================================================
 // APLICAÇÃO
@@ -57,64 +38,250 @@ const PORT = process.env.PORT || 3000;
 const frontendPath = path.resolve(__dirname, "../../frontend");
 
 // ======================================================
-// MIDDLEWARES
+// MIDDLEWARES E PROXIES DOS MICROSSERVIÇOS
 // ======================================================
+
+// PEDIDOS + PIX (:4003)
+app.use(
+  createProxyMiddleware({
+    target: "http://127.0.0.1:4003",
+    changeOrigin: true,
+    pathFilter: ["/api/cliente/pedidos", "/api/pedidos", "/api/admin/pedidos"],
+    timeout: 15000,
+    proxyTimeout: 15000,
+    on: {
+      error: (erro, req, res) => {
+        console.error("[Gateway Pedidos]:", erro.message);
+
+        if (!res.headersSent) {
+          res.status(503).json({
+            mensagem: "Serviço de pedidos temporariamente indisponível.",
+          });
+        }
+      },
+    },
+  }),
+);
+
+// CATÁLOGO (:4002)
+app.use(
+  createProxyMiddleware({
+    target: "http://127.0.0.1:4002",
+    changeOrigin: true,
+    pathFilter: ["/api/cardapio", "/api/formas-pagamento"],
+    timeout: 10000,
+    proxyTimeout: 10000,
+    on: {
+      proxyReq: (proxyReq, req) => {
+        console.log(
+          `[Gateway → Catálogo :4002] ${req.method} ${req.originalUrl}`,
+        );
+      },
+      error: (erro, req, res) => {
+        console.error("[Gateway Catálogo]:", erro.message);
+
+        if (!res.headersSent) {
+          res.status(503).json({
+            mensagem: "Serviço de catálogo temporariamente indisponível.",
+          });
+        }
+      },
+    },
+  }),
+);
+
+// AUTENTICAÇÃO (:4001)
+app.use(
+  createProxyMiddleware({
+    target: "http://127.0.0.1:4001",
+    changeOrigin: true,
+    pathFilter: ["/api/auth"],
+    timeout: 10000,
+    proxyTimeout: 10000,
+    on: {
+      proxyReq: (proxyReq, req) => {
+        console.log(`[Gateway → Auth :4001] ${req.method} ${req.originalUrl}`);
+      },
+      error: (erro, req, res) => {
+        console.error("[Gateway Auth]:", erro.message);
+
+        if (!res.headersSent) {
+          res.status(503).json({
+            mensagem: "Serviço de autenticação temporariamente indisponível.",
+          });
+        }
+      },
+    },
+  }),
+);
+
+// PARSERS: ficam depois dos proxies para preservar os corpos das requisições.
+
+/* ======================================================
+   MICROSSERVIÇOS ADICIONAIS
+   As rotas antigas permanecem como fallback.
+====================================================== */
+
+app.use(createProxyMiddleware({
+  target: "http://127.0.0.1:4004",
+  changeOrigin: true,
+  pathFilter: [
+    "/api/admin/atribuicoes",
+    "/api/admin/entrega",
+    "/api/admin/horarios",
+    "/api/entregador"
+  ],
+  timeout: 15000,
+  proxyTimeout: 15000
+}));
+
+app.use(createProxyMiddleware({
+  target: "http://127.0.0.1:4005",
+  changeOrigin: true,
+  pathFilter: [
+    "/api/cozinha/pedidos"
+  ],
+  timeout: 15000,
+  proxyTimeout: 15000
+}));
+
+app.use(createProxyMiddleware({
+  target: "http://127.0.0.1:4006",
+  changeOrigin: true,
+  pathFilter: [
+    "/api/notificacoes",
+    "/api/cliente/notificacoes"
+  ],
+  timeout: 15000,
+  proxyTimeout: 15000
+}));
+
+app.use(createProxyMiddleware({
+  target: "http://127.0.0.1:4007",
+  changeOrigin: true,
+  pathFilter: [
+    "/api/admin/avaliacoes",
+    "/api/cliente/avaliacoes"
+  ],
+  timeout: 15000,
+  proxyTimeout: 15000
+}));
+
+app.use(createProxyMiddleware({
+  target: "http://127.0.0.1:4008",
+  changeOrigin: true,
+  pathFilter: [
+    "/api/admin/categorias",
+    "/api/admin/produtos",
+    "/api/admin/dashboard",
+    "/api/admin/pagamentos"
+  ],
+  timeout: 15000,
+  proxyTimeout: 15000
+}));
+
+app.use(createProxyMiddleware({
+  target: "http://127.0.0.1:4009",
+  changeOrigin: true,
+  pathFilter: [
+    "/api/atendente/pedidos"
+  ],
+  timeout: 15000,
+  proxyTimeout: 15000
+}));
+
+
+// CLIENTES (:4010)
+app.use(createProxyMiddleware({
+  target: "http://127.0.0.1:4010",
+  changeOrigin: true,
+  pathFilter: [
+    "/api/cliente/carrinho",
+    "/api/cliente/perfil",
+    "/api/cliente/dashboard",
+  ],
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // ======================================================
+// COMUNICAÇÃO INTERNA DOS MICROSSERVIÇOS
+// ======================================================
+
+app.post("/internal/events", (req, res) => {
+  const configurado = process.env.INTERNAL_SERVICE_SECRET;
+  const recebido = req.headers["x-internal-service-secret"];
+
+  if (
+    !configurado ||
+    typeof recebido !== "string" ||
+    Buffer.byteLength(recebido) !== Buffer.byteLength(configurado) ||
+    !crypto.timingSafeEqual(Buffer.from(recebido), Buffer.from(configurado))
+  ) {
+    return res.status(401).json({
+      mensagem: "Comunicação interna não autorizada.",
+    });
+  }
+
+  const { destino, usuarioId, tipos, evento } = req.body || {};
+  const websocket = app.locals.websocket;
+
+  if (
+    !websocket ||
+    !evento ||
+    typeof evento !== "object" ||
+    Array.isArray(evento)
+  ) {
+    return res.status(400).json({
+      mensagem: "Evento inválido ou WebSocket indisponível.",
+    });
+  }
+
+  if (destino === "usuario" && usuarioId != null) {
+    websocket.emitirParaUsuario(usuarioId, evento);
+    return res.json({ sucesso: true });
+  }
+
+  if (destino === "equipe" && Array.isArray(tipos) && tipos.length > 0) {
+    websocket.emitirParaTipos(tipos, evento);
+    return res.json({ sucesso: true });
+  }
+
+  return res.status(400).json({
+    mensagem: "Destino de evento inválido.",
+  });
+});
+
+// ======================================================
 // ROTAS ADMINISTRATIVAS
 // ======================================================
 
-app.use("/api/admin/avaliacoes", adminAvaliacoesRoutes);
-app.use("/api/admin/atribuicoes", adminAtribuicoesRoutes);
 
-app.use("/api/admin/horarios", adminHorariosRoutes);
-app.use("/api/admin/entrega", adminEntregaRoutes);
-app.use("/api/admin/categorias", adminCategoriasRoutes);
-app.use("/api/admin/produtos", adminProdutosRoutes);
-app.use("/api/admin/pedidos", adminPedidosRoutes);
-app.use("/api/admin/dashboard", adminDashboardRoutes);
-app.use("/api/admin/pagamentos", adminFormasPagamentoRoutes);
-
-app.use("/api/formas-pagamento", formasPagamentoRoutes);
 
 // ======================================================
 // ROTAS DO CLIENTE
 // ======================================================
-app.use("/api/cliente/avaliacoes", clienteAvaliacoesRoutes);
-app.use("/api/cliente/perfil", clientePerfilRoutes);
-app.use("/api/cliente/pedidos", pedidosRoutes);
-app.use("/api/cliente/carrinho", carrinhoRoutes);
-app.use("/api/cliente/notificacoes", clienteNotificacoesRoutes);
 
 // ======================================================
 // ROTAS DO ENTREGADOR
 // ======================================================
 
-app.use("/api/entregador", entregadorRoutes);
 
 // ======================================================
 // ROTAS DO ATENDENTE
 // ======================================================
 
-app.use("/api/atendente/pedidos", atendentePedidosRoutes);
 
 // ======================================================
 // ROTAS DA COZINHA
 // ======================================================
 
-app.use("/api/cozinha/pedidos", cozinhaRoutes);
 
 // ======================================================
 // ROTAS GERAIS
 // ======================================================
 
-app.use("/api/notificacoes", notificacoesRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/cardapio", cardapioRoutes);
-app.use("/api/pedidos", pedidosRoutes);
 
 // ======================================================
 // STATUS DO SERVIDOR E BANCO

@@ -1,0 +1,9 @@
+{
+  "name": "fraga-lanches",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plataforma Fraga Lanches com arquitetura de microsserviços",
+  "scripts": {
+    "start": "node scripts/iniciar-servicos.js"
+  }
+}
