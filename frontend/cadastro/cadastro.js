@@ -63,7 +63,7 @@ if (formCadastro) {
         if (!telefoneParseado || !telefoneParseado.isValid()) {
             mostrarErro(
                 "erro-telefone",
-                "Número inválido ou inexistente na numeração oficial. Confira o DDD e o código do país."
+                "Número com formato inválido ou incompatível com as regras de numeração. Confira o DDD e o código do país."
             );
             valido = false;
         }
