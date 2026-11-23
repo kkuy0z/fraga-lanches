@@ -8,6 +8,8 @@ const autenticarCozinha = require("../../../_shared/autenticar")(["cozinha"]);
 
 const STATUS_COZINHA = ["novo", "em_preparo", "pronto"];
 
+router.use(autenticarCozinha);
+
 // ======================================================
 // AUTENTICAÇÃO DA COZINHA
 // ======================================================
