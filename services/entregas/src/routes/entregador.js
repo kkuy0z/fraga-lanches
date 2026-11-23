@@ -5,6 +5,7 @@ const router = express.Router();
 
 const db = require("../database");
 const autenticarEntregador = require("../middleware/autenticarEntregador");
+const { parsePhoneNumberFromString } = require("libphonenumber-js/max");
 
 router.use(autenticarEntregador);
 
@@ -88,20 +89,23 @@ router.patch("/perfil", async (req, res) => {
       });
     }
 
-    if (telefone.length > 20) {
-      return res.status(400).json({
-        mensagem: "O telefone deve ter no máximo 20 caracteres.",
-      });
-    }
-
+    let telefoneNormalizado = null;
     if (telefone) {
-      const numeros = telefone.replace(/\D/g, "");
-
-      if (numeros.length < 10 || numeros.length > 15) {
+      const parsed = parsePhoneNumberFromString(
+        telefone,
+        telefone.startsWith("+") ? undefined : "BR",
+      );
+      if (
+        !parsed ||
+        !parsed.isValid() ||
+        parsed.number.replace(/\D/g, "").length > 15 ||
+        (parsed.country === "BR" && parsed.nationalNumber.length !== 11)
+      ) {
         return res.status(400).json({
-          mensagem: "Informe um telefone válido.",
+          mensagem: "Número inválido. Confira o DDD e o código do país.",
         });
       }
+      telefoneNormalizado = parsed.number;
     }
 
     const [usuarios] = await db.query(
@@ -122,7 +126,7 @@ router.patch("/perfil", async (req, res) => {
       `UPDATE usuarios
        SET nome = ?, telefone = ?
        WHERE id = ? AND tipo = 'entregador' AND ativo = 1`,
-      [nome, telefone || null, req.usuario.id],
+      [nome, telefoneNormalizado, req.usuario.id],
     );
 
     const [atualizado] = await db.query(
