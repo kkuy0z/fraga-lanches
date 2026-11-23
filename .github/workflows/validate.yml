@@ -1,0 +1,51 @@
+name: Validar microsservicos
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  instalar-dependencias:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        projeto:
+          - backend
+          - services/auth
+          - services/catalogo
+          - services/pedidos
+          - services/entregas
+          - services/cozinha
+          - services/notificacoes
+          - services/avaliacoes
+          - services/administracao
+          - services/atendimento
+          - services/clientes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.projeto }}/package-lock.json
+      - name: Instalar dependencias
+        run: npm ci --prefix "${{ matrix.projeto }}"
+
+  sintaxe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validar sintaxe JavaScript
+        shell: bash
+        run: |
+          set -e
+          find backend/src services scripts frontend -type f -name '*.js' -print0 | while IFS= read -r -d '' arquivo; do
+            node --check "$arquivo"
+          done
+          echo "Sintaxe JavaScript valida."
