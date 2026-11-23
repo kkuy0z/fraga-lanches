@@ -258,6 +258,12 @@ document.addEventListener("DOMContentLoaded", () => {
     elementos.cep.value = formatarCEP(elementos.cep.value);
   });
 
+
+  elementos.numero?.addEventListener("input", () => {
+    elementos.numero.value = elementos.numero.value.replace(/\D/g, "").slice(0, 4);
+    elementos.numero.setCustomValidity("");
+  });
+
   elementos.btnBuscarCep?.addEventListener("click", buscarCEP);
 
   elementos.cep?.addEventListener("keydown", (event) => {
@@ -614,11 +620,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const dadosEndereco = {
       rua: elementos.rua.value.trim(),
-      numero: elementos.numero.value.trim(),
+      numero: elementos.numero.value.trim().slice(0, 4),
       bairro: elementos.bairro.value.trim(),
       cidade: elementos.cidade.value.trim(),
       complemento: elementos.complemento.value.trim(),
     };
+
+    if (!/^\d{1,4}$/.test(dadosEndereco.numero)) {
+      mostrarMensagem("O número da casa deve conter de 1 a 4 dígitos.", "error");
+      elementos.numero?.focus();
+      return;
+    }
 
     if (
       !dadosEndereco.rua ||
