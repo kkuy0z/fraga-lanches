@@ -9,205 +9,107 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { WebSocketServer, WebSocket } = require("ws");
 
+// O Gateway usa somente configuracoes compartilhadas; nao acessa o MySQL.
 dotenv.config({
-  path: path.resolve(__dirname, "../.env"),
+  path: path.resolve(__dirname, "../../.env"),
 });
 
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
-  console.error("ERRO: JWT_SECRET precisa ter pelo menos 32 caracteres.");
-  process.exit(1);
+  throw new Error("[Gateway] JWT_SECRET precisa ter pelo menos 32 caracteres.");
 }
 
-const db = require("./database");
-const { iniciarExpiracaoPix } = require("./services/expiracaoPix");
-
-// ======================================================
-// ROTAS
-// ======================================================
-
-
-
-
-// ======================================================
-// APLICAÇÃO
-// ======================================================
-
 const app = express();
-
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT || 3000);
 const frontendPath = path.resolve(__dirname, "../../frontend");
 
-// ======================================================
-// MIDDLEWARES E PROXIES DOS MICROSSERVIÇOS
-// ======================================================
+app.disable("x-powered-by");
 
-// PEDIDOS + PIX (:4003)
-app.use(
-  createProxyMiddleware({
+// ------------------------------------------------------
+// PROXY REVERSO: todas as APIs de negocio pertencem aos
+// microsservicos. O Gateway preserva as URLs publicas.
+// ------------------------------------------------------
+
+const servicos = [
+  {
+    nome: "Pedidos",
     target: "http://127.0.0.1:4003",
+    paths: ["/api/cliente/pedidos", "/api/pedidos", "/api/admin/pedidos"],
+  },
+  {
+    nome: "Catalogo",
+    target: "http://127.0.0.1:4002",
+    paths: ["/api/cardapio", "/api/formas-pagamento"],
+  },
+  {
+    nome: "Auth",
+    target: "http://127.0.0.1:4001",
+    paths: ["/api/auth"],
+  },
+  {
+    nome: "Entregas",
+    target: "http://127.0.0.1:4004",
+    paths: ["/api/admin/atribuicoes", "/api/admin/entrega", "/api/admin/horarios", "/api/entregador"],
+  },
+  {
+    nome: "Cozinha",
+    target: "http://127.0.0.1:4005",
+    paths: ["/api/cozinha/pedidos"],
+  },
+  {
+    nome: "Notificacoes",
+    target: "http://127.0.0.1:4006",
+    paths: ["/api/notificacoes", "/api/cliente/notificacoes"],
+  },
+  {
+    nome: "Avaliacoes",
+    target: "http://127.0.0.1:4007",
+    paths: ["/api/admin/avaliacoes", "/api/cliente/avaliacoes"],
+  },
+  {
+    nome: "Administracao",
+    target: "http://127.0.0.1:4008",
+    paths: ["/api/admin/categorias", "/api/admin/produtos", "/api/admin/dashboard", "/api/admin/pagamentos"],
+  },
+  {
+    nome: "Atendimento",
+    target: "http://127.0.0.1:4009",
+    paths: ["/api/atendente/pedidos"],
+  },
+  {
+    nome: "Clientes",
+    target: "http://127.0.0.1:4010",
+    paths: ["/api/cliente/carrinho", "/api/cliente/perfil", "/api/cliente/dashboard"],
+  },
+];
+
+for (const servico of servicos) {
+  app.use(createProxyMiddleware({
+    target: servico.target,
     changeOrigin: true,
-    pathFilter: ["/api/cliente/pedidos", "/api/pedidos", "/api/admin/pedidos"],
+    pathFilter: servico.paths,
     timeout: 15000,
     proxyTimeout: 15000,
     on: {
       error: (erro, req, res) => {
-        console.error("[Gateway Pedidos]:", erro.message);
-
+        console.error(`[Gateway -> ${servico.nome}]:`, erro.message);
         if (!res.headersSent) {
           res.status(503).json({
-            mensagem: "Serviço de pedidos temporariamente indisponível.",
+            mensagem: `Servico ${servico.nome.toLowerCase()} temporariamente indisponivel.`,
           });
         }
       },
     },
-  }),
-);
+  }));
+}
 
-// CATÁLOGO (:4002)
-app.use(
-  createProxyMiddleware({
-    target: "http://127.0.0.1:4002",
-    changeOrigin: true,
-    pathFilter: ["/api/cardapio", "/api/formas-pagamento"],
-    timeout: 10000,
-    proxyTimeout: 10000,
-    on: {
-      proxyReq: (proxyReq, req) => {
-        console.log(
-          `[Gateway → Catálogo :4002] ${req.method} ${req.originalUrl}`,
-        );
-      },
-      error: (erro, req, res) => {
-        console.error("[Gateway Catálogo]:", erro.message);
-
-        if (!res.headersSent) {
-          res.status(503).json({
-            mensagem: "Serviço de catálogo temporariamente indisponível.",
-          });
-        }
-      },
-    },
-  }),
-);
-
-// AUTENTICAÇÃO (:4001)
-app.use(
-  createProxyMiddleware({
-    target: "http://127.0.0.1:4001",
-    changeOrigin: true,
-    pathFilter: ["/api/auth"],
-    timeout: 10000,
-    proxyTimeout: 10000,
-    on: {
-      proxyReq: (proxyReq, req) => {
-        console.log(`[Gateway → Auth :4001] ${req.method} ${req.originalUrl}`);
-      },
-      error: (erro, req, res) => {
-        console.error("[Gateway Auth]:", erro.message);
-
-        if (!res.headersSent) {
-          res.status(503).json({
-            mensagem: "Serviço de autenticação temporariamente indisponível.",
-          });
-        }
-      },
-    },
-  }),
-);
-
-// PARSERS: ficam depois dos proxies para preservar os corpos das requisições.
-
-/* ======================================================
-   MICROSSERVIÇOS ADICIONAIS
-   As rotas antigas permanecem como fallback.
-====================================================== */
-
-app.use(createProxyMiddleware({
-  target: "http://127.0.0.1:4004",
-  changeOrigin: true,
-  pathFilter: [
-    "/api/admin/atribuicoes",
-    "/api/admin/entrega",
-    "/api/admin/horarios",
-    "/api/entregador"
-  ],
-  timeout: 15000,
-  proxyTimeout: 15000
-}));
-
-app.use(createProxyMiddleware({
-  target: "http://127.0.0.1:4005",
-  changeOrigin: true,
-  pathFilter: [
-    "/api/cozinha/pedidos"
-  ],
-  timeout: 15000,
-  proxyTimeout: 15000
-}));
-
-app.use(createProxyMiddleware({
-  target: "http://127.0.0.1:4006",
-  changeOrigin: true,
-  pathFilter: [
-    "/api/notificacoes",
-    "/api/cliente/notificacoes"
-  ],
-  timeout: 15000,
-  proxyTimeout: 15000
-}));
-
-app.use(createProxyMiddleware({
-  target: "http://127.0.0.1:4007",
-  changeOrigin: true,
-  pathFilter: [
-    "/api/admin/avaliacoes",
-    "/api/cliente/avaliacoes"
-  ],
-  timeout: 15000,
-  proxyTimeout: 15000
-}));
-
-app.use(createProxyMiddleware({
-  target: "http://127.0.0.1:4008",
-  changeOrigin: true,
-  pathFilter: [
-    "/api/admin/categorias",
-    "/api/admin/produtos",
-    "/api/admin/dashboard",
-    "/api/admin/pagamentos"
-  ],
-  timeout: 15000,
-  proxyTimeout: 15000
-}));
-
-app.use(createProxyMiddleware({
-  target: "http://127.0.0.1:4009",
-  changeOrigin: true,
-  pathFilter: [
-    "/api/atendente/pedidos"
-  ],
-  timeout: 15000,
-  proxyTimeout: 15000
-}));
-
-
-// CLIENTES (:4010)
-app.use(createProxyMiddleware({
-  target: "http://127.0.0.1:4010",
-  changeOrigin: true,
-  pathFilter: [
-    "/api/cliente/carrinho",
-    "/api/cliente/perfil",
-    "/api/cliente/dashboard",
-  ],
-}));
-
-app.use(express.json());
+// Parsers depois dos proxies para nao consumir o corpo das requisicoes proxied.
+app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: false }));
 
-// ======================================================
-// COMUNICAÇÃO INTERNA DOS MICROSSERVIÇOS
-// ======================================================
+// ------------------------------------------------------
+// EVENTOS INTERNOS: microsservicos publicam eventos;
+// Gateway apenas os distribui pelas conexoes WebSocket.
+// ------------------------------------------------------
 
 app.post("/internal/events", (req, res) => {
   const configurado = process.env.INTERNAL_SERVICE_SECRET;
@@ -219,137 +121,70 @@ app.post("/internal/events", (req, res) => {
     Buffer.byteLength(recebido) !== Buffer.byteLength(configurado) ||
     !crypto.timingSafeEqual(Buffer.from(recebido), Buffer.from(configurado))
   ) {
-    return res.status(401).json({
-      mensagem: "Comunicação interna não autorizada.",
-    });
+    return res.status(401).json({ mensagem: "Comunicacao interna nao autorizada." });
   }
 
   const { destino, usuarioId, tipos, evento } = req.body || {};
-  const websocket = app.locals.websocket;
-
-  if (
-    !websocket ||
-    !evento ||
-    typeof evento !== "object" ||
-    Array.isArray(evento)
-  ) {
-    return res.status(400).json({
-      mensagem: "Evento inválido ou WebSocket indisponível.",
-    });
+  if (!evento || typeof evento !== "object" || Array.isArray(evento)) {
+    return res.status(400).json({ mensagem: "Evento invalido." });
   }
 
   if (destino === "usuario" && usuarioId != null) {
-    websocket.emitirParaUsuario(usuarioId, evento);
-    return res.json({ sucesso: true });
+    return res.json({ sucesso: true, enviados: emitirParaUsuario(usuarioId, evento) });
   }
 
   if (destino === "equipe" && Array.isArray(tipos) && tipos.length > 0) {
-    websocket.emitirParaTipos(tipos, evento);
-    return res.json({ sucesso: true });
+    return res.json({ sucesso: true, enviados: emitirParaTipos(tipos, evento) });
   }
 
-  return res.status(400).json({
-    mensagem: "Destino de evento inválido.",
+  return res.status(400).json({ mensagem: "Destino de evento invalido." });
+});
+
+// ------------------------------------------------------
+// HEALTH DO GATEWAY: consulta os health checks dos servicos,
+// sem abrir conexao direta com o banco de dados.
+// ------------------------------------------------------
+
+app.get("/api/status", async (req, res) => {
+  const resultados = await Promise.all(servicos.map(async (servico) => {
+    const porta = new URL(servico.target).port;
+    try {
+      const resposta = await fetch(`http://127.0.0.1:${porta}/health`, {
+        signal: AbortSignal.timeout(2500),
+      });
+      const dados = await resposta.json().catch(() => ({}));
+      return { servico: servico.nome, status: resposta.ok ? "online" : "indisponivel", http: resposta.status, ...dados };
+    } catch {
+      return { servico: servico.nome, status: "indisponivel" };
+    }
+  }));
+
+  const todosOnline = resultados.every((item) => item.status === "online");
+  return res.status(todosOnline ? 200 : 503).json({
+    servidor: "online",
+    arquitetura: "microsservicos",
+    status: todosOnline ? "online" : "degradado",
+    servicos: resultados,
   });
 });
 
-// ======================================================
-// ROTAS ADMINISTRATIVAS
-// ======================================================
-
-
-
-// ======================================================
-// ROTAS DO CLIENTE
-// ======================================================
-
-// ======================================================
-// ROTAS DO ENTREGADOR
-// ======================================================
-
-
-// ======================================================
-// ROTAS DO ATENDENTE
-// ======================================================
-
-
-// ======================================================
-// ROTAS DA COZINHA
-// ======================================================
-
-
-// ======================================================
-// ROTAS GERAIS
-// ======================================================
-
-
-// ======================================================
-// STATUS DO SERVIDOR E BANCO
-// ======================================================
-
-app.get("/api/status", async (req, res) => {
-  try {
-    await db.query("SELECT 1");
-
-    return res.json({
-      servidor: "online",
-      banco: "conectado",
-    });
-  } catch (erro) {
-    console.error("Erro de conexão com MySQL:", erro);
-
-    return res.status(500).json({
-      servidor: "online",
-      banco: "desconectado",
-    });
-  }
-});
-
-// ======================================================
-// ARQUIVOS ESTÁTICOS
-// ======================================================
+// ------------------------------------------------------
+// FRONTEND ESTATICO
+// ------------------------------------------------------
 
 app.use(express.static(frontendPath));
-
-// ======================================================
-// PÁGINA INICIAL
-// ======================================================
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "inicio.html"));
 });
 
-// ======================================================
-// SERVIDOR HTTP
-// ======================================================
-
 const server = http.createServer(app);
-
-// ======================================================
-// WEBSOCKET
-// ======================================================
-
-const wss = new WebSocketServer({
-  noServer: true,
-  maxPayload: 1024 * 16,
-});
-
-// ======================================================
-// AUTENTICAÇÃO WEBSOCKET
-// ======================================================
+const wss = new WebSocketServer({ noServer: true, maxPayload: 16 * 1024 });
 
 function obterCookie(req, nome) {
   const cookies = req.headers.cookie || "";
-
-  const cookie = cookies
-    .split(";")
-    .map((item) => item.trim())
-    .find((item) => item.startsWith(`${nome}=`));
-
-  if (!cookie) {
-    return null;
-  }
-
+  const cookie = cookies.split(";").map((item) => item.trim()).find((item) => item.startsWith(`${nome}=`));
+  if (!cookie) return null;
   try {
     return decodeURIComponent(cookie.substring(nome.length + 1));
   } catch {
@@ -357,96 +192,52 @@ function obterCookie(req, nome) {
   }
 }
 
-async function autenticarConexao(req) {
+// A identidade vem do JWT assinado pelo servico Auth.
+// O Gateway nao consulta nem compartilha o banco de usuarios.
+function autenticarConexao(req) {
   const token = obterCookie(req, "fraga_session");
+  if (!token) throw new Error("Sessao nao encontrada.");
 
-  if (!token) {
-    throw new Error("Sessão não encontrada.");
-  }
-
-  const usuarioToken = jwt.verify(token, process.env.JWT_SECRET);
-
-  if (!usuarioToken || !usuarioToken.id) {
-    throw new Error("Token inválido.");
-  }
-
-  const [usuarios] = await db.query(
-    `SELECT id, nome, email, tipo, ativo
-     FROM usuarios
-     WHERE id = ?
-     LIMIT 1`,
-    [usuarioToken.id],
-  );
-
-  if (!usuarios.length) {
-    throw new Error("Usuário não encontrado.");
-  }
-
-  const usuario = usuarios[0];
-
-  if (!usuario.ativo) {
-    throw new Error("Usuário inativo.");
-  }
+  const usuario = jwt.verify(token, process.env.JWT_SECRET);
+  if (!usuario || !usuario.id || !usuario.tipo) throw new Error("Token invalido.");
 
   return {
     id: usuario.id,
-    nome: usuario.nome,
-    email: usuario.email,
+    nome: usuario.nome || "Usuario",
+    email: usuario.email || null,
     tipo: usuario.tipo,
   };
 }
 
-// ======================================================
-// VALIDAÇÃO DA ORIGEM
-// ======================================================
-
 function origemPermitida(req) {
   const origin = req.headers.origin;
-
-  // Clientes que não enviam Origin não são bloqueados por essa regra.
-  if (!origin) {
-    return true;
-  }
-
+  if (!origin) return true;
   try {
-    const url = new URL(origin);
-
-    return url.host === req.headers.host;
+    return new URL(origin).host === req.headers.host;
   } catch {
     return false;
   }
 }
 
-// ======================================================
-// HANDSHAKE WEBSOCKET
-// ======================================================
-
-server.on("upgrade", async (req, socket, head) => {
+server.on("upgrade", (req, socket, head) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
-
     if (url.pathname !== "/ws") {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
-      socket.destroy();
-      return;
+      return socket.destroy();
     }
-
     if (!origemPermitida(req)) {
       socket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
-      socket.destroy();
-      return;
+      return socket.destroy();
     }
 
-    const usuario = await autenticarConexao(req);
-
+    const usuario = autenticarConexao(req);
     wss.handleUpgrade(req, socket, head, (ws) => {
       ws.usuario = usuario;
-
       wss.emit("connection", ws, req);
     });
   } catch (erro) {
-    console.warn("Conexão WebSocket recusada:", erro.message);
-
+    console.warn("[Gateway WebSocket] Conexao recusada:", erro.message);
     if (!socket.destroyed) {
       socket.write("HTTP/1.1 401 Unauthorized\r\n\r\n");
       socket.destroy();
@@ -454,126 +245,56 @@ server.on("upgrade", async (req, socket, head) => {
   }
 });
 
-// ======================================================
-// CONEXÕES AUTENTICADAS
-// ======================================================
-
 wss.on("connection", (ws) => {
   const usuario = ws.usuario;
+  ws.send(JSON.stringify({
+    evento: "conexao_estabelecida",
+    mensagem: "Conexao em tempo real estabelecida.",
+  }));
 
-  console.log(
-    `[WebSocket] Conectado: ${usuario.nome} | ID: ${usuario.id} | Tipo: ${usuario.tipo}`,
-  );
-
-  ws.send(
-    JSON.stringify({
-      evento: "conexao_estabelecida",
-      mensagem: "Conexão em tempo real estabelecida.",
-    }),
-  );
-
-  ws.on("message", (mensagem) => {
-    // O cliente não pode escolher destinatários ou emitir eventos internos.
-    // Neste momento, o servidor não aceita comandos do frontend.
-    console.log(`[WebSocket] Mensagem recebida do usuário ${usuario.id}.`);
+  ws.on("message", () => {
+    // Clientes nao podem publicar eventos internos pelo WebSocket.
   });
-
-  ws.on("close", () => {
-    console.log(
-      `[WebSocket] Desconectado: ${usuario.nome} | ID: ${usuario.id}`,
-    );
-  });
-
   ws.on("error", (erro) => {
-    console.error(
-      `[WebSocket] Erro na conexão do usuário ${usuario.id}:`,
-      erro.message,
-    );
+    console.error(`[Gateway WebSocket] Usuario ${usuario.id}:`, erro.message);
   });
 });
 
-// ======================================================
-// ENVIO DE EVENTOS
-// ======================================================
-
 function enviarEvento(ws, evento) {
-  if (ws.readyState !== WebSocket.OPEN) {
-    return false;
-  }
-
+  if (ws.readyState !== WebSocket.OPEN) return false;
   try {
     ws.send(JSON.stringify(evento));
     return true;
   } catch (erro) {
-    console.error("Erro ao enviar evento WebSocket:", erro);
+    console.error("[Gateway WebSocket] Falha ao enviar evento:", erro.message);
     return false;
   }
 }
 
-// Envia um evento somente para um usuário específico.
 function emitirParaUsuario(usuarioId, evento) {
   let enviados = 0;
-
   for (const ws of wss.clients) {
-    if (
-      ws.usuario &&
-      String(ws.usuario.id) === String(usuarioId) &&
-      enviarEvento(ws, evento)
-    ) {
-      enviados++;
-    }
+    if (ws.usuario && String(ws.usuario.id) === String(usuarioId) && enviarEvento(ws, evento)) enviados++;
   }
-
   return enviados;
 }
 
-// Envia um evento somente para usuários dos tipos informados.
 function emitirParaTipos(tipos, evento) {
-  const tiposPermitidos = Array.isArray(tipos) ? tipos : [tipos];
-
+  const permitidos = Array.isArray(tipos) ? tipos : [tipos];
   let enviados = 0;
-
   for (const ws of wss.clients) {
-    if (
-      ws.usuario &&
-      tiposPermitidos.includes(ws.usuario.tipo) &&
-      enviarEvento(ws, evento)
-    ) {
-      enviados++;
-    }
+    if (ws.usuario && permitidos.includes(ws.usuario.tipo) && enviarEvento(ws, evento)) enviados++;
   }
-
   return enviados;
 }
 
-// Disponibiliza os métodos para as rotas Express.
-app.locals.websocket = {
-  emitirParaUsuario,
-  emitirParaTipos,
-};
-
-iniciarExpiracaoPix(app.locals.websocket);
-
-// ======================================================
-// INICIALIZAÇÃO
-// ======================================================
-
-server.listen(PORT, () => {
-  console.log("-----------------------------------");
-  console.log("       FRAGA LANCHES");
-  console.log("-----------------------------------");
-  console.log(`Servidor: http://localhost:${PORT}`);
-  console.log(`Dashboard: http://localhost:${PORT}/admin/admin-dashboard.html`);
-  console.log(`Cardápio: http://localhost:${PORT}/admin/admin-cardapio.html`);
-  console.log(`WebSocket: ws://localhost:${PORT}/ws`);
-  console.log("API: /api");
-  console.log("-----------------------------------");
+server.listen(PORT, "0.0.0.0", () => {
+  console.log("[Gateway] HTTP:", `http://localhost:${PORT}`);
+  console.log("[Gateway] WebSocket:", `ws://localhost:${PORT}/ws`);
+  console.log("[Gateway] APIs encaminhadas para 10 microsservicos.");
 });
 
-// ======================================================
-// TRATAMENTO DE ERROS DO SERVIDOR
-// ======================================================
-
 server.on("error", (erro) => {
-  console.error("Erro no servidor HTTP:", erro);
+  console.error("[Gateway] Erro HTTP:", erro);
+  process.exitCode = 1;
 });
