@@ -833,7 +833,25 @@
           width: 100% !important;
         }
       }
-    </style>
+    
+      /* Perfil responsivo */
+      #secaoPerfil { min-width: 0; width: 100%; }
+      #secaoPerfil .perfil-campos,
+      #secaoPerfil .perfil-linha-dupla,
+      #secaoPerfil .form-group { min-width: 0; width: 100%; }
+      #secaoPerfil .form-group input { min-width: 0; min-height: 44px; font-size: 14px; }
+      #secaoPerfil .perfil-rodape { width: 100%; align-items: stretch; }
+      #secaoPerfil #btnSalvarPerfil { min-height: 44px; }
+      #secaoPerfil #mensagemPerfil { min-width: 0; overflow-wrap: anywhere; }
+      @media (max-width: 760px) {
+        #secaoPerfil { padding: 16px !important; }
+        #secaoPerfil .perfil-linha-dupla { grid-template-columns: minmax(0, 1fr) !important; }
+        #secaoPerfil .perfil-rodape { flex-direction: column; }
+        #secaoPerfil #btnSalvarPerfil { width: 100% !important; }
+        #secaoPerfil #mensagemPerfil { width: 100%; margin: 0; }
+      }
+      @media (max-width: 380px) { #secaoPerfil { padding: 13px !important; } }
+</style>
   <style>
 
 /* CENTRAL DE NOTIFICAÇÕES */
@@ -1123,6 +1141,7 @@
       </div>
     </main>
 
+    <script type="module" src="/telefone.js"></script>
     <script src="painel.js"></script>
 
     <script>
