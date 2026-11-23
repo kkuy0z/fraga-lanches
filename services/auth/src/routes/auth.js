@@ -73,9 +73,28 @@ router.post("/cadastro", async (req, res) => {
 
         const nomeLimpo = String(nome).trim();
         const emailLimpo = String(email).trim().toLowerCase();
-        const telefoneLimpo = telefone
-            ? String(telefone).trim()
-            : null;
+        const telefoneInformado = telefone == null
+            ? ""
+            : String(telefone).trim();
+
+        let telefoneLimpo = null;
+
+        if (telefoneInformado) {
+            const telefoneValido = /^\+?[\d\s().-]+$/.test(telefoneInformado);
+            const telefoneDigitos = telefoneInformado.replace(/\D/g, "");
+
+            if (
+                !telefoneValido ||
+                telefoneDigitos.length < 8 ||
+                telefoneDigitos.length > 15
+            ) {
+                return res.status(400).json({
+                    mensagem: "Informe um telefone válido com 8 a 15 dígitos. Para números internacionais, inclua o código do país."
+                });
+            }
+
+            telefoneLimpo = `${telefoneInformado.startsWith("+") ? "+" : ""}${telefoneDigitos}`;
+        }
 
         if (nomeLimpo.length < 2 || nomeLimpo.length > 100) {
             return res.status(400).json({
