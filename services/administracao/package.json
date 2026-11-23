@@ -12,6 +12,7 @@
     "express": "latest",
     "jsonwebtoken": "latest",
     "mysql2": "latest",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "argon2": "^0.45.2"
   }
 }
