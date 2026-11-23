@@ -11,7 +11,7 @@ const INTERVALO_ATUALIZACAO = 5000;
 
 // Quantos pedidos prontos aparecem no card "Prontos".
 // Os mais antigos passam para o histórico.
-const LIMITE_PRONTOS = 6;
+const LIMITE_PRONTOS = 1;
 
 // "recentes" = mais novos primeiro | "antigos" = ordem de chegada (fila)
 const ORDEM_FILA = "recentes";
@@ -27,6 +27,8 @@ const colunas = {
 };
 
 const historicoContainer = document.getElementById("historico");
+const secaoHistorico = document.getElementById("secao-historico");
+const btnLerMais = document.getElementById("btn-ler-mais-prontos");
 const buscaHistorico = document.getElementById("busca-historico");
 const conexaoStatus = document.getElementById("conexao-status");
 
@@ -482,7 +484,12 @@ function renderizarPedidos() {
     [...novos, ...emPreparo, ...prontosVisiveis].map((p) => p.id),
   );
 
-  renderizarHistorico(pedidosAtuais.filter((p) => !idsVisiveis.has(p.id)));
+  const pedidosHistorico = pedidosAtuais.filter((p) => !idsVisiveis.has(p.id));
+  renderizarHistorico(pedidosHistorico);
+  if (btnLerMais) {
+    btnLerMais.hidden = pedidosHistorico.length === 0;
+    btnLerMais.textContent = pedidosHistorico.length ? `Ler mais (${pedidosHistorico.length})` : "Ler mais";
+  }
 }
 
 // ======================================================
@@ -561,6 +568,13 @@ document.addEventListener("click", (event) => {
 });
 
 buscaHistorico.addEventListener("input", renderizarPedidos);
+
+btnLerMais?.addEventListener("click", () => {
+  if (!secaoHistorico) return;
+  secaoHistorico.hidden = false;
+  secaoHistorico.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
 
 document
   .getElementById("btn-atualizar")
