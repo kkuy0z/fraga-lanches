@@ -224,7 +224,7 @@ function origemPermitida(req) {
   }
 }
 
-server.on("upgrade", (req, socket, head) => {
+server.on("upgrade", async (req, socket, head) => {
   try {
     const url = new URL(req.url, `http://${req.headers.host}`);
     if (url.pathname !== "/ws") {
