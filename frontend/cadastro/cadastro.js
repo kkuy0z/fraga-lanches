@@ -6,7 +6,7 @@ if (campoTelefone) {
     campoTelefone.addEventListener("input", () => {
         const valor = campoTelefone.value;
         const internacional = valor.trim().startsWith("+");
-        const digitos = valor.replace(/\D/g, "").slice(0, internacional ? 15 : 11);
+        const digitos = valor.replace(/\D/g, "").slice(0, 16);
         const valorLimitado = (internacional ? "+" : "") + digitos;
         const formatador = new AsYouType(internacional ? undefined : "BR");
 
