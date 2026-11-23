@@ -15,6 +15,8 @@ const STATUS_VALIDOS = [
   "cancelado",
 ];
 
+router.use(autenticarAtendente);
+
 // ======================================================
 // AUTENTICAÇÃO E AUTORIZAÇÃO
 // ======================================================
