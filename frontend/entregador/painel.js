@@ -84,6 +84,52 @@ function formatarData(valor) {
   return data.toLocaleString("pt-BR");
 }
 
+
+// ======================================================
+// FINANCEIRO
+// ======================================================
+
+function renderizarFinanceiro(dados) {
+  const total = document.getElementById("financeiroTotal");
+  const quantidade = document.getElementById("financeiroQuantidade");
+  const historico = document.getElementById("financeiroHistorico");
+
+  if (!total || !quantidade || !historico) return;
+
+  total.textContent = formatarMoeda(dados.totalGanho);
+  quantidade.textContent = String(Number(dados.quantidadeEntregas || 0));
+
+  const registros = Array.isArray(dados.historico) ? dados.historico : [];
+
+  if (!registros.length) {
+    historico.innerHTML = '<p class="financeiro-vazio">Você ainda não possui entregas com recebimento confirmado.</p>';
+    return;
+  }
+
+  historico.innerHTML = registros.map((item) => `
+    <article class="financeiro-linha">
+      <div>
+        <strong>Pedido #${Number(item.pedido_id)}</strong>
+        <small>Concluído em ${escaparHTML(formatarData(item.data_conclusao))}</small>
+      </div>
+      <strong class="financeiro-valor">+${formatarMoeda(item.valor_ganho)}</strong>
+    </article>
+  `).join("");
+}
+
+async function carregarFinanceiro() {
+  try {
+    const dados = await requisicao(API_FINANCEIRO);
+    renderizarFinanceiro(dados);
+  } catch (erro) {
+    console.error("Erro ao carregar financeiro:", erro);
+    const historico = document.getElementById("financeiroHistorico");
+    if (historico) {
+      historico.innerHTML = '<p class="ent-erro">Não foi possível carregar seu financeiro.</p>';
+    }
+  }
+}
+
 // ======================================================
 // GOOGLE MAPS
 // ======================================================
