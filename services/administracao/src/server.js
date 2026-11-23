@@ -14,6 +14,7 @@ const adminCategoriasRoutes = require("./routes/adminCategorias");
 const adminProdutosRoutes = require("./routes/adminProdutos");
 const adminDashboardRoutes = require("./routes/adminDashboard");
 const adminFormasPagamentoRoutes = require("./routes/adminFormasPagamento");
+const adminUsuariosRoutes = require("./routes/adminUsuarios");
 
 const app = express();
 const PORT = 4008;
@@ -98,6 +99,7 @@ app.use("/api/admin/categorias", adminCategoriasRoutes);
 app.use("/api/admin/produtos", adminProdutosRoutes);
 app.use("/api/admin/dashboard", adminDashboardRoutes);
 app.use("/api/admin/pagamentos", adminFormasPagamentoRoutes);
+app.use("/api/admin/usuarios", adminUsuariosRoutes);
 
 const servidor = app.listen(PORT, "0.0.0.0", () => {
   console.log("------------------------------------");
