@@ -10,6 +10,24 @@ const PERFIS = new Set(["admin", "atendente", "cozinha", "entregador"]);
 
 router.use(autenticarAdmin);
 
+// Confirma o estado atual da conta administrativa em cada requisição.
+// Isso invalida imediatamente o acesso de administradores desativados.
+router.use(async (req, res, next) => {
+  try {
+    const [usuarios] = await db.execute(
+      "SELECT id FROM usuarios WHERE id = ? AND tipo = 'admin' AND ativo = 1 LIMIT 1",
+      [req.usuario.id],
+    );
+    if (!usuarios.length) {
+      return res.status(403).json({ mensagem: "Esta conta administrativa está inativa ou não possui mais acesso." });
+    }
+    return next();
+  } catch (erro) {
+    console.error("[Admin Usuários] Erro ao validar sessão:", erro);
+    return res.status(500).json({ mensagem: "Não foi possível validar o acesso administrativo." });
+  }
+});
+
 function validarId(valor) {
   const id = Number(valor);
   return Number.isSafeInteger(id) && id > 0 ? id : null;
