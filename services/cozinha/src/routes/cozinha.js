@@ -5,6 +5,7 @@ const router = express.Router();
 
 const db = require("../database");
 const autenticarCozinha = require("../../../_shared/autenticar")(["cozinha"]);
+const { consultarUsuarios } = require("../../../_shared/auth-client");
 
 const STATUS_COZINHA = ["novo", "em_preparo", "pronto"];
 
@@ -28,13 +29,9 @@ router.get("/", async (req, res) => {
           p.data_pedido,
           p.status,
           p.tipo_entrega,
-          p.observacoes,
-          u.nome AS cliente_nome
+          p.observacoes
 
         FROM pedidos p
-
-        INNER JOIN usuarios u
-          ON u.id = p.usuario_id
 
         WHERE p.status IN ('novo', 'em_preparo', 'pronto')
 
@@ -47,6 +44,12 @@ router.get("/", async (req, res) => {
 
     if (pedidos.length === 0) {
       return res.json([]);
+    }
+
+    const perfis = await consultarUsuarios(pedidos.map((pedido) => pedido.usuario_id).filter(Boolean));
+    const nomesPorUsuario = new Map(perfis.map((usuario) => [Number(usuario.id), usuario.nome]));
+    for (const pedido of pedidos) {
+      pedido.cliente_nome = nomesPorUsuario.get(Number(pedido.usuario_id)) || "Cliente não informado";
     }
 
     const ids = pedidos.map((pedido) => pedido.id);
@@ -118,13 +121,9 @@ router.get("/:id", async (req, res) => {
           p.data_pedido,
           p.status,
           p.tipo_entrega,
-          p.observacoes,
-          u.nome AS cliente_nome
+          p.observacoes
 
         FROM pedidos p
-
-        INNER JOIN usuarios u
-          ON u.id = p.usuario_id
 
         WHERE p.id = ?
           AND p.status IN ('novo', 'em_preparo', 'pronto')
@@ -139,6 +138,9 @@ router.get("/:id", async (req, res) => {
         mensagem: "Pedido não encontrado na fila da cozinha.",
       });
     }
+
+    const [perfil] = await consultarUsuarios([pedidos[0].usuario_id]);
+    pedidos[0].cliente_nome = perfil?.nome || "Cliente não informado";
 
     const [itens] = await db.query(
       `
