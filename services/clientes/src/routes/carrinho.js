@@ -2,10 +2,10 @@
 
 const express = require("express");
 const db = require("../database");
-const authRoutes = require("../../../auth/src/routes/auth");
+const autenticar = require("../middleware/autenticar");
 
 const router = express.Router();
-const autenticar = authRoutes.autenticar;
+
 
 // ======================================================
 // CONFIGURAÇÕES
