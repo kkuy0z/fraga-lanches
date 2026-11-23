@@ -543,4 +543,60 @@ router.patch("/entregas/:id/finalizar", async (req, res) => {
   }
 });
 
+
+// ======================================================
+// FINANCEIRO DO ENTREGADOR
+// ======================================================
+// A remuneração é fixa em R$ 7,00 e só é contabilizada
+// depois que o cliente confirma o recebimento do pedido.
+router.get("/financeiro", async (req, res) => {
+  try {
+    const valorPorEntrega = 7.00;
+
+    const [resumo] = await db.query(
+      `SELECT
+          COUNT(*) AS quantidade_entregas,
+          COALESCE(COUNT(*) * ?, 0.00) AS total_ganho
+       FROM entregas e
+       INNER JOIN pedidos p
+          ON p.id = e.pedido_id
+       WHERE e.entregador_id = ?
+         AND e.status = 'entregue'
+         AND e.data_confirmacao_recebimento IS NOT NULL
+         AND p.status = 'concluido'`,
+      [valorPorEntrega, req.usuario.id],
+    );
+
+    const [historico] = await db.query(
+      `SELECT
+          e.id AS entrega_id,
+          p.id AS pedido_id,
+          e.data_confirmacao_recebimento AS data_conclusao,
+          ? AS valor_ganho
+       FROM entregas e
+       INNER JOIN pedidos p
+          ON p.id = e.pedido_id
+       WHERE e.entregador_id = ?
+         AND e.status = 'entregue'
+         AND e.data_confirmacao_recebimento IS NOT NULL
+         AND p.status = 'concluido'
+       ORDER BY e.data_confirmacao_recebimento DESC, e.id DESC`,
+      [valorPorEntrega, req.usuario.id],
+    );
+
+    return res.json({
+      valorPorEntrega,
+      quantidadeEntregas: Number(resumo[0]?.quantidade_entregas || 0),
+      totalGanho: Number(resumo[0]?.total_ganho || 0),
+      historico,
+    });
+  } catch (erro) {
+    console.error("Erro ao carregar financeiro do entregador:", erro);
+
+    return res.status(500).json({
+      mensagem: "Não foi possível carregar seu financeiro.",
+    });
+  }
+});
+
 module.exports = router;
