@@ -25,6 +25,21 @@ if (formCadastro) {
             valido = false;
         }
 
+        const telefoneDigitos = telefone.replace(/\D/g, "");
+        const telefoneFormatoValido = /^\+?[\d\s().-]+$/.test(telefone);
+
+        if (
+            !telefoneFormatoValido ||
+            telefoneDigitos.length < 8 ||
+            telefoneDigitos.length > 15
+        ) {
+            mostrarErro(
+                "erro-telefone",
+                "Informe um telefone válido com 8 a 15 dígitos. Para números internacionais, inclua o código do país."
+            );
+            valido = false;
+        }
+
         if (senha.length < 8 || senha.length > 64) {
             mostrarErro("erro-senha", "A senha deve ter entre 8 e 64 caracteres.");
             valido = false;
