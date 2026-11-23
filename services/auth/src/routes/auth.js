@@ -89,7 +89,7 @@ router.post("/cadastro", async (req, res) => {
             if (
                 !telefoneParseado ||
                 !telefoneParseado.isValid() ||
-                telefoneParseado.number.replace(/\\D/g, "").length > 15 ||
+                telefoneParseado.number.replace(/\D/g, "").length > 15 ||
                 (telefoneParseado.country === "BR" && telefoneParseado.nationalNumber.length !== 11)
             ) {
                 return res.status(400).json({
