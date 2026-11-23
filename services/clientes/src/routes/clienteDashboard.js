@@ -2,51 +2,10 @@
 "use strict";
 
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const db = require("../database");
 
 const router = express.Router();
-
-function lerCookie(req, nome) {
-    const cookies = req.headers.cookie || "";
-
-    for (const item of cookies.split(";")) {
-        const partes = item.trim().split("=");
-
-        if (partes.shift() === nome) {
-            return decodeURIComponent(partes.join("="));
-        }
-    }
-
-    return null;
-}
-
-function exigirCliente(req, res, next) {
-    const token = lerCookie(req, "fraga_session");
-
-    if (!token) {
-        return res.status(401).json({
-            mensagem: "Faça login para continuar."
-        });
-    }
-
-    try {
-        const usuario = jwt.verify(token, process.env.JWT_SECRET);
-
-        if (usuario.tipo !== "cliente") {
-            return res.status(403).json({
-                mensagem: "Acesso permitido somente ao cliente."
-            });
-        }
-
-        req.usuario = usuario;
-        next();
-    } catch (erro) {
-        return res.status(401).json({
-            mensagem: "Sessão inválida ou expirada."
-        });
-    }
-}
+const exigirCliente = require("../../../_shared/autenticar")(["cliente"]);
 
 router.get("/", exigirCliente, async (req, res) => {
     try {

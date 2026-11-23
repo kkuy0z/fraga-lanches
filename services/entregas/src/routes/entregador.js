@@ -5,6 +5,7 @@ const router = express.Router();
 
 const db = require("../database");
 const autenticarEntregador = require("../middleware/autenticarEntregador");
+const { consultarUsuarios, atualizarPerfilUsuario } = require("../../../_shared/auth-client");
 
 router.use(autenticarEntregador);
 
@@ -53,21 +54,15 @@ function emitirEventoEquipe(req, evento) {
 
 router.get("/perfil", async (req, res) => {
   try {
-    const [usuarios] = await db.query(
-      `SELECT id, nome, email, telefone, tipo, data_cadastro
-       FROM usuarios
-       WHERE id = ? AND tipo = 'entregador' AND ativo = 1
-       LIMIT 1`,
-      [req.usuario.id],
-    );
+    const [usuario] = await consultarUsuarios([req.usuario.id]);
 
-    if (!usuarios.length) {
+    if (!usuario || usuario.tipo !== "entregador" || Number(usuario.ativo) !== 1) {
       return res.status(404).json({
         mensagem: "Entregador não encontrado.",
       });
     }
 
-    return res.json({ usuario: usuarios[0] });
+    return res.json({ usuario });
   } catch (erro) {
     console.error("Erro ao carregar perfil:", erro);
 
@@ -104,38 +99,11 @@ router.patch("/perfil", async (req, res) => {
       }
     }
 
-    const [usuarios] = await db.query(
-      `SELECT id
-       FROM usuarios
-       WHERE id = ? AND tipo = 'entregador' AND ativo = 1
-       LIMIT 1`,
-      [req.usuario.id],
-    );
-
-    if (!usuarios.length) {
-      return res.status(404).json({
-        mensagem: "Entregador não encontrado.",
-      });
-    }
-
-    await db.query(
-      `UPDATE usuarios
-       SET nome = ?, telefone = ?
-       WHERE id = ? AND tipo = 'entregador' AND ativo = 1`,
-      [nome, telefone || null, req.usuario.id],
-    );
-
-    const [atualizado] = await db.query(
-      `SELECT id, nome, email, telefone, tipo, data_cadastro
-       FROM usuarios
-       WHERE id = ?
-       LIMIT 1`,
-      [req.usuario.id],
-    );
+    const atualizado = await atualizarPerfilUsuario(req.usuario.id, { nome, telefone: telefone || null });
 
     return res.json({
       mensagem: "Perfil atualizado com sucesso.",
-      usuario: atualizado[0],
+      usuario: atualizado,
     });
   } catch (erro) {
     console.error("Erro ao atualizar perfil:", erro);
@@ -161,6 +129,7 @@ router.get("/entregas", async (req, res) => {
           e.data_confirmacao_recebimento,
 
           p.id AS pedido_id,
+          p.usuario_id AS cliente_id,
           p.status AS status_pedido,
           p.data_pedido,
           p.tipo_entrega,
@@ -169,9 +138,6 @@ router.get("/entregas", async (req, res) => {
           p.desconto,
           p.total,
           p.observacoes,
-
-          u.nome AS cliente_nome,
-          u.telefone AS cliente_telefone,
 
           en.rua,
           en.numero,
@@ -184,8 +150,6 @@ router.get("/entregas", async (req, res) => {
        INNER JOIN pedidos p
           ON p.id = e.pedido_id
 
-       INNER JOIN usuarios u
-          ON u.id = p.usuario_id
 
        LEFT JOIN enderecos en
           ON en.id = p.endereco_id
@@ -206,6 +170,14 @@ router.get("/entregas", async (req, res) => {
 
     if (!entregas.length) {
       return res.json({ entregas: [] });
+    }
+
+    const perfis = await consultarUsuarios(entregas.map((entrega) => entrega.cliente_id).filter(Boolean));
+    const perfisPorId = new Map(perfis.map((usuario) => [Number(usuario.id), usuario]));
+    for (const entrega of entregas) {
+      const cliente = perfisPorId.get(Number(entrega.cliente_id));
+      entrega.cliente_nome = cliente?.nome || "Cliente não informado";
+      entrega.cliente_telefone = cliente?.telefone || null;
     }
 
     const idsPedidos = entregas.map((entrega) => entrega.pedido_id);

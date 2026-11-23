@@ -1,12 +1,10 @@
 "use strict";
 
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const db = require("../database");
 
 const router = express.Router();
-
-const TIPOS_PERMITIDOS = ["atendente", "admin"];
+const autenticarAtendente = require("../middleware/autenticarEquipe");
 
 const STATUS_VALIDOS = [
   "novo",
@@ -17,83 +15,11 @@ const STATUS_VALIDOS = [
   "cancelado",
 ];
 
+router.use(autenticarAtendente);
+
 // ======================================================
 // AUTENTICAÇÃO E AUTORIZAÇÃO
 // ======================================================
-
-function lerCookie(req, nome) {
-  const cookies = req.headers.cookie || "";
-
-  const cookie = cookies
-    .split(";")
-    .map((item) => item.trim())
-    .find((item) => item.startsWith(`${nome}=`));
-
-  if (!cookie) return null;
-
-  try {
-    return decodeURIComponent(cookie.substring(nome.length + 1));
-  } catch {
-    return null;
-  }
-}
-
-async function autenticarAtendente(req, res, next) {
-  const token = lerCookie(req, "fraga_session");
-
-  if (!token) {
-    return res.status(401).json({
-      mensagem: "Você precisa fazer login.",
-    });
-  }
-
-  try {
-    const usuarioToken = jwt.verify(token, process.env.JWT_SECRET);
-
-    const [usuarios] = await db.query(
-      `SELECT id, nome, email, tipo, ativo
-       FROM usuarios
-       WHERE id = ?
-       LIMIT 1`,
-      [usuarioToken.id],
-    );
-
-    if (!usuarios.length || !usuarios[0].ativo) {
-      return res.status(401).json({
-        mensagem: "Usuário não encontrado ou inativo.",
-      });
-    }
-
-    const usuario = usuarios[0];
-
-    if (!TIPOS_PERMITIDOS.includes(usuario.tipo)) {
-      return res.status(403).json({
-        mensagem: "Acesso permitido somente para atendentes e administradores.",
-      });
-    }
-
-    req.usuario = usuario;
-
-    return next();
-  } catch (erro) {
-    if (
-      erro.name === "JsonWebTokenError" ||
-      erro.name === "TokenExpiredError"
-    ) {
-      return res.status(401).json({
-        mensagem: "Sessão inválida ou expirada.",
-      });
-    }
-
-    console.error("Erro na autenticação do atendente:", erro);
-
-    return res.status(500).json({
-      mensagem: "Erro ao verificar autenticação.",
-    });
-  }
-}
-
-router.use(autenticarAtendente);
 
 // ======================================================
 // RESUMO DOS PEDIDOS

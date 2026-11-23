@@ -1,89 +1,19 @@
 "use strict";
 
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 const db = require("../database");
+const autenticarCozinha = require("../../../_shared/autenticar")(["cozinha"]);
+const { consultarUsuarios } = require("../../../_shared/auth-client");
 
 const STATUS_COZINHA = ["novo", "em_preparo", "pronto"];
+
+router.use(autenticarCozinha);
 
 // ======================================================
 // AUTENTICAÇÃO DA COZINHA
 // ======================================================
-
-function lerCookie(req, nome) {
-  const cookies = String(req.headers.cookie || "").split(";");
-
-  for (const cookie of cookies) {
-    const separador = cookie.indexOf("=");
-
-    if (separador === -1) continue;
-
-    const chave = cookie.slice(0, separador).trim();
-    const valor = cookie.slice(separador + 1).trim();
-
-    if (chave === nome) {
-      return decodeURIComponent(valor);
-    }
-  }
-
-  return null;
-}
-
-async function autenticarCozinha(req, res, next) {
-  try {
-    const token = lerCookie(req, "fraga_session");
-
-    if (!token) {
-      return res.status(401).json({
-        mensagem: "Autenticação necessária.",
-      });
-    }
-
-    const sessao = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (!sessao || !sessao.id) {
-      return res.status(401).json({
-        mensagem: "Sessão inválida.",
-      });
-    }
-
-    const [usuarios] = await db.query(
-      `
-        SELECT id, nome, email, tipo, ativo
-        FROM usuarios
-        WHERE id = ?
-        LIMIT 1
-      `,
-      [sessao.id],
-    );
-
-    if (usuarios.length === 0 || !usuarios[0].ativo) {
-      return res.status(401).json({
-        mensagem: "Usuário não encontrado ou inativo.",
-      });
-    }
-
-    if (usuarios[0].tipo !== "cozinha") {
-      return res.status(403).json({
-        mensagem: "Acesso permitido somente à cozinha.",
-      });
-    }
-
-    req.usuario = usuarios[0];
-
-    next();
-  } catch (erro) {
-    console.error("Erro na autenticação da cozinha:", erro);
-
-    return res.status(401).json({
-      mensagem: "Sessão inválida ou expirada.",
-    });
-  }
-}
-
-router.use(autenticarCozinha);
 
 // ======================================================
 // LISTAR PEDIDOS DA COZINHA
@@ -99,13 +29,9 @@ router.get("/", async (req, res) => {
           p.data_pedido,
           p.status,
           p.tipo_entrega,
-          p.observacoes,
-          u.nome AS cliente_nome
+          p.observacoes
 
         FROM pedidos p
-
-        INNER JOIN usuarios u
-          ON u.id = p.usuario_id
 
         WHERE p.status IN ('novo', 'em_preparo', 'pronto')
 
@@ -118,6 +44,12 @@ router.get("/", async (req, res) => {
 
     if (pedidos.length === 0) {
       return res.json([]);
+    }
+
+    const perfis = await consultarUsuarios(pedidos.map((pedido) => pedido.usuario_id).filter(Boolean));
+    const nomesPorUsuario = new Map(perfis.map((usuario) => [Number(usuario.id), usuario.nome]));
+    for (const pedido of pedidos) {
+      pedido.cliente_nome = nomesPorUsuario.get(Number(pedido.usuario_id)) || "Cliente não informado";
     }
 
     const ids = pedidos.map((pedido) => pedido.id);
@@ -189,13 +121,9 @@ router.get("/:id", async (req, res) => {
           p.data_pedido,
           p.status,
           p.tipo_entrega,
-          p.observacoes,
-          u.nome AS cliente_nome
+          p.observacoes
 
         FROM pedidos p
-
-        INNER JOIN usuarios u
-          ON u.id = p.usuario_id
 
         WHERE p.id = ?
           AND p.status IN ('novo', 'em_preparo', 'pronto')
@@ -210,6 +138,9 @@ router.get("/:id", async (req, res) => {
         mensagem: "Pedido não encontrado na fila da cozinha.",
       });
     }
+
+    const [perfil] = await consultarUsuarios([pedidos[0].usuario_id]);
+    pedidos[0].cliente_nome = perfil?.nome || "Cliente não informado";
 
     const [itens] = await db.query(
       `
