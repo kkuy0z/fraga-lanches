@@ -1902,7 +1902,7 @@ function validarEndereco() {
   }
 
   const numero = campoNumero?.value.trim() || "";
-  if (!/^\\d{1,4}$/.test(numero)) {
+  if (!/^\d{1,4}$/.test(numero)) {
     alert("O número da casa deve conter de 1 a 4 dígitos.");
     campoNumero?.focus();
     return false;
