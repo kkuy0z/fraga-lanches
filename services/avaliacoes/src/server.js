@@ -92,6 +92,35 @@ app.get("/health", async (req, res) => {
   }
 });
 
+// Avaliações públicas: somente comentários aprovados pela administração.
+app.get("/api/avaliacoes/publicas", async (req, res) => {
+  try {
+    const [avaliacoes] = await db.query(
+      `
+        SELECT
+          a.nota,
+          a.comentario,
+          a.data_avaliacao,
+          u.nome AS cliente_nome
+        FROM avaliacoes a
+        INNER JOIN usuarios u ON u.id = a.usuario_id
+        WHERE a.status = 'aprovada'
+          AND a.comentario IS NOT NULL
+          AND TRIM(a.comentario) <> ''
+        ORDER BY a.data_moderacao DESC, a.id DESC
+        LIMIT 6
+      `,
+    );
+
+    return res.json({ avaliacoes });
+  } catch (erro) {
+    console.error("[Avaliações] Erro ao carregar avaliações públicas:", erro);
+    return res.status(500).json({
+      mensagem: "Não foi possível carregar as avaliações.",
+    });
+  }
+});
+
 app.use("/api/admin/avaliacoes", adminAvaliacoesRoutes);
 app.use("/api/cliente/avaliacoes", clienteAvaliacoesRoutes);
 
