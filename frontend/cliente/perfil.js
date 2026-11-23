@@ -321,6 +321,17 @@ document.addEventListener("DOMContentLoaded", () => {
   elementos.formDados?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
+    const telefoneDigitado = elementos.telefone?.value.trim() || "";
+    const telefoneValidado = window.FragaTelefone
+      ? window.FragaTelefone.validar(telefoneDigitado)
+      : { valido: false, mensagem: "Validador de telefone ainda não carregou. Atualize a página." };
+    if (!telefoneValidado.valido) {
+      mostrarMensagem(telefoneValidado.mensagem || "Informe um telefone válido.", "error");
+      elementos.telefone?.focus();
+      return;
+    }
+
+
     const botao = elementos.formDados.querySelector('button[type="submit"]');
 
     const textoOriginal = botao?.textContent;
@@ -335,7 +346,7 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "PUT",
         body: JSON.stringify({
           nome: elementos.nome.value.trim(),
-          telefone: elementos.telefone.value.trim(),
+          telefone: telefoneValidado.numero || "",
         }),
       });
 
