@@ -1,0 +1,297 @@
+/* Fraga Lanches — camada global de responsividade
+   Carregada por último em todas as páginas para uniformizar os breakpoints.
+   Mantém os estilos e a identidade visual específicos de cada área. */
+
+:root {
+  --fraga-content-width: 1440px;
+  --fraga-page-gutter: clamp(14px, 3vw, 36px);
+  --fraga-control-height: 44px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  width: 100%;
+  min-width: 320px;
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  min-width: 320px;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+img, video, canvas, svg, iframe {
+  max-width: 100%;
+}
+
+img, video {
+  height: auto;
+}
+
+button, input, select, textarea {
+  max-width: 100%;
+  font: inherit;
+}
+
+button, [role="button"], a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input, select, textarea {
+  min-width: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+table {
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+pre, code {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+h1, h2, h3, h4, p, label, a, span, td, th {
+  overflow-wrap: break-word;
+}
+
+:where(.container, .page-container, .page-main, .admin-main, .pnl-main,
+       .main-content, .checkout-container, .cardapio-main, .cozinha-conteudo,
+       .atendente-conteudo, .entregador-conteudo) {
+  min-width: 0;
+  max-width: min(100% - (var(--fraga-page-gutter) * 2), var(--fraga-content-width));
+  margin-inline: auto;
+}
+
+:where(.table-container, .table-responsive, .tabela-container, .overflow-x-auto) {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+:where(.table-container, .table-responsive, .tabela-container) table {
+  width: 100%;
+  min-width: 620px;
+}
+
+:where(.form-row, .form-grid, .filters, .filtros, .toolbar, .page-actions,
+       .actions, .acoes, .header-actions, .modal-actions) {
+  min-width: 0;
+}
+
+:where(.form-grid, .stats-grid, .dashboard-grid, .cards-grid, .products-grid,
+       .produtos-grid, .menu-grid, .pedidos-grid, .metricas-grid) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+}
+
+:where(.card, .panel, .painel-card, .stat-card, .metric-card, .modal,
+       .form-card, .content-card) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+:where(.modal, .modal-content, .dialog, .popup) {
+  max-width: min(100% - 24px, 720px);
+}
+
+:where(input, select, textarea, .form-control, .campo, .input-group) {
+  max-width: 100%;
+}
+
+:where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+       select, textarea) {
+  min-height: var(--fraga-control-height);
+}
+
+@media (max-width: 1100px) {
+  :root { --fraga-page-gutter: 24px; }
+
+  :where(.container, .page-container, .page-main, .admin-main, .pnl-main,
+         .main-content, .checkout-container, .cardapio-main, .cozinha-conteudo,
+         .atendente-conteudo, .entregador-conteudo) {
+    width: calc(100% - (var(--fraga-page-gutter) * 2));
+  }
+
+  :where(.site-header, .pnl-header, .admin-header, header) {
+    max-width: 100%;
+  }
+
+  :where(.nav-menu, .pnl-nav, .admin-nav, nav) {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --fraga-page-gutter: 18px;
+    --fraga-control-height: 46px;
+  }
+
+  body {
+    font-size: 15px;
+  }
+
+  :where(.container, .page-container, .page-main, .admin-main, .pnl-main,
+         .main-content, .checkout-container, .cardapio-main, .cozinha-conteudo,
+         .atendente-conteudo, .entregador-conteudo) {
+    width: calc(100% - 36px);
+    max-width: 100%;
+  }
+
+  :where(.site-header, .pnl-header, .admin-header) {
+    padding-inline: var(--fraga-page-gutter);
+  }
+
+  :where(.nav-menu, .pnl-nav, .admin-nav) {
+    max-width: 100%;
+  }
+
+  :where(.page-header, .section-header, .content-header, .dashboard-header) {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  :where(.page-header, .section-header, .content-header, .dashboard-header) > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  :where(.toolbar, .filters, .filtros, .page-actions, .header-actions,
+         .form-actions, .modal-actions, .acoes) {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  :where(.toolbar, .filters, .filtros, .page-actions) > * {
+    min-width: min(100%, 150px);
+  }
+
+  :where(.stats-grid, .dashboard-grid, .cards-grid, .products-grid,
+         .produtos-grid, .menu-grid, .pedidos-grid, .metricas-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :where(.form-grid) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  :where(.table-container, .table-responsive, .tabela-container) {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  :where(.modal, .modal-content, .dialog, .popup) {
+    width: calc(100% - 24px);
+    max-height: calc(100dvh - 24px);
+    overflow: auto;
+    margin-inline: auto;
+  }
+
+  :where(.btn, button, [role="button"]) {
+    touch-action: manipulation;
+  }
+}
+
+@media (max-width: 520px) {
+  :root {
+    --fraga-page-gutter: 14px;
+    --fraga-control-height: 46px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+
+  :where(.container, .page-container, .page-main, .admin-main, .pnl-main,
+         .main-content, .checkout-container, .cardapio-main, .cozinha-conteudo,
+         .atendente-conteudo, .entregador-conteudo) {
+    width: calc(100% - 28px);
+  }
+
+  :where(.stats-grid, .dashboard-grid, .cards-grid, .products-grid,
+         .produtos-grid, .menu-grid, .pedidos-grid, .metricas-grid,
+         .form-grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  :where(.page-title, .section-title, .hero-conteudo h1) {
+    max-width: 100%;
+    font-size: clamp(1.45rem, 7vw, 2.25rem);
+    line-height: 1.12;
+  }
+
+  :where(.btn, button, input[type="submit"], input[type="button"]) {
+    min-height: 44px;
+  }
+
+  :where(.toolbar, .filters, .filtros, .page-actions, .header-actions) > * {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  :where(.form-row) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :where(.form-row > *, .form-group, .campo) {
+    min-width: 0;
+    width: 100%;
+  }
+
+  :where(.card, .panel, .painel-card, .stat-card, .metric-card, .form-card) {
+    padding: clamp(12px, 4vw, 18px);
+  }
+
+  :where(.table-container, .table-responsive, .tabela-container) {
+    margin-inline: 0;
+    border-radius: 10px;
+  }
+
+  :where(.modal, .modal-content, .dialog, .popup) {
+    width: calc(100% - 16px);
+    max-height: calc(100dvh - 16px);
+    padding: 16px;
+  }
+
+  :where(.site-header, .pnl-header, .admin-header) {
+    padding-inline: 14px;
+  }
+
+  :where(.nav-menu, .pnl-nav, .admin-nav) {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 360px) {
+  :root { --fraga-page-gutter: 10px; }
+
+  :where(.container, .page-container, .page-main, .admin-main, .pnl-main,
+         .main-content, .checkout-container, .cardapio-main, .cozinha-conteudo,
+         .atendente-conteudo, .entregador-conteudo) {
+    width: calc(100% - 20px);
+  }
+
+  :where(.btn, button) {
+    padding-inline: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
