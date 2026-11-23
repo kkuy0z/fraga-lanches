@@ -19,6 +19,8 @@ const elementos = {
 
   faturamentoHoje: document.getElementById("metricFaturamentoHoje"),
   faturamentoHojeSub: document.getElementById("metricFaturamentoSub"),
+  pedidosTotal: document.getElementById("metricPedidosTotal"),
+  faturamentoTotal: document.getElementById("metricFaturamentoTotal"),
 
   pedidosPendentes: document.getElementById("metricPendentes"),
   pedidosPendentesSub: document.getElementById("metricPendentesSub"),
@@ -187,6 +189,14 @@ function atualizarEstatisticas(dados) {
 
   if (elementos.faturamentoHojeSub) {
     elementos.faturamentoHojeSub.textContent = "Pagamentos aprovados hoje";
+  }
+
+  if (elementos.pedidosTotal) {
+    elementos.pedidosTotal.textContent = dados.pedidosTotal ?? 0;
+  }
+
+  if (elementos.faturamentoTotal) {
+    elementos.faturamentoTotal.textContent = formatarMoeda(dados.faturamentoTotal);
   }
 
   if (elementos.pedidosPendentes) {
