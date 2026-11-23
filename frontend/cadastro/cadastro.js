@@ -29,6 +29,19 @@ if (campoTelefone) {
     });
 }
 
+document.querySelectorAll(".input-icon-btn[data-alvo]").forEach((botao) => {
+    botao.addEventListener("click", () => {
+        const id = botao.dataset.alvo;
+        const campo = document.getElementById(id);
+        if (!campo) return;
+
+        const mostrar = campo.type === "password";
+        campo.type = mostrar ? "text" : "password";
+        botao.setAttribute("aria-label", mostrar ? "Ocultar senha" : "Mostrar senha");
+        botao.setAttribute("aria-pressed", String(mostrar));
+    });
+});
+
 const formCadastro = document.getElementById("form-cadastro");
 
 if (formCadastro) {
