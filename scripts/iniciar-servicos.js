@@ -1,6 +1,7 @@
 "use strict";
 
 const path = require("path");
+const fs = require("fs");
 const net = require("net");
 const { spawn } = require("child_process");
 
@@ -113,6 +114,11 @@ async function iniciar() {
   console.log("========================================");
 
   try {
+    const arquivoEnv = path.join(raiz, ".env");
+    if (!fs.existsSync(arquivoEnv)) {
+      throw new Error("Arquivo .env nao encontrado na raiz. Copie .env.example para .env e configure o MySQL e os segredos.");
+    }
+
     for (const servico of servicos) {
       if (await verificarPorta(servico.porta)) {
         console.log(
