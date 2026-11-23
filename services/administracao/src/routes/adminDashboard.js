@@ -5,6 +5,7 @@ const router = express.Router();
 
 const db = require("../database");
 const autenticarAdmin = require("../middleware/autenticarAdmin");
+const { consultarUsuarios, contarUsuarios } = require("../../../_shared/auth-client");
 
 router.use(autenticarAdmin);
 
@@ -21,7 +22,6 @@ router.get("/", async (req, res) => {
       [pedidosPendentes],
       [produtosAtivos],
       [categoriasAtivas],
-      [clientesCadastrados],
       [pedidosRecentes],
     ] = await Promise.all([
       // ------------------------------------------------
@@ -103,17 +103,6 @@ router.get("/", async (req, res) => {
       `),
 
       // ------------------------------------------------
-      // CLIENTES CADASTRADOS
-      // ------------------------------------------------
-
-      db.query(`
-        SELECT COUNT(*) AS total
-        FROM usuarios
-        WHERE tipo = 'cliente'
-          AND ativo = 1
-      `),
-
-      // ------------------------------------------------
       // ÚLTIMOS 8 PEDIDOS
       // ------------------------------------------------
 
@@ -123,16 +112,25 @@ router.get("/", async (req, res) => {
           p.data_pedido,
           p.status,
           p.total,
-          COALESCE(u.nome, 'Cliente não informado') AS cliente
+          p.usuario_id
         FROM pedidos p
-        LEFT JOIN usuarios u
-          ON u.id = p.usuario_id
         ORDER BY
           p.data_pedido DESC,
           p.id DESC
         LIMIT 8
       `),
     ]);
+
+    const clientesCadastrados = await contarUsuarios("cliente", 1);
+    const perfis = await consultarUsuarios(pedidosRecentes.map((pedido) => pedido.usuario_id).filter(Boolean));
+    const perfisPorId = new Map(perfis.map((usuario) => [Number(usuario.id), usuario]));
+    const pedidosRecentesComCliente = pedidosRecentes.map((pedido) => ({
+      id: pedido.id,
+      data_pedido: pedido.data_pedido,
+      status: pedido.status,
+      total: pedido.total,
+      cliente: perfisPorId.get(Number(pedido.usuario_id))?.nome || "Cliente não informado",
+    }));
 
     // ==================================================
     // RESPOSTA
@@ -146,10 +144,10 @@ router.get("/", async (req, res) => {
         pedidosPendentes: Number(pedidosPendentes[0].total || 0),
         produtosAtivos: Number(produtosAtivos[0].total || 0),
         categorias: Number(categoriasAtivas[0].total || 0),
-        clientes: Number(clientesCadastrados[0].total || 0),
+        clientes: clientesCadastrados,
       },
 
-      pedidosRecentes,
+      pedidosRecentes: pedidosRecentesComCliente,
     });
   } catch (erro) {
     console.error("Erro ao carregar dashboard:", erro);
