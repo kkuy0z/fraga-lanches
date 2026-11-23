@@ -129,6 +129,7 @@ router.get("/entregas", async (req, res) => {
           e.data_confirmacao_recebimento,
 
           p.id AS pedido_id,
+          p.usuario_id AS cliente_id,
           p.status AS status_pedido,
           p.data_pedido,
           p.tipo_entrega,
