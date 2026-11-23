@@ -3,6 +3,7 @@
 const express = require("express");
 const db = require("../database");
 const autenticar = require("../middleware/autenticar");
+const { parsePhoneNumberFromString } = require("libphonenumber-js/max");
 
 const router = express.Router();
 
@@ -113,6 +114,82 @@ router.get("/", async (req, res) => {
     return res.status(500).json({
       sucesso: false,
       mensagem: "Não foi possível carregar seu perfil.",
+    });
+  }
+});
+
+// ======================================================
+// ATUALIZAR DADOS PESSOAIS
+// PUT /api/cliente/perfil/dados
+// ======================================================
+
+router.put("/dados", async (req, res) => {
+  try {
+    const nome = String(req.body.nome || "").trim();
+    const telefoneInformado = String(req.body.telefone || "").trim();
+
+    if (nome.length < 2 || nome.length > 100) {
+      return res.status(400).json({
+        sucesso: false,
+        mensagem: "O nome deve ter entre 2 e 100 caracteres.",
+      });
+    }
+
+    let telefone = null;
+    if (telefoneInformado) {
+      const parsed = parsePhoneNumberFromString(
+        telefoneInformado,
+        telefoneInformado.startsWith("+") ? undefined : "BR",
+      );
+      if (
+        !parsed ||
+        !parsed.isValid() ||
+        parsed.number.replace(/\D/g, "").length > 15 ||
+        (parsed.country === "BR" && parsed.nationalNumber.length !== 11)
+      ) {
+        return res.status(400).json({
+          sucesso: false,
+          mensagem: "Número inválido. Confira o DDD e o código do país.",
+        });
+      }
+      telefone = parsed.number;
+    }
+
+    const [resultado] = await db.execute(
+      `UPDATE usuarios SET nome = ?, telefone = ?
+       WHERE id = ? AND tipo = 'cliente'`,
+      [nome, telefone, req.usuario.id],
+    );
+
+    if (!resultado.affectedRows) {
+      const [existente] = await db.execute(
+        "SELECT id FROM usuarios WHERE id = ? AND tipo = 'cliente' LIMIT 1",
+        [req.usuario.id],
+      );
+      if (!existente.length) {
+        return res.status(404).json({
+          sucesso: false,
+          mensagem: "Usuário não encontrado.",
+        });
+      }
+    }
+
+    const [usuarios] = await db.execute(
+      `SELECT id, nome, email, telefone FROM usuarios
+       WHERE id = ? AND tipo = 'cliente' LIMIT 1`,
+      [req.usuario.id],
+    );
+
+    return res.json({
+      sucesso: true,
+      mensagem: "Dados pessoais atualizados com sucesso.",
+      usuario: usuarios[0],
+    });
+  } catch (erro) {
+    console.error("Erro ao atualizar dados pessoais:", erro);
+    return res.status(500).json({
+      sucesso: false,
+      mensagem: "Não foi possível atualizar seus dados pessoais.",
     });
   }
 });
