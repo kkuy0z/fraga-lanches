@@ -101,7 +101,7 @@ app.patch("/internal/users/:id/profile", exigirServicoInterno, async (req, res) 
     return res.status(400).json({ mensagem: "Dados de perfil inválidos." });
   }
   if (telefone) {
-    const digitos = telefone.replace(/\\D/g, "");
+    const digitos = telefone.replace(/\D/g, "");
     if (digitos.length < 10 || digitos.length > 15) {
       return res.status(400).json({ mensagem: "Telefone inválido." });
     }
