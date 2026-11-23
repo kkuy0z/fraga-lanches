@@ -1,9 +1,10 @@
-const CACHE_NAME = "fraga-lanches-v2";
+const CACHE_NAME = "fraga-lanches-v3";
 
 const ARQUIVOS = [
   "/inicio.html",
   "/manifest.json",
   "/design-system.css",
+  "/responsive.css",
   "/cliente/painel.html",
   "/cliente/painel.js",
   "/cliente/cardapio.html",
