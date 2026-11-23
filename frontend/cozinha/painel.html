@@ -1,48 +1,994 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <link rel="manifest" href="/manifest.json">
- <meta name=theme-color content=#1a1a1a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
- <meta name=theme-color content=#1a1a1a>
-    
- 
-    
- 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/design-system.css">
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0c0c0c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches" />
+
+    <link rel="stylesheet" href="/design-system.css" />
+
     <title>Painel da Cozinha | Fraga Lanches</title>
-<link rel="icon" type="image/png" href="/assets/images/icons/logo.png">
-<link rel="apple-touch-icon" href="/assets/images/icons/logo.png">
-</head>
-<body>
+
+    <link rel="icon" type="image/png" href="/assets/images/icons/logo.png" />
+    <link rel="apple-touch-icon" href="/assets/images/icons/logo.png" />
+
+    <!-- Fontes do design-system -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ==========================================
+         PAINEL DA COZINHA · minimalista
+         Usa os tokens do /design-system.css
+         ========================================== */
+      :root {
+        --surface: rgba(255, 255, 255, 0.035);
+        --surface-hover: rgba(255, 255, 255, 0.055);
+        --line: rgba(255, 255, 255, 0.08);
+        --line-strong: rgba(255, 255, 255, 0.16);
+        --cor: var(--color-accent);
+      }
+
+      html {
+        overflow-x: clip;
+      }
+
+      body {
+        background: var(--color-bg-primary);
+        font-size: var(--fs-sm);
+        line-height: 1.5;
+        overflow-x: clip;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      /* Cores por status (usadas por tickets, selos e colunas) */
+      .status-novo {
+        --cor: var(--color-accent);
+      }
+      .status-em_preparo {
+        --cor: var(--color-warning);
+      }
+      .status-pronto {
+        --cor: var(--color-info);
+      }
+      .status-saiu_para_entrega {
+        --cor: #b388ff;
+      }
+      .status-concluido {
+        --cor: var(--color-success);
+      }
+      .status-cancelado {
+        --cor: var(--color-error);
+      }
+
+      /* ==========================================
+         HEADER
+         ========================================== */
+      body > header {
+        position: sticky;
+        top: 0;
+        z-index: var(--z-header);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+        padding: var(--space-4) var(--container-padding);
+        border-bottom: 1px solid var(--line);
+        background: rgba(12, 12, 12, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      body > header h1 {
+        color: var(--color-accent);
+        font-family: var(--font-heading);
+        font-size: var(--fs-2xl);
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      body > header > div:last-child {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+      }
+
+      #nome-usuario {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-1) var(--space-3);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-full);
+        color: var(--color-text-muted);
+        font-size: var(--fs-xs);
+        font-weight: 500;
+      }
+
+      #nome-usuario::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--color-success);
+      }
+
+      #nome-usuario:empty {
+        display: none;
+      }
+
+      /* ==========================================
+         BOTÕES
+         ========================================== */
+      #btn-sair,
+      #btn-atualizar,
+      .btn-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 40px;
+        padding: var(--space-2) var(--space-4);
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius-sm);
+        background: transparent;
+        color: var(--color-text-primary);
+        font-family: var(--font-mono);
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+          background-color var(--transition-fast),
+          border-color var(--transition-fast),
+          color var(--transition-fast);
+      }
+
+      #btn-sair:hover {
+        border-color: var(--color-error);
+        color: var(--color-error);
+      }
+
+      #btn-atualizar,
+      .btn-status {
+        border-color: var(--color-accent);
+        background: var(--color-accent);
+        color: var(--color-bg-primary);
+      }
+
+      #btn-atualizar:hover:not(:disabled),
+      .btn-status:hover:not(:disabled) {
+        border-color: var(--color-accent-dark);
+        background: var(--color-accent-dark);
+      }
+
+      .btn-status[data-status="pronto"] {
+        border-color: var(--color-success);
+        background: var(--color-success);
+      }
+
+      .btn-status[data-status="pronto"]:hover:not(:disabled) {
+        border-color: color-mix(in srgb, var(--color-success) 80%, #000);
+        background: color-mix(in srgb, var(--color-success) 80%, #000);
+      }
+
+      .btn-status:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* ==========================================
+         CONTEÚDO (neutraliza `section {}` global do design-system)
+         ========================================== */
+      .cozinha-conteudo {
+        width: 100%;
+        max-width: 1480px;
+        margin: 0 auto;
+        padding: var(--space-10) clamp(1rem, 2vw, 2rem) var(--space-16);
+      }
+
+      .cozinha-conteudo section {
+        position: static;
+        display: block;
+        width: 100%;
+        min-height: 0;
+        padding: 0;
+        overflow: visible;
+        background: transparent;
+      }
+
+      .cozinha-cabecalho {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-5);
+        margin-bottom: var(--space-10);
+        padding-bottom: var(--space-6);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .cozinha-titulo-linha {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-bottom: var(--space-2);
+      }
+
+      .cozinha-traco {
+        width: 24px;
+        height: 2px;
+        background: var(--color-accent);
+      }
+
+      .cozinha-tag {
+        color: var(--color-accent);
+        font-family: var(--font-title);
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      .cozinha-cabecalho h2 {
+        margin-bottom: var(--space-1);
+        font-family: var(--font-heading);
+        font-size: var(--fs-3xl);
+        font-weight: 400;
+        line-height: 1.05;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .cozinha-cabecalho p {
+        color: var(--color-text-dim);
+        font-size: var(--fs-xs);
+      }
+
+      .cozinha-cabecalho > div:last-child {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+      }
+
+      /* Títulos de seção */
+      .cozinha-secao + .cozinha-secao {
+        margin-top: var(--space-12);
+      }
+
+      .cozinha-secao-topo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+      }
+
+      .cozinha-secao-topo h3 {
+        color: var(--color-text-primary);
+        font-family: var(--font-title);
+        font-size: var(--fs-lg);
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .cozinha-dica {
+        color: var(--color-text-dim);
+        font-size: var(--fs-xs);
+      }
+
+      /* ==========================================
+         OS 3 CARDS
+         ========================================== */
+      .cozinha-quadro {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: var(--space-5);
+        align-items: start;
+      }
+
+      .cozinha-coluna {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .cozinha-coluna-topo {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding: var(--space-5) var(--space-5) var(--space-4);
+      }
+
+      .cozinha-coluna-topo h4 {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--color-text-primary);
+        font-family: var(--font-title);
+        font-size: var(--fs-sm);
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .cozinha-coluna-topo h4::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--cor);
+      }
+
+      .cozinha-coluna-topo p {
+        margin-top: 2px;
+        color: var(--color-text-dim);
+        font-size: var(--fs-xs);
+      }
+
+      .cozinha-coluna-topo strong {
+        color: var(--cor);
+        font-family: var(--font-heading);
+        font-size: var(--fs-3xl);
+        font-weight: 400;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .cozinha-fila {
+        display: grid;
+        align-content: start;
+        gap: var(--space-3);
+        min-height: 200px;
+        max-height: max(440px, calc(100dvh - 340px));
+        padding: 0 var(--space-4) var(--space-4);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--line-strong) transparent;
+      }
+
+      .cozinha-vazio {
+        padding: var(--space-10) var(--space-4);
+        border: 1px dashed var(--line);
+        border-radius: var(--radius-md);
+        color: var(--color-text-dim);
+        font-size: var(--fs-xs);
+        text-align: center;
+      }
+
+      /* ==========================================
+         TICKET DE PEDIDO
+         ========================================== */
+      .cozinha-ticket {
+        display: grid;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--cor);
+        border-radius: var(--radius-md);
+        background: var(--surface);
+        transition:
+          background-color var(--transition-fast),
+          border-color var(--transition-fast);
+      }
+
+      .cozinha-ticket:hover {
+        background: var(--surface-hover);
+        border-color: var(--line-strong);
+        border-left-color: var(--cor);
+      }
+
+      .cozinha-ticket.destaque {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+      }
+
+      .ticket-topo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+      }
+
+      .ticket-numero {
+        color: var(--color-text-primary);
+        font-family: var(--font-heading);
+        font-size: var(--fs-xl);
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: 0.04em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .ticket-tempo {
+        display: inline-flex;
+        align-items: baseline;
+        gap: var(--space-2);
+        color: var(--color-text-dim);
+        font-size: 11px;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .ticket-tempo strong {
+        color: var(--color-text-secondary);
+        font-weight: 600;
+      }
+
+      .ticket-cliente {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-2) var(--space-3);
+        color: var(--color-text-primary);
+        font-size: var(--fs-sm);
+        font-weight: 600;
+      }
+
+      .ticket-tipo {
+        padding: 1px var(--space-2);
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius-sm);
+        color: var(--color-text-muted);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .cozinha-itens {
+        display: grid;
+        gap: var(--space-2);
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--line);
+        list-style: none;
+      }
+
+      .cozinha-itens li {
+        color: var(--color-text-primary);
+        font-size: var(--fs-base);
+        font-weight: 500;
+        line-height: 1.35;
+      }
+
+      .cozinha-itens li strong {
+        margin-right: var(--space-2);
+        color: var(--color-accent);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .cozinha-itens li small {
+        display: block;
+        margin-top: 2px;
+        padding-left: var(--space-3);
+        border-left: 2px solid var(--line-strong);
+        color: var(--color-text-muted);
+        font-size: var(--fs-xs);
+        font-weight: 400;
+      }
+
+      .cozinha-obs {
+        display: block;
+        padding: var(--space-2) var(--space-3);
+        border-left: 3px solid var(--color-warning);
+        border-radius: var(--radius-sm);
+        background: rgba(255, 152, 0, 0.08);
+        color: var(--color-text-primary);
+        font-size: var(--fs-xs);
+        line-height: 1.45;
+      }
+
+      .cozinha-sem-obs {
+        color: var(--color-text-dim);
+        font-size: var(--fs-xs);
+      }
+
+      .cozinha-ticket .btn-status {
+        width: 100%;
+        min-height: 44px;
+        white-space: normal;
+      }
+
+      /* ==========================================
+         HISTÓRICO
+         ========================================== */
+      .cozinha-busca {
+        flex: 1 1 220px;
+        max-width: 320px;
+      }
+
+      .cozinha-busca input {
+        width: 100%;
+        min-height: 38px;
+        padding: var(--space-2) var(--space-4);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        background: var(--surface);
+        color: var(--color-text-primary);
+        font-size: var(--fs-xs);
+        transition: border-color var(--transition-fast);
+      }
+
+      .cozinha-busca input::placeholder {
+        color: var(--color-text-dim);
+      }
+
+      .cozinha-busca input:focus {
+        outline: none;
+        border-color: var(--color-accent);
+      }
+
+      .tabela-pedidos-wrapper {
+        max-height: 480px;
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        scrollbar-width: thin;
+        scrollbar-color: var(--line-strong) transparent;
+      }
+
+      .tabela-pedidos {
+        width: 100%;
+        min-width: 720px;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: var(--fs-xs);
+      }
+
+      .tabela-pedidos thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--line-strong);
+        background: #151515;
+        color: var(--color-text-dim);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-align: left;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .tabela-pedidos tbody td {
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--line);
+        color: var(--color-text-secondary);
+        vertical-align: middle;
+      }
+
+      .tabela-pedidos tbody tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .tabela-pedidos tbody tr:hover {
+        background: var(--surface-hover);
+      }
+
+      tr.destaque td {
+        background: rgba(255, 193, 7, 0.12);
+      }
+
+      .tabela-pedido-identificacao {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      .tabela-pedido-identificacao > strong {
+        min-width: 48px;
+        color: var(--color-text-primary);
+        font-family: var(--font-heading);
+        font-size: var(--fs-base);
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .pedido-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px var(--space-3);
+        border: 1px solid color-mix(in srgb, var(--cor) 40%, transparent);
+        border-radius: var(--radius-full);
+        color: var(--cor);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .pedido-status::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .tabela-cliente {
+        display: block;
+        max-width: 220px;
+        overflow: hidden;
+        color: var(--color-text-primary);
+        font-weight: 500;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .tabela-data {
+        color: var(--color-text-dim);
+        white-space: nowrap;
+      }
+
+      .tabela-modalidade {
+        color: var(--color-text-secondary);
+      }
+
+      .tabela-itens-resumo {
+        display: block;
+        max-width: 420px;
+        overflow: hidden;
+        color: var(--color-text-muted);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .tabela-rodape {
+        padding-top: var(--space-3);
+        color: var(--color-text-dim);
+        font-size: var(--fs-xs);
+      }
+
+      .tabela-rodape strong {
+        color: var(--color-text-primary);
+      }
+
+      /* ==========================================
+         NOTIFICAÇÕES
+         ========================================== */
+      .fraga-notificacao {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        z-index: var(--z-dropdown);
+      }
+
+      .fraga-sino {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid var(--line-strong);
+        border-radius: 50%;
+        color: var(--color-accent);
+        font-size: var(--fs-lg);
+        cursor: pointer;
+        transition: background-color var(--transition-fast);
+      }
+
+      .fraga-sino:hover {
+        background: var(--surface-hover);
+      }
+
+      .fraga-contador {
+        position: absolute;
+        top: -5px;
+        right: -6px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border: 2px solid var(--color-bg-primary);
+        border-radius: var(--radius-full);
+        background: var(--color-error);
+        color: var(--color-bg-primary);
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .fraga-painel-notificacoes {
+        position: absolute;
+        top: 50px;
+        right: 0;
+        display: none;
+        width: 360px;
+        max-width: calc(100vw - 24px);
+        max-height: 440px;
+        overflow-y: auto;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius-lg);
+        background: var(--color-bg-secondary);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+        z-index: var(--z-modal-backdrop);
+      }
+
+      .fraga-painel-notificacoes.aberto {
+        display: block;
+      }
+
+      .fraga-notificacoes-topo {
+        position: sticky;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        border-bottom: 1px solid var(--line);
+        background: var(--color-bg-secondary);
+      }
+
+      .fraga-notificacoes-topo strong {
+        color: var(--color-text-primary);
+        font-family: var(--font-title);
+        font-size: var(--fs-xs);
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .fraga-marcar-todas {
+        color: var(--color-info);
+        font-size: var(--fs-xs);
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .fraga-marcar-todas:hover {
+        text-decoration: underline;
+      }
+
+      .fraga-notificacao-item {
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--line);
+        cursor: pointer;
+        transition: background-color var(--transition-fast);
+      }
+
+      .fraga-notificacao-item:last-child {
+        border-bottom: 0;
+      }
+
+      .fraga-notificacao-item:hover {
+        background: var(--surface-hover);
+      }
+
+      .fraga-notificacao-item.nao-lida {
+        border-left: 3px solid var(--color-accent);
+        background: rgba(255, 193, 7, 0.06);
+      }
+
+      .fraga-notificacao-item strong {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--color-text-primary);
+        font-size: var(--fs-sm);
+      }
+
+      .fraga-notificacao-item p {
+        margin: 0 0 6px;
+        color: var(--color-text-muted);
+        font-size: var(--fs-xs);
+      }
+
+      .fraga-notificacao-item small {
+        color: var(--color-text-dim);
+        font-size: 11px;
+      }
+
+      .fraga-notificacao-vazia {
+        padding: var(--space-6) var(--space-4);
+        color: var(--color-text-muted);
+        font-size: var(--fs-sm);
+        text-align: center;
+      }
+
+      /* ==========================================
+         RESPONSIVO
+         ========================================== */
+      @media (max-width: 1024px) {
+        .cozinha-cabecalho {
+          margin-bottom: var(--space-8);
+        }
+      }
+
+      @media (max-width: 720px) {
+        body > header {
+          padding: var(--space-3) var(--container-padding);
+        }
+
+        .cozinha-conteudo {
+          padding-top: var(--space-6);
+        }
+
+        .cozinha-quadro {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .cozinha-fila {
+          max-height: none;
+        }
+
+        .cozinha-cabecalho > div:last-child,
+        #btn-atualizar {
+          width: 100%;
+        }
+
+        .cozinha-busca {
+          flex: 1 1 100%;
+          max-width: none;
+        }
+
+        .cozinha-secao + .cozinha-secao {
+          margin-top: var(--space-10);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .fraga-painel-notificacoes {
+          position: fixed;
+          top: 68px;
+          left: var(--space-3);
+          right: var(--space-3);
+          width: auto;
+          max-width: none;
+        }
+      }
+
+      @supports not (backdrop-filter: blur(1px)) {
+        body > header {
+          background: var(--color-bg-primary);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
     <header>
-        <h1>Fraga Lanches</h1>
-        <button id="btn-sair">Sair</button>
+      <h1>Fraga Lanches</h1>
+      <div>
+        <span id="nome-usuario"></span>
+        <button id="btn-sair" type="button">Sair</button>
+      </div>
     </header>
-    <main>
-        <h2>ÃƒÂrea da Cozinha</h2>
-<p>Gerenciamento dos pedidos para preparo.</p>
-<section>
-    <h3>Pedidos recebidos</h3>
-    <div id="pedidos">
-        <p>Aguardando integraÃƒÂ§ÃƒÂ£o com a rota de pedidos.</p>
-    </div>
-</section>
+
+    <main class="cozinha-conteudo">
+      <div class="cozinha-cabecalho">
+        <div>
+          <div class="cozinha-titulo-linha">
+            <span class="cozinha-traco" aria-hidden="true"></span>
+            <span class="cozinha-tag">Produção e Preparo</span>
+          </div>
+          <h2>Área da Cozinha</h2>
+          <p>Gerenciamento dos pedidos para preparo em tempo real.</p>
+        </div>
+
+        <div>
+          <button id="btn-atualizar" type="button">Atualizar pedidos</button>
+        </div>
+      </div>
+
+      <!-- PEDIDOS EM ANDAMENTO: 3 cards -->
+      <section class="cozinha-secao" aria-label="Pedidos em andamento">
+        <div class="cozinha-secao-topo">
+          <h3>Pedidos em andamento</h3>
+          <span class="cozinha-dica">Mais recentes primeiro</span>
+        </div>
+
+        <div class="cozinha-quadro">
+          <article class="cozinha-coluna status-novo">
+            <div class="cozinha-coluna-topo">
+              <div>
+                <h4>Novos</h4>
+                <p>Aguardando início do preparo</p>
+              </div>
+              <strong id="total-novos">0</strong>
+            </div>
+            <div id="fila-novos" class="cozinha-fila" aria-live="polite">
+              <p class="cozinha-vazio">Carregando pedidos...</p>
+            </div>
+          </article>
+
+          <article class="cozinha-coluna status-em_preparo">
+            <div class="cozinha-coluna-topo">
+              <div>
+                <h4>Em preparo</h4>
+                <p>Em produção na cozinha</p>
+              </div>
+              <strong id="total-preparo">0</strong>
+            </div>
+            <div id="fila-preparo" class="cozinha-fila" aria-live="polite">
+              <p class="cozinha-vazio">Carregando pedidos...</p>
+            </div>
+          </article>
+
+          <article class="cozinha-coluna status-pronto">
+            <div class="cozinha-coluna-topo">
+              <div>
+                <h4>Prontos</h4>
+                <p>Aguardando atendimento</p>
+              </div>
+              <strong id="total-prontos">0</strong>
+            </div>
+            <div id="fila-prontos" class="cozinha-fila" aria-live="polite">
+              <p class="cozinha-vazio">Carregando pedidos...</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- HISTÓRICO -->
+      <section class="cozinha-secao" aria-label="Histórico de pedidos">
+        <div class="cozinha-secao-topo">
+          <h3>Histórico</h3>
+
+          <div class="cozinha-busca">
+            <input
+              type="search"
+              id="busca-historico"
+              placeholder="Buscar por número ou cliente..."
+              aria-label="Buscar no histórico por número ou cliente"
+            />
+          </div>
+        </div>
+
+        <div id="historico" aria-live="polite">
+          <p class="cozinha-vazio">Carregando histórico...</p>
+        </div>
+      </section>
     </main>
+
     <script src="painel.js"></script>
-<script src="/pwa.js"></script>
 
-<script>
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js")
-            .catch(erro => console.error("Erro ao registrar Service Worker:", erro));
-    });
-}
-</script>
-</body>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .catch((erro) =>
+              console.error("Erro ao registrar Service Worker:", erro),
+            );
+        });
+      }
+    </script>
+  </body>
 </html>
-
-

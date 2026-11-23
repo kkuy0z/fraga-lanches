@@ -166,7 +166,7 @@
         background-color: var(--chk-yellow);
       }
 
-      /* Etapas / Progresso */
+      /* Etapas */
       .checkout-progress {
         width: 100%;
         max-width: 1200px;
@@ -231,7 +231,7 @@
         background-color: #2f2f2f;
       }
 
-      /* Área principal e grid */
+      /* Área principal */
       .checkout-main {
         width: 100%;
         padding: 14px 20px 64px;
@@ -414,7 +414,7 @@
         cursor: not-allowed;
       }
 
-      /* Resumo lateral e confirmação */
+      /* Resumo */
       .checkout-resumo .card {
         border: 1px solid #2b2b2b;
         border-radius: 14px;
@@ -467,7 +467,7 @@
         color: var(--chk-yellow);
       }
 
-      /* Modal de sucesso */
+      /* Modal */
       .modal-overlay {
         position: fixed;
         inset: 0;
@@ -480,9 +480,16 @@
         backdrop-filter: blur(5px);
       }
 
+      /* Garante que o modal comece fechado */
+      .modal-overlay.hidden {
+        display: none !important;
+      }
+
       .modal {
         width: 100%;
-        max-width: 420px;
+        max-width: 480px;
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
         border: 1px solid rgba(245, 197, 66, 0.3);
         border-radius: 14px;
         background-color: var(--chk-card);
@@ -510,6 +517,99 @@
         font-size: 13px;
       }
 
+      /* Pagamento PIX */
+      .pix-container {
+        display: none;
+        margin-top: 20px;
+        padding: 16px;
+        border: 1px solid rgba(245, 197, 66, 0.25);
+        border-radius: 12px;
+        background: #121212;
+      }
+
+      .pix-container.ativo {
+        display: block;
+      }
+
+      .pix-titulo {
+        margin: 0 0 8px;
+        color: var(--chk-yellow);
+        font-size: 17px;
+        font-weight: 700;
+      }
+
+      .pix-descricao {
+        color: var(--chk-muted) !important;
+        font-size: 12px !important;
+        line-height: 1.5;
+      }
+
+      .pix-qr-area {
+        display: flex;
+        justify-content: center;
+        margin: 16px auto;
+        padding: 12px;
+        width: fit-content;
+        border-radius: 10px;
+        background: #fff;
+      }
+
+      .pix-qr-area img {
+        display: block;
+        width: 220px;
+        max-width: 100%;
+        height: auto;
+      }
+
+      .pix-valor {
+        margin: 12px 0 !important;
+        color: var(--chk-yellow) !important;
+        font-size: 22px !important;
+        font-weight: 700;
+      }
+
+      .pix-temporizador {
+        margin: 12px 0;
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(245, 197, 66, 0.08);
+        color: var(--chk-yellow);
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .pix-campo {
+        width: 100%;
+        min-height: 75px;
+        padding: 10px;
+        border: 1px solid #383838;
+        border-radius: 8px;
+        background: #0c0c0c;
+        color: #fff;
+        font-size: 11px;
+        resize: none;
+        overflow-wrap: anywhere;
+      }
+
+      .pix-chave {
+        margin: 8px 0;
+        color: #fff !important;
+        font-size: 12px !important;
+        overflow-wrap: anywhere;
+      }
+
+      .pix-aviso {
+        margin-top: 14px !important;
+        color: #ffcf75 !important;
+        font-size: 11px !important;
+        line-height: 1.5;
+      }
+
+      .pix-expirado {
+        color: #ff7777 !important;
+        font-weight: 700;
+      }
+
       @media (max-width: 920px) {
         .checkout-layout {
           grid-template-columns: minmax(0, 1fr);
@@ -530,6 +630,137 @@
           flex: 1;
         }
       }
+
+      /* Central de notificações */
+      .fraga-notificacao {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 12px;
+        z-index: 9999;
+      }
+
+      .fraga-sino {
+        position: relative;
+        width: 42px;
+        height: 42px;
+        border: 1px solid #333;
+        border-radius: 50%;
+        background: #1a1a1a;
+        color: #fff;
+        cursor: pointer;
+        font-size: 21px;
+      }
+
+      .fraga-sino:hover {
+        background: #292929;
+      }
+
+      .fraga-contador {
+        position: absolute;
+        top: -4px;
+        right: -5px;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 4px;
+        border-radius: 20px;
+        background: #e53935;
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .fraga-painel-notificacoes {
+        position: absolute;
+        top: 50px;
+        right: 0;
+        width: 340px;
+        max-width: calc(100vw - 30px);
+        max-height: 420px;
+        overflow-y: auto;
+        background: #171717;
+        color: #fff;
+        border: 1px solid #333;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px #0008;
+        display: none;
+        z-index: 10000;
+      }
+
+      .fraga-painel-notificacoes.aberto {
+        display: block;
+      }
+
+      .fraga-notificacoes-topo {
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #333;
+      }
+
+      .fraga-notificacoes-topo strong {
+        font-size: 14px;
+      }
+
+      .fraga-marcar-todas {
+        background: none;
+        border: none;
+        color: #44b7f8;
+        cursor: pointer;
+        font-size: 11px;
+      }
+
+      .fraga-notificacao-item {
+        padding: 13px 15px;
+        border-bottom: 1px solid #292929;
+        cursor: pointer;
+      }
+
+      .fraga-notificacao-item:hover {
+        background: #242424;
+      }
+
+      .fraga-notificacao-item.nao-lida {
+        border-left: 3px solid #44b7f8;
+        background: #202a30;
+      }
+
+      .fraga-notificacao-item strong {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+
+      .fraga-notificacao-item p {
+        font-size: 12px;
+        color: #ccc;
+        margin: 0 0 6px;
+      }
+
+      .fraga-notificacao-item small {
+        font-size: 10px;
+        color: #888;
+      }
+
+      .fraga-notificacao-vazia {
+        padding: 25px 15px;
+        text-align: center;
+        color: #999;
+        font-size: 13px;
+      }
+
+      @media (max-width: 480px) {
+        .fraga-painel-notificacoes {
+          position: fixed;
+          top: 75px;
+          right: 10px;
+        }
+      }
     </style>
   </head>
 
@@ -539,7 +770,9 @@
         ← Voltar ao cardápio
       </a>
 
-      <a href="/cliente/painel.html" class="btn-voltar"> Painel do cliente </a>
+      <a href="/cliente/painel.html" class="btn-voltar" id="linkPainelCliente">
+        Painel do cliente
+      </a>
     </div>
 
     <section class="page-header">
@@ -580,9 +813,9 @@
         <form id="checkoutForm" novalidate>
           <div class="checkout-layout">
             <section class="checkout-form-section">
+              <!-- ETAPA 1 -->
               <fieldset class="checkout-step" id="step1">
                 <legend class="step-title">Entrega ou Retirada</legend>
-
                 <div class="form-group">
                   <label class="form-label" for="tipoEntrega">
                     Tipo de pedido
@@ -600,8 +833,7 @@
                 </div>
 
                 <div id="enderecoCampos">
-                  <!-- Endereços cadastrados no perfil -->
-                  <div class="endereco-salvo-area">
+                  <div class="endereco-salvo-area" id="enderecoSalvoArea">
                     <div class="form-group">
                       <label class="form-label" for="enderecoSalvo">
                         Meus endereços cadastrados
@@ -660,13 +892,11 @@
                   <div class="form-row">
                     <div class="form-group">
                       <label class="form-label" for="rua">Rua</label>
-
                       <input type="text" id="rua" class="form-input" required />
                     </div>
 
                     <div class="form-group">
                       <label class="form-label" for="numero">Número</label>
-
                       <input
                         type="text"
                         id="numero"
@@ -680,14 +910,12 @@
                     <label class="form-label" for="complemento">
                       Complemento
                     </label>
-
                     <input type="text" id="complemento" class="form-input" />
                   </div>
 
                   <div class="form-row">
                     <div class="form-group">
                       <label class="form-label" for="bairro">Bairro</label>
-
                       <input
                         type="text"
                         id="bairro"
@@ -698,7 +926,6 @@
 
                     <div class="form-group">
                       <label class="form-label" for="cidade">Cidade</label>
-
                       <input
                         type="text"
                         id="cidade"
@@ -713,7 +940,6 @@
                   <label class="form-label" for="referencia">
                     Ponto de referência
                   </label>
-
                   <input type="text" id="referencia" class="form-input" />
                 </div>
 
@@ -728,6 +954,7 @@
                 </div>
               </fieldset>
 
+              <!-- ETAPA 2 -->
               <fieldset class="checkout-step hidden" id="step2">
                 <legend class="step-title">Forma de Pagamento</legend>
 
@@ -792,6 +1019,7 @@
                 </div>
               </fieldset>
 
+              <!-- ETAPA 3 -->
               <fieldset class="checkout-step hidden" id="step3">
                 <legend class="step-title">Confirmar Pedido</legend>
 
@@ -826,6 +1054,7 @@
               </fieldset>
             </section>
 
+            <!-- RESUMO DO PEDIDO -->
             <aside class="checkout-resumo">
               <div class="card">
                 <div class="card-content">
@@ -855,25 +1084,100 @@
       </div>
     </main>
 
+    <!-- ÚNICO MODAL DE SUCESSO -->
     <div
       class="modal-overlay hidden"
       id="sucessoModal"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="tituloSucesso"
+      aria-hidden="true"
       style="display: none"
     >
       <div class="modal modal-sm">
         <div class="modal-body">
-          <h2>Pedido registrado!</h2>
+          <h2 id="tituloSucesso">Pedido registrado!</h2>
 
-          <p>Seu pedido foi recebido.</p>
+          <p id="mensagemSucesso">Seu pedido foi recebido.</p>
 
           <p id="pedidoNumero"></p>
 
+          <!-- PAGAMENTO PIX -->
+          <div id="pixContainer" class="pix-container">
+            <h3 class="pix-titulo">Pagamento via PIX</h3>
+
+            <p class="pix-descricao">
+              Escaneie o QR Code pelo aplicativo do seu banco ou copie o código
+              PIX.
+            </p>
+
+            <div class="pix-qr-area">
+              <img id="pixQrCode" src="" alt="QR Code para pagamento PIX" />
+            </div>
+
+            <p class="pix-valor" id="pixValor">R$ 0,00</p>
+
+            <p class="pix-descricao">Tempo restante para pagamento:</p>
+
+            <div id="pixTemporizador" class="pix-temporizador">05:00</div>
+
+            <p class="pix-descricao">Chave PIX:</p>
+
+            <p id="pixChave" class="pix-chave"></p>
+
+            <button
+              type="button"
+              id="btnCopiarPixChave"
+              class="btn btn-secondary"
+              style="width: 100%; margin-bottom: 12px"
+            >
+              Copiar chave PIX
+            </button>
+
+            <p class="pix-descricao">Código PIX copia e cola:</p>
+
+            <textarea
+              id="pixCopiaECola"
+              class="pix-campo"
+              readonly
+              aria-label="Código PIX copia e cola"
+            ></textarea>
+
+            <button
+              type="button"
+              id="btnCopiarPix"
+              class="btn btn-primary"
+              style="width: 100%; margin-top: 10px"
+            >
+              Copiar código PIX
+            </button>
+
+            <p class="pix-aviso">
+              O pagamento precisa ser realizado em até 5 minutos. Após esse
+              prazo, o pedido será cancelado automaticamente caso continue
+              pendente. A confirmação depende da verificação do estabelecimento.
+            </p>
+            <button
+              type="button"
+              id="btnCancelarPix"
+              class="btn btn-secondary"
+              style="width: 100%; margin-top: 12px"
+            >
+              Cancelar PIX e fazer outro pedido
+            </button>
+
+            <p class="pix-aviso">
+              Ao cancelar, não utilize o código PIX anterior. Se você já iniciou
+              um pagamento no banco, confira a situação antes de fazer outro
+              pedido.
+            </p>
+          </div>
+
           <a
+            id="linkMeusPedidos"
             href="/cliente/meus-pedidos.html"
             class="btn btn-primary btn-block"
-            style="width: 100%; margin-top: 10px"
+            style="width: 100%; margin-top: 16px"
           >
             Ver Meus Pedidos
           </a>

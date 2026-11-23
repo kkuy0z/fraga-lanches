@@ -686,3 +686,265 @@ document.addEventListener("DOMContentLoaded", () => {
 
   iniciar();
 });
+
+
+
+/* =====================================================
+   CENTRAL DE NOTIFICAÇÕES FRAGA LANCHES
+   ===================================================== */
+(function () {
+    "use strict";
+
+    if (window.fragaNotificacoesIniciado) return;
+    window.fragaNotificacoesIniciado = true;
+
+    function iniciarNotificacoes() {
+        const cabecalho = document.querySelector(".header-actions");
+
+        if (!cabecalho) return;
+
+        if (document.querySelector(".fraga-notificacao")) return;
+
+        const container = document.createElement("div");
+        container.className = "fraga-notificacao";
+
+        const botao = document.createElement("button");
+        botao.className = "fraga-sino";
+        botao.type = "button";
+        botao.setAttribute("aria-label", "Notificações");
+        botao.setAttribute("title", "Notificações");
+        botao.textContent = "🔔";
+
+        const contador = document.createElement("span");
+        contador.className = "fraga-contador";
+
+        const painel = document.createElement("div");
+        painel.className = "fraga-painel-notificacoes";
+
+        const topo = document.createElement("div");
+        topo.className = "fraga-notificacoes-topo";
+
+        const titulo = document.createElement("strong");
+        titulo.textContent = "Notificações";
+
+        const marcarTodas = document.createElement("button");
+        marcarTodas.className = "fraga-marcar-todas";
+        marcarTodas.type = "button";
+        marcarTodas.textContent = "Marcar todas como lidas";
+
+        const lista = document.createElement("div");
+        lista.className = "fraga-lista-notificacoes";
+
+        topo.append(titulo, marcarTodas);
+        painel.append(topo, lista);
+        container.append(botao, contador, painel);
+
+        cabecalho.prepend(container);
+
+        let notificacoes = [];
+
+        function atualizarContador(valor) {
+            const quantidade = Number(valor) || 0;
+
+            contador.textContent = quantidade > 99 ? "99+" : quantidade;
+            contador.style.display = quantidade > 0 ? "flex" : "none";
+        }
+
+        function formatarData(data) {
+            if (!data) return "";
+
+            const dataValida = new Date(data);
+
+            if (Number.isNaN(dataValida.getTime())) return "";
+
+            return dataValida.toLocaleString("pt-BR");
+        }
+
+        function renderizar(dados) {
+            lista.replaceChildren();
+
+            if (!Array.isArray(dados) || dados.length === 0) {
+                const vazio = document.createElement("div");
+                vazio.className = "fraga-notificacao-vazia";
+                vazio.textContent = "Nenhuma notificação encontrada.";
+                lista.appendChild(vazio);
+                return;
+            }
+
+            dados.forEach(function (notificacao) {
+                const item = document.createElement("div");
+
+                item.className = "fraga-notificacao-item";
+
+                if (!Number(notificacao.lida)) {
+                    item.classList.add("nao-lida");
+                }
+
+                const tituloItem = document.createElement("strong");
+                tituloItem.textContent = notificacao.titulo || "Notificação";
+
+                const mensagem = document.createElement("p");
+                mensagem.textContent = notificacao.mensagem || "";
+
+                const data = document.createElement("small");
+                data.textContent = formatarData(notificacao.data_criacao);
+
+                item.append(tituloItem, mensagem, data);
+
+                if (!Number(notificacao.lida)) {
+                    item.addEventListener("click", async function () {
+                        try {
+                            const resposta = await fetch(
+                                "/api/notificacoes/" +
+                                encodeURIComponent(notificacao.id) +
+                                "/lida",
+                                {
+                                    method: "PATCH",
+                                    credentials: "same-origin"
+                                }
+                            );
+
+                            if (resposta.ok) {
+                                await carregarNotificacoes();
+                            }
+                        } catch (erro) {
+                            console.error(
+                                "[Notificações] Erro ao marcar como lida:",
+                                erro
+                            );
+                        }
+                    });
+                }
+
+                lista.appendChild(item);
+            });
+        }
+
+        async function carregarNotificacoes() {
+            try {
+                const resposta = await fetch("/api/notificacoes", {
+                    method: "GET",
+                    credentials: "same-origin",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                });
+
+                if (resposta.status === 401 || resposta.status === 403) {
+                    return;
+                }
+
+                if (!resposta.ok) {
+                    throw new Error("Falha ao carregar notificações.");
+                }
+
+                const dados = await resposta.json();
+
+                notificacoes = Array.isArray(dados.notificacoes)
+                    ? dados.notificacoes
+                    : [];
+
+                atualizarContador(dados.naoLidas);
+                renderizar(notificacoes);
+
+            } catch (erro) {
+                console.error("[Notificações]", erro);
+            }
+        }
+
+        botao.addEventListener("click", function (evento) {
+            evento.stopPropagation();
+
+            painel.classList.toggle("aberto");
+
+            if (painel.classList.contains("aberto")) {
+                carregarNotificacoes();
+            }
+        });
+
+        painel.addEventListener("click", function (evento) {
+            evento.stopPropagation();
+        });
+
+        document.addEventListener("click", function () {
+            painel.classList.remove("aberto");
+        });
+
+        marcarTodas.addEventListener("click", async function () {
+            try {
+                const resposta = await fetch("/api/notificacoes/lidas", {
+                    method: "PATCH",
+                    credentials: "same-origin"
+                });
+
+                if (resposta.ok) {
+                    await carregarNotificacoes();
+                }
+            } catch (erro) {
+                console.error(
+                    "[Notificações] Erro ao marcar todas:",
+                    erro
+                );
+            }
+        });
+
+        function conectarWebSocket() {
+            const protocolo =
+                location.protocol === "https:" ? "wss:" : "ws:";
+
+            const ws = new WebSocket(
+                protocolo + "//" + location.host + "/ws"
+            );
+
+            ws.addEventListener("message", function () {
+                carregarNotificacoes();
+            });
+
+            ws.addEventListener("close", function () {
+                setTimeout(conectarWebSocket, 5000);
+            });
+
+            ws.addEventListener("error", function () {
+                ws.close();
+            });
+        }
+
+        carregarNotificacoes();
+        conectarWebSocket();
+    }
+
+    function aguardarCabecalho() {
+        const encontrar = () => {
+            const area = document.querySelector(".header-actions");
+
+            if (!area) return false;
+
+            iniciarNotificacoes();
+            return true;
+        };
+
+        if (encontrar()) return;
+
+        const observador = new MutationObserver(() => {
+            if (encontrar()) {
+                observador.disconnect();
+            }
+        });
+
+        observador.observe(document.documentElement, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener(
+            "DOMContentLoaded",
+            aguardarCabecalho,
+            { once: true }
+        );
+    } else {
+        aguardarCabecalho();
+    }
+})();
+

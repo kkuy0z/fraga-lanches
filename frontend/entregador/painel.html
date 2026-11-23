@@ -740,7 +740,141 @@
         }
       }
     </style>
-  </head>
+  <style>
+
+/* CENTRAL DE NOTIFICAÇÕES */
+.fraga-notificacao {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 12px;
+    z-index: 9999;
+}
+
+.fraga-sino {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #333;
+    border-radius: 50%;
+    background: #1a1a1a;
+    color: #fff;
+    cursor: pointer;
+    font-size: 21px;
+}
+
+.fraga-sino:hover {
+    background: #292929;
+}
+
+.fraga-contador {
+    position: absolute;
+    top: -4px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 20px;
+    background: #e53935;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.fraga-painel-notificacoes {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 340px;
+    max-width: calc(100vw - 30px);
+    max-height: 420px;
+    overflow-y: auto;
+    background: #171717;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px #0008;
+    display: none;
+    z-index: 10000;
+}
+
+.fraga-painel-notificacoes.aberto {
+    display: block;
+}
+
+.fraga-notificacoes-topo {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+}
+
+.fraga-notificacoes-topo strong {
+    font-size: 14px;
+}
+
+.fraga-marcar-todas {
+    background: none;
+    border: none;
+    color: #44b7f8;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.fraga-notificacao-item {
+    padding: 13px 15px;
+    border-bottom: 1px solid #292929;
+    cursor: pointer;
+}
+
+.fraga-notificacao-item:hover {
+    background: #242424;
+}
+
+.fraga-notificacao-item.nao-lida {
+    border-left: 3px solid #44b7f8;
+    background: #202a30;
+}
+
+.fraga-notificacao-item strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.fraga-notificacao-item p {
+    font-size: 12px;
+    color: #ccc;
+    margin: 0 0 6px;
+}
+
+.fraga-notificacao-item small {
+    font-size: 10px;
+    color: #888;
+}
+
+.fraga-notificacao-vazia {
+    padding: 25px 15px;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+}
+
+@media(max-width: 480px) {
+    .fraga-painel-notificacoes {
+        position: fixed;
+        top: 75px;
+        right: 10px;
+    }
+}
+
+</style>
+</head>
 
   <body>
     <header class="ent-header" role="banner">

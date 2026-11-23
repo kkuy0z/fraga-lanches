@@ -17,23 +17,28 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
 }
 
 const db = require("./database");
+const { iniciarExpiracaoPix } = require("./services/expiracaoPix");
 
 // ======================================================
 // ROTAS
 // ======================================================
+const atendentePedidosRoutes = require("./routes/atendentePedidos");
 
+const cozinhaRoutes = require("./routes/cozinha");
+
+const adminAvaliacoesRoutes = require("./routes/adminAvaliacoes");
 const adminAtribuicoesRoutes = require("./routes/adminAtribuicoes");
 const entregadorRoutes = require("./routes/entregador");
 const clienteNotificacoesRoutes = require("./routes/clienteNotificacoes");
 
-const adminPagamentosRoutes = require("./routes/adminPagamentos");
 const adminHorariosRoutes = require("./routes/adminHorarios");
 const adminEntregaRoutes = require("./routes/adminEntrega");
 const adminCategoriasRoutes = require("./routes/adminCategorias");
 const adminProdutosRoutes = require("./routes/adminProdutos");
 const adminPedidosRoutes = require("./routes/adminPedidos");
 const adminDashboardRoutes = require("./routes/adminDashboard");
-
+const notificacoesRoutes = require("./routes/notificacoes");
+const clienteAvaliacoesRoutes = require("./routes/clienteAvaliacoes");
 const formasPagamentoRoutes = require("./routes/formasPagamento");
 const clientePerfilRoutes = require("./routes/clientePerfil");
 const pedidosRoutes = require("./routes/pedidos");
@@ -62,8 +67,9 @@ app.use(express.urlencoded({ extended: false }));
 // ROTAS ADMINISTRATIVAS
 // ======================================================
 
+app.use("/api/admin/avaliacoes", adminAvaliacoesRoutes);
 app.use("/api/admin/atribuicoes", adminAtribuicoesRoutes);
-app.use("/api/admin/pagamentos", adminPagamentosRoutes);
+
 app.use("/api/admin/horarios", adminHorariosRoutes);
 app.use("/api/admin/entrega", adminEntregaRoutes);
 app.use("/api/admin/categorias", adminCategoriasRoutes);
@@ -77,7 +83,7 @@ app.use("/api/formas-pagamento", formasPagamentoRoutes);
 // ======================================================
 // ROTAS DO CLIENTE
 // ======================================================
-
+app.use("/api/cliente/avaliacoes", clienteAvaliacoesRoutes);
 app.use("/api/cliente/perfil", clientePerfilRoutes);
 app.use("/api/cliente/pedidos", pedidosRoutes);
 app.use("/api/cliente/carrinho", carrinhoRoutes);
@@ -90,9 +96,22 @@ app.use("/api/cliente/notificacoes", clienteNotificacoesRoutes);
 app.use("/api/entregador", entregadorRoutes);
 
 // ======================================================
+// ROTAS DO ATENDENTE
+// ======================================================
+
+app.use("/api/atendente/pedidos", atendentePedidosRoutes);
+
+// ======================================================
+// ROTAS DA COZINHA
+// ======================================================
+
+app.use("/api/cozinha/pedidos", cozinhaRoutes);
+
+// ======================================================
 // ROTAS GERAIS
 // ======================================================
 
+app.use("/api/notificacoes", notificacoesRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/cardapio", cardapioRoutes);
 app.use("/api/pedidos", pedidosRoutes);
@@ -365,6 +384,8 @@ app.locals.websocket = {
   emitirParaUsuario,
   emitirParaTipos,
 };
+
+iniciarExpiracaoPix(app.locals.websocket);
 
 // ======================================================
 // INICIALIZAÇÃO

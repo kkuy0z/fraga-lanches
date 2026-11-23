@@ -392,7 +392,7 @@ router.delete("/:id", async (req, res) => {
 
     await db.query(
       `
-        DELETE FROM formas_pagamento
+        UPDATE formas_pagamento SET ativo = 0
         WHERE id = ?
       `,
       [id],

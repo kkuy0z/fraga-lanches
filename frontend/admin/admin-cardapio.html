@@ -340,6 +340,190 @@
       }
 
       /* ==========================================
+   CENTRAL DE NOTIFICAÇÕES
+========================================== */
+
+      .notification-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .notification-button {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border: 1px solid #343434;
+        border-radius: 50%;
+        background: var(--adm-card);
+        color: var(--adm-text);
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .notification-button:hover,
+      .notification-button[aria-expanded="true"] {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+        background: var(--adm-card-elevated);
+      }
+
+      .notification-button svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 19px;
+        height: 19px;
+        padding: 0 5px;
+        border: 2px solid var(--adm-bg);
+        border-radius: 999px;
+        background: #ef4444;
+        color: #fff;
+        font-size: 9px;
+        font-weight: 700;
+      }
+
+      .notification-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 12px);
+        right: 0;
+        z-index: 1300;
+        width: min(370px, calc(100vw - 28px));
+        max-height: 440px;
+        overflow: hidden;
+        border: 1px solid #343434;
+        border-radius: 14px;
+        background: #171717;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      }
+
+      .notification-dropdown.open {
+        display: block;
+      }
+
+      .notification-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 15px;
+        border-bottom: 1px solid var(--adm-border);
+      }
+
+      .notification-header strong {
+        color: #fff;
+        font-size: 13px;
+      }
+
+      .notification-mark-all {
+        padding: 5px 0;
+        border: 0;
+        background: transparent;
+        color: var(--adm-yellow);
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .notification-mark-all:hover {
+        color: var(--adm-yellow-hover);
+      }
+
+      .notification-list {
+        max-height: 365px;
+        overflow-y: auto;
+      }
+
+      .notification-item {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+        padding: 14px 15px;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        background: transparent;
+        color: var(--adm-text);
+        font-family: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .notification-item:hover {
+        background: rgba(245, 197, 66, 0.07);
+      }
+
+      .notification-item.unread {
+        background: rgba(245, 197, 66, 0.045);
+      }
+
+      .notification-item-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .notification-item.unread .notification-item-title::before {
+        width: 7px;
+        height: 7px;
+        flex: 0 0 7px;
+        border-radius: 50%;
+        background: var(--adm-yellow);
+        content: "";
+      }
+
+      .notification-item-message {
+        color: #b5b5b5;
+        font-size: 11px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+
+      .notification-item-date {
+        color: #777;
+        font-size: 10px;
+      }
+
+      .notification-empty,
+      .notification-error,
+      .notification-loading {
+        padding: 26px 18px;
+        color: var(--adm-muted);
+        font-size: 12px;
+        line-height: 1.5;
+        text-align: center;
+      }
+
+      @media (max-width: 640px) {
+        .notification-dropdown {
+          position: fixed;
+          top: 72px;
+          right: 12px;
+          width: min(370px, calc(100vw - 24px));
+        }
+
+        .header-actions {
+          gap: 8px;
+        }
+      }
+      /* ==========================================
          CONTEÚDO PRINCIPAL — TÍTULO E TEXTO CENTRALIZADOS
       ========================================== */
       main.page-main.admin-main {
@@ -960,7 +1144,141 @@
     </style>
 
     <script src="/admin/admin-cardapio.js" defer></script>
-  </head>
+  <style>
+
+/* CENTRAL DE NOTIFICAÇÕES */
+.fraga-notificacao {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 12px;
+    z-index: 9999;
+}
+
+.fraga-sino {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #333;
+    border-radius: 50%;
+    background: #1a1a1a;
+    color: #fff;
+    cursor: pointer;
+    font-size: 21px;
+}
+
+.fraga-sino:hover {
+    background: #292929;
+}
+
+.fraga-contador {
+    position: absolute;
+    top: -4px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 20px;
+    background: #e53935;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.fraga-painel-notificacoes {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 340px;
+    max-width: calc(100vw - 30px);
+    max-height: 420px;
+    overflow-y: auto;
+    background: #171717;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px #0008;
+    display: none;
+    z-index: 10000;
+}
+
+.fraga-painel-notificacoes.aberto {
+    display: block;
+}
+
+.fraga-notificacoes-topo {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+}
+
+.fraga-notificacoes-topo strong {
+    font-size: 14px;
+}
+
+.fraga-marcar-todas {
+    background: none;
+    border: none;
+    color: #44b7f8;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.fraga-notificacao-item {
+    padding: 13px 15px;
+    border-bottom: 1px solid #292929;
+    cursor: pointer;
+}
+
+.fraga-notificacao-item:hover {
+    background: #242424;
+}
+
+.fraga-notificacao-item.nao-lida {
+    border-left: 3px solid #44b7f8;
+    background: #202a30;
+}
+
+.fraga-notificacao-item strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.fraga-notificacao-item p {
+    font-size: 12px;
+    color: #ccc;
+    margin: 0 0 6px;
+}
+
+.fraga-notificacao-item small {
+    font-size: 10px;
+    color: #888;
+}
+
+.fraga-notificacao-vazia {
+    padding: 25px 15px;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+}
+
+@media(max-width: 480px) {
+    .fraga-painel-notificacoes {
+        position: fixed;
+        top: 75px;
+        right: 10px;
+    }
+}
+
+</style>
+</head>
 
   <body>
     <header class="header-fixed admin-header" role="banner">
@@ -993,6 +1311,9 @@
           <a href="/admin/admin-pagamentos.html" data-page="pagamentos"
             >Pagamentos</a
           >
+          <a href="/admin/admin-avaliacoes.html" data-page="avaliacoes">
+            Avaliações
+          </a>
           <a href="/admin/admin-usuarios.html" data-page="usuarios">Usuários</a>
         </nav>
 

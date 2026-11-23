@@ -20,6 +20,7 @@
     "multer": "latest",
     "mysql2": "latest",
     "nodemailer": "latest",
+    "qrcode": "^1.5.4",
     "socket.io": "latest",
     "web-push": "latest",
     "ws": "^8.23.0",

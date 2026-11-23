@@ -768,6 +768,8 @@
                   autocomplete="name"
                   placeholder="Digite seu nome completo"
                   maxlength="80"
+                  pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s]+"
+                  title="Digite somente letras e espaços."
                   required
                   aria-describedby="erro-nome"
                   class="form-input"
@@ -1087,7 +1089,21 @@
         </div>
       </div>
     </main>
+    <script>
+      const campoNome = document.getElementById("nome");
 
+      campoNome.addEventListener("input", function () {
+        // Permite somente letras, acentos e espaços.
+        this.value = this.value.replace(/[^a-zA-ZÀ-ÖØ-öø-ÿ\s]/g, "");
+
+        // Remove espaços repetidos.
+        this.value = this.value.replace(/\s{2,}/g, " ");
+      });
+
+      campoNome.addEventListener("blur", function () {
+        this.value = this.value.trim();
+      });
+    </script>
     <script type="module" src="cadastro.js"></script>
 
     <script>

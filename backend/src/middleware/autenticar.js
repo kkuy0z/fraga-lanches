@@ -1,50 +1,50 @@
+"use strict";
 
 const jwt = require("jsonwebtoken");
 
 function lerCookie(req, nome) {
-    const cookies = req.headers.cookie || "";
+  const cookies = req.headers.cookie || "";
 
-    const cookie = cookies
-        .split(";")
-        .map(item => item.trim())
-        .find(item => item.startsWith(`${nome}=`));
+  const cookie = cookies
+    .split(";")
+    .map((item) => item.trim())
+    .find((item) => item.startsWith(`${nome}=`));
 
-    if (!cookie) return null;
+  if (!cookie) return null;
 
-    return decodeURIComponent(
-        cookie.substring(nome.length + 1)
-    );
+  try {
+    return decodeURIComponent(cookie.substring(nome.length + 1));
+  } catch {
+    return null;
+  }
 }
 
 function autenticar(req, res, next) {
-    const token = lerCookie(req, "fraga_session");
+  const token = lerCookie(req, "fraga_session");
 
-    if (!token) {
-        return res.status(401).json({
-            mensagem: "Você precisa fazer login."
-        });
+  if (!token) {
+    return res.status(401).json({
+      mensagem: "Você precisa fazer login.",
+    });
+  }
+
+  try {
+    const usuario = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!usuario || !usuario.id || !usuario.tipo) {
+      return res.status(401).json({
+        mensagem: "Sessão inválida.",
+      });
     }
 
-    try {
-        const usuario = jwt.verify(
-            token,
-            process.env.JWT_SECRET
-        );
+    req.usuario = usuario;
 
-        if (usuario.tipo !== "cliente") {
-            return res.status(403).json({
-                mensagem: "Acesso permitido somente para clientes."
-            });
-        }
-
-        req.usuario = usuario;
-
-        next();
-    } catch (erro) {
-        return res.status(401).json({
-            mensagem: "Sessão inválida ou expirada."
-        });
-    }
+    next();
+  } catch (erro) {
+    return res.status(401).json({
+      mensagem: "Sessão inválida ou expirada.",
+    });
+  }
 }
 
 module.exports = autenticar;

@@ -29,6 +29,25 @@ function emitirEventoCliente(req, clienteId, evento) {
 }
 
 // ======================================================
+// NOTIFICAR ATENDENTE E ADMINISTRADOR
+// ======================================================
+
+function emitirEventoEquipe(req, evento) {
+  try {
+    const websocket = req.app.locals.websocket;
+
+    if (!websocket || typeof websocket.emitirParaTipos !== "function") {
+      console.warn("[WebSocket] Serviço indisponível para notificar equipe.");
+      return;
+    }
+
+    websocket.emitirParaTipos(["atendente", "admin"], evento);
+  } catch (erro) {
+    console.error("[WebSocket] Erro ao notificar equipe:", erro);
+  }
+}
+
+// ======================================================
 // PERFIL
 // ======================================================
 
@@ -339,11 +358,20 @@ router.patch("/entregas/:id/iniciar", async (req, res) => {
     transacaoFinalizada = true;
 
     // Evento emitido somente depois da confirmação da transação.
+    // Notifica o cliente.
     emitirEventoCliente(req, entrega.cliente_id, {
       evento: "pedido_atualizado",
       pedidoId: entrega.pedido_id,
       status: "saiu_para_entrega",
       mensagem: `Seu pedido #${entrega.pedido_id} saiu para entrega.`,
+    });
+
+    // Notifica atendente e administrador.
+    emitirEventoEquipe(req, {
+      evento: "pedido_atualizado",
+      pedidoId: entrega.pedido_id,
+      status: "saiu_para_entrega",
+      mensagem: `O pedido #${entrega.pedido_id} saiu para entrega.`,
     });
 
     return res.json({
@@ -474,13 +502,22 @@ router.patch("/entregas/:id/finalizar", async (req, res) => {
     await conexao.commit();
     transacaoFinalizada = true;
 
-    // Notifica o cliente em tempo real depois do COMMIT.
+    // Notifica o cliente.
     emitirEventoCliente(req, entrega.cliente_id, {
       evento: "entrega_informada",
       pedidoId: entrega.pedido_id,
       statusEntrega: "entregue",
       statusPedido: "saiu_para_entrega",
       mensagem: `O entregador informou que o pedido #${entrega.pedido_id} foi entregue. Confirme o recebimento.`,
+    });
+
+    // Notifica atendente e administrador.
+    emitirEventoEquipe(req, {
+      evento: "entrega_informada",
+      pedidoId: entrega.pedido_id,
+      statusEntrega: "entregue",
+      statusPedido: "saiu_para_entrega",
+      mensagem: `O entregador informou que o pedido #${entrega.pedido_id} foi entregue.`,
     });
 
     return res.json({

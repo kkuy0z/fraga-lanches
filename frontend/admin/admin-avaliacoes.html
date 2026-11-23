@@ -1,0 +1,1163 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Avaliações | Fraga Lanches Admin</title>
+
+    <meta name="theme-color" content="#0c0c0c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Fraga Lanches Admin" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; base-uri 'self'; form-action 'self';"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="geolocation=(), microphone=(), camera=()"
+    />
+
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" href="/imagens/logo.png" />
+    <link rel="apple-touch-icon" href="/imagens/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel:wght@400;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/design-system.css" />
+
+    <style>
+      :root {
+        --adm-bg: #0c0c0c;
+        --adm-surface: #141414;
+        --adm-card: #191919;
+        --adm-card-elevated: #1e1e1e;
+        --adm-border: rgba(255, 255, 255, 0.08);
+        --adm-border-strong: #2c2c2c;
+        --adm-yellow: #f5c542;
+        --adm-yellow-hover: #ffda65;
+        --adm-yellow-soft: rgba(245, 197, 66, 0.14);
+        --adm-text: #f5f5f5;
+        --adm-muted: #a5a5a5;
+        --adm-danger: #fca5a5;
+        --adm-danger-bg: rgba(248, 113, 113, 0.14);
+        --adm-danger-border: rgba(248, 113, 113, 0.42);
+        --adm-success: #86efac;
+        --adm-info: #93c5fd;
+        --adm-info-bg: rgba(96, 165, 250, 0.14);
+        --adm-info-border: rgba(96, 165, 250, 0.38);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        min-height: 100%;
+        width: 100%;
+        overflow-x: clip;
+      }
+
+      body {
+        display: block;
+        width: 100%;
+        min-height: 100vh;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 0;
+        overflow-x: clip;
+        background:
+          radial-gradient(
+            circle at 12% 6%,
+            rgba(245, 197, 66, 0.09),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 88% 92%,
+            rgba(245, 197, 66, 0.05),
+            transparent 42%
+          ),
+          var(--adm-bg);
+        color: var(--adm-text);
+        font-family: "Montserrat", sans-serif;
+      }
+
+      body section {
+        position: static;
+        min-height: 0;
+        height: auto;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      /* ==========================================
+         HEADER ADMINISTRATIVO
+      ========================================== */
+      .admin-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        width: 100%;
+        border-bottom: 1px solid var(--adm-border);
+        background: rgba(12, 12, 12, 0.92);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        width: 100%;
+        max-width: 1440px;
+        min-height: 76px;
+        margin: 0 auto;
+        padding: 12px 36px;
+      }
+
+      .logo a {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+      }
+
+      .logo-img {
+        width: 43px;
+        height: 43px;
+        object-fit: cover;
+        border: 1px solid rgba(245, 197, 66, 0.45);
+        border-radius: 50%;
+        box-shadow: 0 0 22px rgba(245, 197, 66, 0.08);
+      }
+
+      .logo-label {
+        color: #fff;
+        font-family: "Cinzel", serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .admin-nav {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .admin-nav a {
+        padding: 8px 14px;
+        border-radius: 9px;
+        border: 1px solid transparent;
+        color: var(--adm-muted);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-decoration: none;
+        white-space: nowrap;
+        transition:
+          color 0.2s,
+          background-color 0.2s,
+          border-color 0.2s;
+      }
+
+      .admin-nav a:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .admin-nav a.active {
+        color: var(--adm-yellow);
+        background: var(--adm-yellow-soft);
+        border-color: rgba(245, 197, 66, 0.36);
+      }
+
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .user-menu {
+        position: relative;
+      }
+
+      .user-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 5px 14px 5px 6px;
+        border: 1px solid #343434;
+        border-radius: 999px;
+        background: var(--adm-card);
+        color: var(--adm-text);
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .user-button:hover {
+        border-color: rgba(245, 197, 66, 0.55);
+        background: var(--adm-card-elevated);
+        color: var(--adm-yellow);
+      }
+
+      .user-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--adm-yellow);
+        color: #141414;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .user-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        min-width: 190px;
+        padding: 8px;
+        border: 1px solid #323232;
+        border-radius: 12px;
+        background: var(--adm-card);
+        box-shadow: 0 20px 44px rgba(0, 0, 0, 0.85);
+        z-index: 1200;
+      }
+
+      .user-dropdown.open,
+      .user-dropdown.show {
+        display: block;
+      }
+
+      .user-dropdown-header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .user-dropdown-divider {
+        height: 1px;
+        margin: 6px 0;
+        background: var(--adm-border);
+      }
+
+      .user-dropdown-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 9px 10px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        color: #e5e5e5;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .user-dropdown-item:hover {
+        background: rgba(245, 197, 66, 0.1);
+        color: var(--adm-yellow);
+      }
+
+      .user-dropdown-item.btn-logout {
+        color: var(--adm-danger);
+      }
+
+      .user-dropdown-item.btn-logout:hover {
+        background: var(--adm-danger-bg);
+        color: var(--adm-danger);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 9px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .badge-info {
+        background: var(--adm-info-bg);
+        border: 1px solid var(--adm-info-border);
+        color: var(--adm-info);
+      }
+
+      .badge-pendente {
+        border-color: rgba(245, 197, 66, 0.3);
+        background: var(--adm-yellow-soft);
+        color: var(--adm-yellow);
+      }
+
+      .badge-aprovada {
+        border-color: rgba(134, 239, 172, 0.25);
+        background: rgba(134, 239, 172, 0.1);
+        color: var(--adm-success);
+      }
+
+      .badge-rejeitada {
+        border-color: var(--adm-danger-border);
+        background: var(--adm-danger-bg);
+        color: var(--adm-danger);
+      }
+
+      .admin-nav-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #333;
+        border-radius: 10px;
+        background: var(--adm-card);
+        color: var(--adm-text);
+        cursor: pointer;
+      }
+
+      .admin-nav-toggle:hover {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      /* ==========================================
+         CONTEÚDO PRINCIPAL — COMPACTO E SEM ESPAÇOS EXTRAS
+      ========================================== */
+      main.page-main,
+      .page-main {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 16px 24px 48px !important;
+      }
+
+      main.page-main > .container,
+      .page-main .container {
+        display: block !important;
+        width: 100% !important;
+        max-width: 1280px !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+      }
+
+      .page-header {
+        display: block !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 0 14px !important;
+        padding: 0 !important;
+      }
+
+      .page-title {
+        margin: 0 0 4px !important;
+        color: #fff;
+        font-family: "Anton", sans-serif;
+        font-size: clamp(32px, 4.2vw, 44px);
+        font-weight: 400;
+        line-height: 1.05;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .page-subtitle {
+        margin: 0 !important;
+        color: var(--adm-muted);
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .yellow-line {
+        width: 56px;
+        height: 3px;
+        margin: 10px 0 0 !important;
+        border-radius: 999px;
+        background: var(--adm-yellow);
+      }
+
+      .filters {
+        display: flex !important;
+        align-items: flex-end !important;
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 0 14px !important;
+        padding: 14px 16px !important;
+        border: 1px solid var(--adm-border-strong) !important;
+        border-radius: 14px !important;
+        background: var(--adm-card) !important;
+      }
+
+      .filter-field {
+        display: flex;
+        flex: 1;
+        min-width: 180px;
+        flex-direction: column;
+        gap: 6px;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .form-label {
+        margin: 0 !important;
+        color: var(--adm-muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .form-input,
+      .form-select,
+      .form-textarea {
+        width: 100%;
+        min-height: 38px;
+        margin: 0 !important;
+        padding: 8px 12px;
+        border: 1px solid #323232;
+        border-radius: 9px;
+        outline: none;
+        background: var(--adm-surface);
+        color: var(--adm-text);
+        font-size: 12px;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        border-color: var(--adm-yellow);
+        box-shadow: 0 0 0 2px rgba(245, 197, 66, 0.16);
+      }
+
+      .form-input::placeholder,
+      .form-textarea::placeholder {
+        color: #777;
+      }
+
+      .form-select option {
+        background: #191919;
+        color: #fff;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 38px;
+        margin: 0 !important;
+        padding: 8px 14px;
+        border-radius: 9px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        cursor: pointer;
+        transition:
+          background-color 0.2s,
+          border-color 0.2s,
+          color 0.2s;
+      }
+
+      .btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .btn-primary {
+        border: 1px solid var(--adm-yellow);
+        background: var(--adm-yellow);
+        color: #141414;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        border-color: var(--adm-yellow-hover);
+        background: var(--adm-yellow-hover);
+      }
+
+      .btn-secondary {
+        border: 1px solid #383838;
+        background: var(--adm-surface);
+        color: #e5e5e5;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      .btn-danger {
+        border: 1px solid var(--adm-danger-border);
+        background: var(--adm-danger-bg);
+        color: var(--adm-danger);
+      }
+
+      .btn-danger:hover:not(:disabled) {
+        background: rgba(248, 113, 113, 0.24);
+      }
+
+      .table-section {
+        display: block !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 16px 18px !important;
+        border: 1px solid var(--adm-border-strong) !important;
+        border-radius: 16px !important;
+        background: var(--adm-card) !important;
+        box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+      }
+
+      .section-heading {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 0 12px !important;
+        padding: 0 !important;
+      }
+
+      .section-heading h2 {
+        margin: 0 !important;
+        color: var(--adm-yellow);
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        text-transform: uppercase;
+      }
+
+      #totalAvaliacoes {
+        margin: 0 !important;
+        color: var(--adm-muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .table-container {
+        width: 100%;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: auto;
+        border: 1px solid var(--adm-border);
+        border-radius: 12px;
+        background: var(--adm-surface);
+      }
+
+      .table {
+        width: 100%;
+        margin: 0 !important;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      .table th {
+        padding: 12px 14px;
+        border-bottom: 1px solid #2a2a2a;
+        background: #111;
+        color: var(--adm-yellow);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+        color: #ececec;
+        font-size: 12px;
+        vertical-align: middle;
+      }
+
+      .table tbody tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .table tbody tr:hover {
+        background: rgba(245, 197, 66, 0.035);
+      }
+
+      .nota {
+        color: var(--adm-yellow);
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .comentario {
+        display: block;
+        max-width: 320px;
+        overflow: hidden;
+        color: #ddd;
+        line-height: 1.5;
+        text-overflow: ellipsis;
+      }
+
+      .acoes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .empty-state {
+        padding: 28px 16px !important;
+        color: var(--adm-muted);
+        text-align: center;
+      }
+
+      .empty-state strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #fff;
+        font-size: 14px;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(0, 0, 0, 0.78);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        overflow-y: auto;
+      }
+
+      .modal-overlay.show {
+        display: flex !important;
+      }
+
+      .modal-overlay.hidden {
+        display: none !important;
+      }
+
+      .modal {
+        position: relative;
+        width: 100%;
+        max-width: 540px;
+        max-height: calc(100vh - 36px);
+        overflow-y: auto;
+        border: 1px solid #323232;
+        border-radius: 16px;
+        background: var(--adm-card);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.88);
+      }
+
+      .modal-header,
+      .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--adm-border-strong);
+      }
+
+      .modal-footer {
+        justify-content: flex-end;
+        border-top: 1px solid var(--adm-border-strong);
+        border-bottom: 0;
+      }
+
+      .modal-title {
+        margin: 0;
+        color: var(--adm-yellow);
+        font-family: "Anton", sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .modal-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 1px solid #333;
+        border-radius: 8px;
+        background: var(--adm-surface);
+        color: #e5e5e5;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .modal-close:hover {
+        border-color: var(--adm-yellow);
+        color: var(--adm-yellow);
+      }
+
+      .modal-body {
+        padding: 18px 20px;
+      }
+
+      .modal-body p {
+        margin: 0 0 10px;
+        color: #ddd;
+        font-size: 13px;
+        line-height: 1.65;
+        overflow-wrap: anywhere;
+      }
+
+      .modal-body p:last-child {
+        margin-bottom: 0;
+      }
+
+      .modal-body strong {
+        color: #fff;
+      }
+
+      .modal-body .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+      }
+
+      .modal-body .form-textarea {
+        min-height: 104px;
+        resize: vertical;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      @media (max-width: 900px) {
+        .admin-nav-toggle {
+          display: inline-flex;
+        }
+
+        .admin-nav {
+          display: none;
+          position: fixed;
+          top: 76px;
+          left: 16px;
+          right: 16px;
+          flex-direction: column;
+          align-items: stretch;
+          padding: 12px;
+          border: 1px solid #333;
+          border-radius: 14px;
+          background: var(--adm-card);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+          z-index: 1100;
+        }
+
+        .admin-nav.open,
+        .admin-nav.show {
+          display: flex;
+        }
+
+        .admin-nav a {
+          padding: 10px 14px;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .header-inner {
+          padding: 12px 16px;
+        }
+
+        main.page-main,
+        .page-main {
+          padding: 14px 14px 48px !important;
+        }
+
+        section.table-section,
+        section.filters,
+        .table-section,
+        .filters {
+          padding: 12px 14px !important;
+        }
+
+        .logo-label,
+        #userName {
+          display: none;
+        }
+      }
+    </style>
+
+    <script src="/admin/admin-avaliacoes.js" defer></script>
+  <style>
+
+/* CENTRAL DE NOTIFICAÇÕES */
+.fraga-notificacao {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 12px;
+    z-index: 9999;
+}
+
+.fraga-sino {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #333;
+    border-radius: 50%;
+    background: #1a1a1a;
+    color: #fff;
+    cursor: pointer;
+    font-size: 21px;
+}
+
+.fraga-sino:hover {
+    background: #292929;
+}
+
+.fraga-contador {
+    position: absolute;
+    top: -4px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 4px;
+    border-radius: 20px;
+    background: #e53935;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.fraga-painel-notificacoes {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 340px;
+    max-width: calc(100vw - 30px);
+    max-height: 420px;
+    overflow-y: auto;
+    background: #171717;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px #0008;
+    display: none;
+    z-index: 10000;
+}
+
+.fraga-painel-notificacoes.aberto {
+    display: block;
+}
+
+.fraga-notificacoes-topo {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+}
+
+.fraga-notificacoes-topo strong {
+    font-size: 14px;
+}
+
+.fraga-marcar-todas {
+    background: none;
+    border: none;
+    color: #44b7f8;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.fraga-notificacao-item {
+    padding: 13px 15px;
+    border-bottom: 1px solid #292929;
+    cursor: pointer;
+}
+
+.fraga-notificacao-item:hover {
+    background: #242424;
+}
+
+.fraga-notificacao-item.nao-lida {
+    border-left: 3px solid #44b7f8;
+    background: #202a30;
+}
+
+.fraga-notificacao-item strong {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.fraga-notificacao-item p {
+    font-size: 12px;
+    color: #ccc;
+    margin: 0 0 6px;
+}
+
+.fraga-notificacao-item small {
+    font-size: 10px;
+    color: #888;
+}
+
+.fraga-notificacao-vazia {
+    padding: 25px 15px;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+}
+
+@media(max-width: 480px) {
+    .fraga-painel-notificacoes {
+        position: fixed;
+        top: 75px;
+        right: 10px;
+    }
+}
+
+</style>
+</head>
+
+  <body>
+    <header class="header-fixed admin-header" role="banner">
+      <div class="header-inner">
+        <div class="logo">
+          <a href="/admin/admin-dashboard.html">
+            <img src="/imagens/logo.png" alt="Fraga Lanches" class="logo-img" />
+            <span class="logo-label">Fraga Admin</span>
+          </a>
+        </div>
+
+        <nav
+          class="admin-nav"
+          id="adminNav"
+          role="navigation"
+          aria-label="Navegação administrativa"
+        >
+          <a href="/admin/admin-dashboard.html" data-page="dashboard"
+            >Dashboard</a
+          >
+          <a href="/admin/admin-pedidos.html" data-page="pedidos">Pedidos</a>
+          <a href="/admin/admin-cardapio.html" data-page="cardapio">Cardápio</a>
+          <a href="/admin/admin-horarios.html" data-page="horarios">Horários</a>
+          <a href="/admin/admin-entrega.html" data-page="entrega">Entrega</a>
+          <a href="/admin/admin-pagamentos.html" data-page="pagamentos"
+            >Pagamentos</a
+          >
+          <a
+            class="active"
+            href="/admin/admin-avaliacoes.html"
+            data-page="avaliacoes"
+          >
+            Avaliações
+          </a>
+          <a href="/admin/admin-usuarios.html" data-page="usuarios">Usuários</a>
+        </nav>
+
+        <div class="header-actions">
+          <button
+            type="button"
+            class="admin-nav-toggle"
+            id="adminNavToggle"
+            aria-label="Alternar menu"
+            aria-expanded="false"
+            aria-controls="adminNav"
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          <div class="user-menu" id="userMenu">
+            <button
+              type="button"
+              class="user-button"
+              id="userButton"
+              aria-expanded="false"
+              aria-haspopup="true"
+              aria-label="Menu do usuário"
+            >
+              <div class="user-avatar" id="userAvatar">?</div>
+              <span id="userName">Admin</span>
+            </button>
+            <div class="user-dropdown" id="userDropdown" role="menu">
+              <div class="user-dropdown-header">
+                <span id="dropdownUserName">Admin</span>
+                <span id="dropdownUserRole" class="badge badge-info"
+                  >Administrador</span
+                >
+              </div>
+              <div class="user-dropdown-divider"></div>
+              <button
+                type="button"
+                class="user-dropdown-item btn-logout"
+                id="logoutBtn"
+                role="menuitem"
+              >
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="page-main" role="main">
+      <div class="container">
+        <header class="page-header">
+          <h1 class="page-title">Avaliações</h1>
+          <p class="page-subtitle">
+            Analise os comentários dos clientes e gerencie sua publicação.
+          </p>
+          <div class="yellow-line"></div>
+        </header>
+
+        <section class="filters" aria-label="Filtros de avaliações">
+          <div class="filter-field">
+            <label class="form-label" for="buscaAvaliacao">Buscar</label>
+            <input
+              type="search"
+              id="buscaAvaliacao"
+              class="form-input"
+              placeholder="Cliente, pedido ou comentário..."
+            />
+          </div>
+
+          <div class="filter-field">
+            <label class="form-label" for="filtroStatus">Situação</label>
+            <select id="filtroStatus" class="form-select">
+              <option value="pendente">Pendentes</option>
+              <option value="aprovada">Aprovadas</option>
+              <option value="rejeitada">Rejeitadas</option>
+              <option value="">Todas</option>
+            </select>
+          </div>
+
+          <button type="button" class="btn btn-secondary" id="btnAtualizar">
+            Atualizar
+          </button>
+        </section>
+
+        <section class="table-section">
+          <div class="section-heading">
+            <h2>Lista de avaliações</h2>
+            <span id="totalAvaliacoes">0 avaliações</span>
+          </div>
+
+          <div class="table-container">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Avaliação</th>
+                  <th>Cliente</th>
+                  <th>Nota</th>
+                  <th>Comentário</th>
+                  <th>Data</th>
+                  <th>Situação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+
+              <tbody id="tbodyAvaliacoes">
+                <tr>
+                  <td colspan="7" class="empty-state">
+                    Carregando avaliações...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div
+      class="modal-overlay hidden"
+      id="avaliacaoModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitulo"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h2 class="modal-title" id="modalTitulo">Avaliação</h2>
+          <button
+            type="button"
+            class="modal-close"
+            id="modalClose"
+            aria-label="Fechar"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="modal-body" id="modalBody"></div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="modalFechar">
+            Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

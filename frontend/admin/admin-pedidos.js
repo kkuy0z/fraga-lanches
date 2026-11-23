@@ -27,8 +27,11 @@ const statusModal = document.getElementById("statusModal");
 const statusForm = document.getElementById("statusForm");
 const statusPedidoId = document.getElementById("statusPedidoId");
 const novoStatus = document.getElementById("novoStatus");
+const intencoesPixEmAprovacao = new Set();
 
 let pedidos = [];
+let intencoesPix = [];
+let intervaloIntencoesPix = null;
 
 // ======================================================
 // CONSTANTES
@@ -325,6 +328,433 @@ function configurarMenu() {
 }
 
 // ======================================================
+// CENTRAL DE INTENÇÕES PIX
+// ======================================================
+
+function criarPainelIntencoesPix() {
+  let painel = document.getElementById("painelIntencoesPix");
+
+  if (painel) return painel;
+
+  const referencia =
+    tbody?.closest(".table-container") ||
+    tbody?.closest("table") ||
+    tbody?.parentElement;
+
+  if (!referencia) {
+    console.error("Não foi possível localizar a tabela de pedidos.");
+    return null;
+  }
+
+  painel = document.createElement("section");
+  painel.id = "painelIntencoesPix";
+  painel.style.cssText = `
+    margin-bottom: 28px;
+    padding: 20px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 12px;
+    background: var(--card-bg, #fff);
+  `;
+
+  painel.innerHTML = `
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:18px;
+    ">
+      <div>
+        <h2 style="margin:0 0 5px;">PIX aguardando confirmação</h2>
+        <p style="margin:0;opacity:.7;">
+          Intenções que ainda não se transformaram em pedidos oficiais.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm"
+        id="btnAtualizarIntencoesPix"
+      >
+        Atualizar
+      </button>
+    </div>
+
+    <div id="listaIntencoesPix">
+      <p>Carregando intenções PIX...</p>
+    </div>
+  `;
+
+  referencia.parentElement.insertBefore(painel, referencia);
+
+  painel
+    .querySelector("#btnAtualizarIntencoesPix")
+    ?.addEventListener("click", carregarIntencoesPix);
+
+  painel.addEventListener("click", async (evento) => {
+    const alvo = evento.target;
+
+    if (!(alvo instanceof Element)) return;
+
+    const botao = alvo.closest('[data-acao="aprovar-intencao-pix"]');
+
+    if (!botao || botao.disabled) return;
+
+    const id = Number(botao.dataset.id);
+
+    await aprovarIntencaoPix(id, botao);
+  });
+
+  return painel;
+}
+
+// ======================================================
+// RENDERIZAR INTENÇÕES PIX
+// ======================================================
+
+function renderizarIntencoesPix() {
+  const painel = criarPainelIntencoesPix();
+
+  if (!painel) return;
+
+  const lista = painel.querySelector("#listaIntencoesPix");
+
+  if (!lista) return;
+
+  if (!intencoesPix.length) {
+    lista.innerHTML = `
+      <div style="
+        padding:20px;
+        text-align:center;
+        opacity:.7;
+        border:1px dashed var(--border-color, #ccc);
+        border-radius:8px;
+      ">
+        Nenhuma intenção PIX aguardando confirmação.
+      </div>
+    `;
+
+    return;
+  }
+
+  lista.innerHTML = intencoesPix
+    .map((intencao) => {
+      const id = Number(intencao.id);
+
+      const endereco = [
+        intencao.rua,
+        intencao.numero,
+        intencao.bairro,
+        intencao.cidade,
+        intencao.complemento,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
+      const itens = Array.isArray(intencao.itens) ? intencao.itens : [];
+
+      return `
+      <article style="
+        border:1px solid var(--border-color, #ddd);
+        border-radius:10px;
+        padding:16px;
+        margin-bottom:14px;
+      ">
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:flex-start;
+          flex-wrap:wrap;
+          gap:12px;
+        ">
+          <div>
+            <strong style="font-size:17px;">
+              PIX #${id}
+            </strong>
+
+            <p style="margin:5px 0;">
+              ${escaparHTML(intencao.cliente_nome)}
+            </p>
+
+            <small style="opacity:.7;">
+              Referência:
+              ${escaparHTML(intencao.codigo_referencia)}
+            </small>
+          </div>
+
+          <span class="badge badge-warning">
+            Aguardando confirmação
+          </span>
+        </div>
+
+        <hr style="margin:14px 0;opacity:.2;">
+
+        <div style="
+          display:grid;
+          grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+          gap:12px;
+        ">
+          <div>
+            <small>Telefone</small>
+            <p style="margin:4px 0;">
+              ${escaparHTML(intencao.cliente_telefone || "-")}
+            </p>
+          </div>
+
+          <div>
+            <small>Entrega</small>
+            <p style="margin:4px 0;">
+              ${intencao.tipo_entrega === "entrega" ? "Entrega" : "Retirada"}
+            </p>
+          </div>
+
+          <div>
+            <small>Solicitado em</small>
+            <p style="margin:4px 0;">
+              ${escaparHTML(formatarData(intencao.criado_em))}
+            </p>
+          </div>
+
+          <div>
+            <small>Expira em</small>
+            <p style="margin:4px 0;">
+              ${escaparHTML(formatarData(intencao.expira_em))}
+            </p>
+          </div>
+        </div>
+
+        ${
+          intencao.tipo_entrega === "entrega"
+            ? `
+          <div style="margin-top:12px;">
+            <strong>Endereço:</strong>
+            <p style="margin:4px 0;">
+              ${escaparHTML(endereco || "Não informado")}
+            </p>
+          </div>
+        `
+            : ""
+        }
+
+        <hr style="margin:14px 0;opacity:.2;">
+
+        <strong>Itens solicitados</strong>
+
+        <div style="margin-top:10px;">
+          ${itens
+            .map(
+              (item) => `
+            <div style="
+              display:flex;
+              justify-content:space-between;
+              gap:12px;
+              padding:7px 0;
+              border-bottom:1px solid var(--border-color, #eee);
+            ">
+              <div>
+                <strong>
+                  ${Number(item.quantidade)}x
+                  ${escaparHTML(item.nome_produto)}
+                </strong>
+
+                ${
+                  item.personalizacao
+                    ? `
+                  <p style="margin:3px 0;font-size:12px;opacity:.7;">
+                    ${escaparHTML(item.personalizacao)}
+                  </p>
+                `
+                    : ""
+                }
+              </div>
+
+              <span>
+                ${formatarMoeda(item.subtotal)}
+              </span>
+            </div>
+          `,
+            )
+            .join("")}
+        </div>
+
+        <div style="margin-top:14px;">
+          <p style="margin:5px 0;">
+            Subtotal:
+            <strong>${formatarMoeda(intencao.subtotal)}</strong>
+          </p>
+
+          <p style="margin:5px 0;">
+            Entrega:
+            <strong>${formatarMoeda(intencao.taxa_entrega)}</strong>
+          </p>
+
+          <p style="margin:5px 0;">
+            Desconto:
+            <strong>${formatarMoeda(intencao.desconto)}</strong>
+          </p>
+
+          <h3 style="margin:12px 0;">
+            Total: ${formatarMoeda(intencao.total)}
+          </h3>
+        </div>
+
+        ${
+          intencao.observacoes
+            ? `
+          <div style="margin-top:10px;">
+            <strong>Observações:</strong>
+            <p>${escaparHTML(intencao.observacoes)}</p>
+          </div>
+        `
+            : ""
+        }
+
+        <div style="margin-top:16px;">
+          <button
+            type="button"
+            class="btn btn-success"
+            data-acao="aprovar-intencao-pix"
+            data-id="${id}"
+          >
+            Confirmar recebimento e criar pedido
+          </button>
+        </div>
+
+        <p style="
+          font-size:12px;
+          opacity:.7;
+          margin:10px 0 0;
+        ">
+          A aprovação exige conferência do crédito diretamente
+          no extrato bancário. Uma imagem de comprovante não
+          é confirmação suficiente.
+        </p>
+      </article>
+    `;
+    })
+    .join("");
+}
+
+// ======================================================
+// CARREGAR INTENÇÕES PIX
+// ======================================================
+
+async function carregarIntencoesPix() {
+  const painel = criarPainelIntencoesPix();
+
+  if (!painel) return;
+
+  const lista = painel.querySelector("#listaIntencoesPix");
+
+  try {
+    const resultado = await requisicao(`${API}/pix/intencoes`);
+
+    intencoesPix = Array.isArray(resultado)
+      ? resultado
+      : resultado.intencoes || [];
+
+    renderizarIntencoesPix();
+  } catch (erro) {
+    console.error("Erro ao carregar intenções PIX:", erro);
+
+    if (lista) {
+      lista.innerHTML = `
+        <p style="color:var(--danger-color,#c00);">
+          ${escaparHTML(erro.message)}
+        </p>
+      `;
+    }
+  }
+}
+
+// ======================================================
+// APROVAR INTENÇÃO PIX
+// ======================================================
+
+async function aprovarIntencaoPix(id, botao) {
+  if (!Number.isInteger(id) || id <= 0) {
+    mostrarMensagem("ID da intenção PIX inválido.");
+    return;
+  }
+
+  // Impede aprovações simultâneas da mesma intenção.
+  if (intencoesPixEmAprovacao.has(id)) {
+    return;
+  }
+
+  const intencao = intencoesPix.find((item) => Number(item.id) === id);
+
+  if (!intencao) {
+    mostrarMensagem("Esta intenção PIX não está mais disponível.");
+    return;
+  }
+
+  intencoesPixEmAprovacao.add(id);
+
+  const textoOriginal = botao?.textContent;
+
+  if (botao) {
+    botao.disabled = true;
+    botao.textContent = "Confirmando...";
+  }
+
+  try {
+    const confirmado = window.confirm(
+      `O valor de ${formatarMoeda(intencao.total)} foi ` +
+        `conferido diretamente no extrato bancário?\n\n` +
+        `Somente confirme se o crédito realmente entrou na conta.\n\n` +
+        `Deseja aprovar o PIX e criar o pedido oficial?`,
+    );
+
+    if (!confirmado) {
+      return;
+    }
+
+    const resultado = await requisicao(`${API}/pix/intencoes/${id}/aprovar`, {
+      method: "POST",
+    });
+
+    const pedidoId = resultado?.pedido_id || resultado?.pedidoId;
+
+    if (!pedidoId) {
+      throw new Error(
+        "A resposta não retornou o número do pedido. Atualize o painel e confira a situação da intenção.",
+      );
+    }
+
+    if (resultado.ja_aprovada) {
+      mostrarMensagem(
+        `Esta intenção já havia sido aprovada.\nPedido oficial: #${pedidoId}`,
+      );
+    } else {
+      mostrarMensagem(
+        `${resultado.mensagem || "PIX confirmado com sucesso."}\n` +
+          `Pedido oficial: #${pedidoId}`,
+      );
+    }
+
+    // Atualiza a lista e os pedidos oficiais.
+    await Promise.all([carregarIntencoesPix(), carregarPedidos()]);
+  } catch (erro) {
+    console.error("Erro ao aprovar intenção PIX:", erro);
+
+    mostrarMensagem(erro.message || "Não foi possível aprovar a intenção PIX.");
+
+    // Atualiza a situação real após uma falha.
+    await carregarIntencoesPix();
+  } finally {
+    intencoesPixEmAprovacao.delete(id);
+
+    if (botao && botao.isConnected) {
+      botao.disabled = false;
+      botao.textContent =
+        textoOriginal || "Confirmar recebimento e criar pedido";
+    }
+  }
+}
+
+// ======================================================
 // PEDIDOS
 // ======================================================
 
@@ -595,6 +1025,41 @@ async function alterarStatus(evento) {
 // MODAL DE DETALHES
 // ======================================================
 
+async function confirmarPagamento(id, botao) {
+  if (!Number.isInteger(id) || id <= 0) {
+    mostrarMensagem("ID do pedido invalido.");
+    return;
+  }
+
+  const confirmado = window.confirm(
+    "Confirme somente se o pagamento foi realmente recebido ou aprovado na maquininha. Deseja continuar?",
+  );
+
+  if (!confirmado) return;
+
+  if (botao) botao.disabled = true;
+
+  try {
+    await requisicao(`${API}/${id}/pagamento`, {
+      method: "PATCH",
+    });
+
+    mostrarMensagem("Recebimento do pagamento confirmado com sucesso.");
+
+    try {
+      await carregarPedidos();
+    } catch (erroAtualizacao) {
+      console.error("Erro ao atualizar a listagem:", erroAtualizacao);
+    }
+
+    await abrirDetalhes(id);
+  } catch (erro) {
+    mostrarMensagem(erro.message);
+
+    if (botao) botao.disabled = false;
+  }
+}
+
 async function abrirDetalhes(id) {
   if (!pedidoModal || !pedidoModalBody || !pedidoModalTitulo) {
     return;
@@ -633,6 +1098,13 @@ async function abrirDetalhes(id) {
       : "Retirada no estabelecimento";
 
     const pagamentoAtual = pagamentos[0] || null;
+
+    const formasPresenciais = ["dinheiro", "cartao", "credito", "debito"];
+
+    const podeConfirmarPagamento =
+      ["pronto", "saiu_para_entrega"].includes(pedido.status) &&
+      pagamentoAtual?.status === "pendente" &&
+      formasPresenciais.includes(pagamentoAtual?.forma_pagamento);
 
     pedidoModalBody.innerHTML = `
       <div class="pedido-detalhes">
@@ -922,7 +1394,30 @@ async function abrirDetalhes(id) {
 
         <!-- OBSERVAÇÕES -->
 
-        <h3>Observações</h3>
+        ${
+          podeConfirmarPagamento
+            ? `
+          <div class="form-group">
+            <button
+              type="button"
+              class="btn btn-success"
+              data-acao="confirmar-pagamento"
+              data-id="${Number(pedido.id)}"
+            >
+              Confirmar recebimento
+            </button>
+
+            <p>
+              <small>
+                Confirme somente depois de receber o valor ou verificar a aprovacao na maquininha.
+              </small>
+            </p>
+          </div>
+        `
+            : ""
+        }
+
+<h3>Observações</h3>
 
         <p>
           ${escaparHTML(pedido.observacoes || "Nenhuma observação.")}
@@ -1200,6 +1695,16 @@ function configurarTabela() {
 // ======================================================
 
 function configurarModais() {
+  pedidoModalBody?.addEventListener("click", async (evento) => {
+    const botao = evento.target.closest('[data-acao="confirmar-pagamento"]');
+
+    if (!botao) return;
+
+    const id = Number(botao.dataset.id);
+
+    await confirmarPagamento(id, botao);
+  });
+
   statusForm?.addEventListener("submit", alterarStatus);
 
   document
@@ -1285,9 +1790,266 @@ async function iniciar() {
     return;
   }
 
-  await carregarPedidos();
+  await Promise.all([carregarPedidos(), carregarIntencoesPix()]);
+
+  // Atualiza as intenções pendentes periodicamente.
+  if (intervaloIntencoesPix) {
+    clearInterval(intervaloIntencoesPix);
+  }
+
+  intervaloIntencoesPix = setInterval(() => {
+    if (document.visibilityState === "visible") {
+      carregarIntencoesPix();
+    }
+  }, 5000);
 
   console.log("[ADMIN PEDIDOS] Inicializado com sucesso.");
 }
 
 document.addEventListener("DOMContentLoaded", iniciar);
+
+/* =====================================================
+   CENTRAL DE NOTIFICAÇÕES FRAGA LANCHES
+   ===================================================== */
+(function () {
+  "use strict";
+
+  if (window.fragaNotificacoesIniciado) return;
+  window.fragaNotificacoesIniciado = true;
+
+  function iniciarNotificacoes() {
+    const cabecalho = document.querySelector(".header-actions");
+
+    if (!cabecalho) return;
+
+    if (document.querySelector(".fraga-notificacao")) return;
+
+    const container = document.createElement("div");
+    container.className = "fraga-notificacao";
+
+    const botao = document.createElement("button");
+    botao.className = "fraga-sino";
+    botao.type = "button";
+    botao.setAttribute("aria-label", "Notificações");
+    botao.setAttribute("title", "Notificações");
+    botao.textContent = "🔔";
+
+    const contador = document.createElement("span");
+    contador.className = "fraga-contador";
+
+    const painel = document.createElement("div");
+    painel.className = "fraga-painel-notificacoes";
+
+    const topo = document.createElement("div");
+    topo.className = "fraga-notificacoes-topo";
+
+    const titulo = document.createElement("strong");
+    titulo.textContent = "Notificações";
+
+    const marcarTodas = document.createElement("button");
+    marcarTodas.className = "fraga-marcar-todas";
+    marcarTodas.type = "button";
+    marcarTodas.textContent = "Marcar todas como lidas";
+
+    const lista = document.createElement("div");
+    lista.className = "fraga-lista-notificacoes";
+
+    topo.append(titulo, marcarTodas);
+    painel.append(topo, lista);
+    container.append(botao, contador, painel);
+
+    cabecalho.prepend(container);
+
+    let notificacoes = [];
+
+    function atualizarContador(valor) {
+      const quantidade = Number(valor) || 0;
+
+      contador.textContent = quantidade > 99 ? "99+" : quantidade;
+      contador.style.display = quantidade > 0 ? "flex" : "none";
+    }
+
+    function formatarData(data) {
+      if (!data) return "";
+
+      const dataValida = new Date(data);
+
+      if (Number.isNaN(dataValida.getTime())) return "";
+
+      return dataValida.toLocaleString("pt-BR");
+    }
+
+    function renderizar(dados) {
+      lista.replaceChildren();
+
+      if (!Array.isArray(dados) || dados.length === 0) {
+        const vazio = document.createElement("div");
+        vazio.className = "fraga-notificacao-vazia";
+        vazio.textContent = "Nenhuma notificação encontrada.";
+        lista.appendChild(vazio);
+        return;
+      }
+
+      dados.forEach(function (notificacao) {
+        const item = document.createElement("div");
+
+        item.className = "fraga-notificacao-item";
+
+        if (!Number(notificacao.lida)) {
+          item.classList.add("nao-lida");
+        }
+
+        const tituloItem = document.createElement("strong");
+        tituloItem.textContent = notificacao.titulo || "Notificação";
+
+        const mensagem = document.createElement("p");
+        mensagem.textContent = notificacao.mensagem || "";
+
+        const data = document.createElement("small");
+        data.textContent = formatarData(notificacao.data_criacao);
+
+        item.append(tituloItem, mensagem, data);
+
+        item.style.cursor = "pointer";
+        item.title = "Abrir pedido relacionado";
+        // FRAGA_NOTIFICACAO_ABRE_PEDIDO
+        item.addEventListener("click", async function () {
+          try {
+            if (!Number(notificacao.lida)) {
+              const resposta = await fetch(
+                "/api/notificacoes/" +
+                  encodeURIComponent(notificacao.id) +
+                  "/lida",
+                { method: "PATCH", credentials: "same-origin" },
+              );
+              if (resposta.ok) await carregarNotificacoes();
+            }
+            const pedidoId = Number(notificacao.pedido_id);
+            if (pedidoId > 0) await abrirDetalhes(pedidoId);
+          } catch (erro) {
+            console.error("[Notificações] Erro ao abrir pedido:", erro);
+          }
+        });
+
+        lista.appendChild(item);
+      });
+    }
+
+    async function carregarNotificacoes() {
+      try {
+        const resposta = await fetch("/api/notificacoes", {
+          method: "GET",
+          credentials: "same-origin",
+          headers: {
+            Accept: "application/json",
+          },
+        });
+
+        if (resposta.status === 401 || resposta.status === 403) {
+          return;
+        }
+
+        if (!resposta.ok) {
+          throw new Error("Falha ao carregar notificações.");
+        }
+
+        const dados = await resposta.json();
+
+        notificacoes = Array.isArray(dados.notificacoes)
+          ? dados.notificacoes
+          : [];
+
+        atualizarContador(dados.naoLidas);
+        renderizar(notificacoes);
+      } catch (erro) {
+        console.error("[Notificações]", erro);
+      }
+    }
+
+    botao.addEventListener("click", function (evento) {
+      evento.stopPropagation();
+
+      painel.classList.toggle("aberto");
+
+      if (painel.classList.contains("aberto")) {
+        carregarNotificacoes();
+      }
+    });
+
+    painel.addEventListener("click", function (evento) {
+      evento.stopPropagation();
+    });
+
+    document.addEventListener("click", function () {
+      painel.classList.remove("aberto");
+    });
+
+    marcarTodas.addEventListener("click", async function () {
+      try {
+        const resposta = await fetch("/api/notificacoes/lidas", {
+          method: "PATCH",
+          credentials: "same-origin",
+        });
+
+        if (resposta.ok) {
+          await carregarNotificacoes();
+        }
+      } catch (erro) {
+        console.error("[Notificações] Erro ao marcar todas:", erro);
+      }
+    });
+
+    function conectarWebSocket() {
+      const protocolo = location.protocol === "https:" ? "wss:" : "ws:";
+
+      const ws = new WebSocket(protocolo + "//" + location.host + "/ws");
+
+      ws.addEventListener("message", function () {
+        carregarNotificacoes();
+      });
+
+      ws.addEventListener("close", function () {
+        setTimeout(conectarWebSocket, 5000);
+      });
+
+      ws.addEventListener("error", function () {
+        ws.close();
+      });
+    }
+
+    carregarNotificacoes();
+    conectarWebSocket();
+  }
+
+  function aguardarCabecalho() {
+    const encontrar = () => {
+      const area = document.querySelector(".header-actions");
+
+      if (!area) return false;
+
+      iniciarNotificacoes();
+      return true;
+    };
+
+    if (encontrar()) return;
+
+    const observador = new MutationObserver(() => {
+      if (encontrar()) {
+        observador.disconnect();
+      }
+    });
+
+    observador.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", aguardarCabecalho, {
+      once: true,
+    });
+  } else {
+    aguardarCabecalho();
+  }
+})();

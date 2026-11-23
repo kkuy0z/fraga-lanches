@@ -9,7 +9,7 @@ const autenticar = require("../middleware/autenticar");
 router.use(autenticar);
 
 // ======================================================
-// LISTAR NOTIFICAÇÕES DO CLIENTE
+// LISTAR NOTIFICAÇÕES DO USUÁRIO
 // ======================================================
 
 router.get("/", async (req, res) => {
@@ -34,14 +34,113 @@ router.get("/", async (req, res) => {
       [usuarioId],
     );
 
+    const [resultadoContagem] = await db.query(
+      `
+        SELECT COUNT(*) AS naoLidas
+        FROM notificacoes
+        WHERE usuario_id = ?
+          AND lida = FALSE
+      `,
+      [usuarioId],
+    );
+
     return res.json({
       notificacoes,
+      naoLidas: Number(resultadoContagem[0].naoLidas),
     });
   } catch (erro) {
     console.error("Erro ao listar notificações:", erro);
 
     return res.status(500).json({
       mensagem: "Não foi possível carregar as notificações.",
+    });
+  }
+});
+
+// ======================================================
+// MARCAR UMA NOTIFICAÇÃO COMO LIDA
+// ======================================================
+
+router.patch("/:id/lida", async (req, res) => {
+  const notificacaoId = Number(req.params.id);
+  const usuarioId = req.usuario.id;
+
+  if (!Number.isInteger(notificacaoId) || notificacaoId <= 0) {
+    return res.status(400).json({
+      mensagem: "Identificador da notificação inválido.",
+    });
+  }
+
+  try {
+    const [resultado] = await db.query(
+      `
+        UPDATE notificacoes
+        SET lida = TRUE
+        WHERE id = ?
+          AND usuario_id = ?
+      `,
+      [notificacaoId, usuarioId],
+    );
+
+    if (resultado.affectedRows === 0) {
+      const [existentes] = await db.query(
+        `
+          SELECT id
+          FROM notificacoes
+          WHERE id = ?
+            AND usuario_id = ?
+          LIMIT 1
+        `,
+        [notificacaoId, usuarioId],
+      );
+
+      if (!existentes.length) {
+        return res.status(404).json({
+          mensagem: "Notificação não encontrada.",
+        });
+      }
+    }
+
+    return res.json({
+      mensagem: "Notificação marcada como lida.",
+      notificacaoId,
+    });
+  } catch (erro) {
+    console.error("Erro ao marcar notificação como lida:", erro);
+
+    return res.status(500).json({
+      mensagem: "Não foi possível atualizar a notificação.",
+    });
+  }
+});
+
+// ======================================================
+// MARCAR TODAS AS NOTIFICAÇÕES COMO LIDAS
+// ======================================================
+
+router.patch("/lidas", async (req, res) => {
+  try {
+    const usuarioId = req.usuario.id;
+
+    const [resultado] = await db.query(
+      `
+        UPDATE notificacoes
+        SET lida = TRUE
+        WHERE usuario_id = ?
+          AND lida = FALSE
+      `,
+      [usuarioId],
+    );
+
+    return res.json({
+      mensagem: "Todas as notificações foram marcadas como lidas.",
+      atualizadas: resultado.affectedRows,
+    });
+  } catch (erro) {
+    console.error("Erro ao marcar todas as notificações como lidas:", erro);
+
+    return res.status(500).json({
+      mensagem: "Não foi possível atualizar as notificações.",
     });
   }
 });
@@ -64,15 +163,17 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
   let transacaoIniciada = false;
   let transacaoFinalizada = false;
 
+  let notificacaoEntregador = null;
+
   try {
     conexao = await db.getConnection();
 
     await conexao.beginTransaction();
     transacaoIniciada = true;
 
-    // ==================================================
+    // ================================================
     // BUSCAR PEDIDO E ENTREGA
-    // ==================================================
+    // ================================================
 
     const [pedidos] = await conexao.query(
       `
@@ -82,6 +183,8 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
           p.status AS status_pedido,
 
           e.id AS entrega_id,
+          e.entregador_id AS entregador_id,
+          e.entregador_id,
           e.status AS status_entrega,
           e.data_confirmacao_recebimento
 
@@ -109,9 +212,9 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
 
     const pedido = pedidos[0];
 
-    // ==================================================
+    // ================================================
     // VERIFICAR SE JÁ FOI CONFIRMADO
-    // ==================================================
+    // ================================================
 
     if (
       pedido.status_pedido === "concluido" &&
@@ -127,9 +230,9 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
       });
     }
 
-    // ==================================================
+    // ================================================
     // VALIDAR STATUS DA ENTREGA
-    // ==================================================
+    // ================================================
 
     if (pedido.status_entrega !== "entregue") {
       await conexao.rollback();
@@ -140,9 +243,9 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
       });
     }
 
-    // ==================================================
+    // ================================================
     // VALIDAR STATUS DO PEDIDO
-    // ==================================================
+    // ================================================
 
     if (pedido.status_pedido !== "saiu_para_entrega") {
       await conexao.rollback();
@@ -153,9 +256,9 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
       });
     }
 
-    // ==================================================
-    // VERIFICAR NOTIFICAÇÃO
-    // ==================================================
+    // ================================================
+    // VERIFICAR NOTIFICAÇÃO DE ENTREGA
+    // ================================================
 
     const [notificacoes] = await conexao.query(
       `
@@ -180,9 +283,9 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
       });
     }
 
-    // ==================================================
+    // ================================================
     // CONCLUIR PEDIDO
-    // ==================================================
+    // ================================================
 
     const [resultadoPedido] = await conexao.query(
       `
@@ -199,9 +302,9 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
       throw new Error("Não foi possível atualizar o status do pedido.");
     }
 
-    // ==================================================
+    // ================================================
     // REGISTRAR CONFIRMAÇÃO DO RECEBIMENTO
-    // ==================================================
+    // ================================================
 
     const [resultadoEntrega] = await conexao.query(
       `
@@ -218,9 +321,9 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
       throw new Error("Não foi possível registrar a confirmação da entrega.");
     }
 
-    // ==================================================
+    // ================================================
     // REGISTRAR HISTÓRICO
-    // ==================================================
+    // ================================================
 
     await conexao.query(
       `
@@ -236,9 +339,9 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
       [pedidoId, usuarioId],
     );
 
-    // ==================================================
-    // MARCAR NOTIFICAÇÃO COMO LIDA
-    // ==================================================
+    // ================================================
+    // MARCAR NOTIFICAÇÃO ANTERIOR COMO LIDA
+    // ================================================
 
     await conexao.query(
       `
@@ -251,17 +354,117 @@ router.patch("/pedidos/:pedidoId/confirmar-recebimento", async (req, res) => {
       [pedidoId, usuarioId],
     );
 
-    // ==================================================
+    // ================================================
+    // CRIAR NOTIFICAÇÃO PARA O ENTREGADOR
+    // ================================================
+
+    if (pedido.entregador_id) {
+      const dadosNotificacao = {
+        usuarioId: Number(pedido.entregador_id),
+        pedidoId,
+        tipo: "cliente_confirmou_recebimento",
+        titulo: "Recebimento confirmado",
+        mensagem: `O cliente confirmou o recebimento do pedido #${pedidoId}.`,
+      };
+
+      const [resultadoNotificacao] = await conexao.query(
+        `
+          INSERT INTO notificacoes (
+            usuario_id,
+            pedido_id,
+            tipo,
+            titulo,
+            mensagem,
+            lida,
+            data_criacao
+          )
+          VALUES (?, ?, ?, ?, ?, 0, NOW())
+
+          ON DUPLICATE KEY UPDATE
+            titulo = VALUES(titulo),
+            mensagem = VALUES(mensagem),
+            lida = 0,
+            data_criacao = NOW()
+        `,
+        [
+          dadosNotificacao.usuarioId,
+          dadosNotificacao.pedidoId,
+          dadosNotificacao.tipo,
+          dadosNotificacao.titulo,
+          dadosNotificacao.mensagem,
+        ],
+      );
+
+      notificacaoEntregador = {
+        id: resultadoNotificacao.insertId || null,
+        pedido_id: pedidoId,
+        tipo: dadosNotificacao.tipo,
+        titulo: dadosNotificacao.titulo,
+        mensagem: dadosNotificacao.mensagem,
+        lida: 0,
+        data_criacao: new Date().toISOString(),
+      };
+
+      console.log(
+        "[CONFIRMACAO] Notificação criada para o entregador:",
+        dadosNotificacao.usuarioId,
+        "Pedido:",
+        pedidoId,
+      );
+    }
+
+    // ================================================
     // FINALIZAR TRANSAÇÃO
-    // ==================================================
+    // ================================================
 
     await conexao.commit();
     transacaoFinalizada = true;
+
+    // ================================================
+    // AVISAR ENTREGADOR PELO WEBSOCKET
+    // ================================================
+
+    if (notificacaoEntregador && pedido.entregador_id) {
+      try {
+        const websocket = req.app.locals.websocket;
+
+        if (websocket && typeof websocket.emitirParaUsuario === "function") {
+          websocket.emitirParaUsuario(Number(pedido.entregador_id), {
+            tipo: "notificacao_criada",
+            notificacao: notificacaoEntregador,
+          });
+        }
+      } catch (erroWebSocket) {
+        console.error(
+          "Erro ao enviar confirmação ao entregador:",
+          erroWebSocket,
+        );
+      }
+    }
+
+    // ================================================
+    // NOTIFICAR ADMINISTRADOR E ATENDENTE
+    // ================================================
+
+    try {
+      const websocket = req.app.locals.websocket;
+
+      if (websocket && typeof websocket.emitirParaTipos === "function") {
+        websocket.emitirParaTipos(["admin", "atendente"], {
+          evento: "pedido_concluido",
+          pedidoId,
+          mensagem: `O cliente confirmou o recebimento do pedido #${pedidoId}.`,
+        });
+      }
+    } catch (erroWebSocket) {
+      console.error("Erro ao notificar os painéis internos:", erroWebSocket);
+    }
 
     return res.json({
       mensagem: "Recebimento confirmado. Pedido concluído com sucesso!",
       pedidoId,
       status: "concluido",
+      notificacaoEntregador: Boolean(notificacaoEntregador),
     });
   } catch (erro) {
     if (conexao && transacaoIniciada && !transacaoFinalizada) {
