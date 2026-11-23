@@ -544,6 +544,12 @@ router.post("/", autenticarCliente, async (req, res) => {
         );
       }
 
+      if (!/^\d{1,4}$/.test(String(endereco.numero).trim())) {
+        throw criarErroValidacao(
+          "O número da casa deve conter de 1 a 4 dígitos.",
+        );
+      }
+
       enderecoValidado = {
         rua: endereco.rua.trim(),
         numero: endereco.numero.trim(),
