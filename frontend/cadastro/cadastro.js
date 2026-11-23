@@ -6,7 +6,7 @@ if (campoTelefone) {
     campoTelefone.addEventListener("input", () => {
         const valor = campoTelefone.value;
         const internacional = valor.trim().startsWith("+");
-        const digitos = valor.replace(/\\D/g, "").slice(0, internacional ? 15 : 11);
+        const digitos = valor.replace(/\D/g, "").slice(0, internacional ? 15 : 11);
         const valorLimitado = (internacional ? "+" : "") + digitos;
         const formatador = new AsYouType(internacional ? undefined : "BR");
 
@@ -66,7 +66,7 @@ if (formCadastro) {
         if (
             !telefoneParseado ||
             !telefoneParseado.isValid() ||
-            telefoneParseado.number.replace(/\\D/g, "").length > 15 ||
+            telefoneParseado.number.replace(/\D/g, "").length > 15 ||
             (telefoneParseado.country === "BR" && telefoneParseado.nationalNumber.length !== 11)
         ) {
             mostrarErro(
