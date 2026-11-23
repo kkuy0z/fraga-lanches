@@ -836,9 +836,9 @@
                   name="telefone"
                   type="tel"
                   inputmode="tel"
-                  autocomplete="tel-national"
-                  placeholder="(31) 98767-7197"
-                  maxlength="15"
+                  autocomplete="tel"
+                  placeholder="+55 31 98767-7197"
+                  maxlength="25"
                   required
                   aria-describedby="erro-telefone"
                   class="form-input"
@@ -859,6 +859,9 @@
                 </svg>
               </div>
               <p class="form-help error" id="erro-telefone"></p>
+              <p class="form-help" id="ajuda-telefone">
+                Aceita números nacionais e internacionais. Inclua o código do país (ex.: +55).
+              </p>
             </div>
 
             <div class="campo">
