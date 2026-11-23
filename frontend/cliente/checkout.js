@@ -48,6 +48,16 @@ const mensagemSucesso = document.getElementById("mensagemSucesso");
 const campoCep = document.getElementById("cep");
 const campoRua = document.getElementById("rua");
 const campoNumero = document.getElementById("numero");
+
+if (campoNumero) {
+  campoNumero.maxLength = 4;
+  campoNumero.inputMode = "numeric";
+  campoNumero.addEventListener("input", () => {
+    campoNumero.value = campoNumero.value.replace(/\D/g, "").slice(0, 4);
+    campoNumero.setCustomValidity("");
+  });
+}
+
 const campoComplemento = document.getElementById("complemento");
 const campoBairro = document.getElementById("bairro");
 const campoCidade = document.getElementById("cidade");
@@ -1872,7 +1882,14 @@ function mostrarEtapa(numero) {
 
 function validarEndereco() {
   if (tipoEntrega.value === "retirada") {
-    return true;
+    const numero = campoNumero?.value.trim() || "";
+  if (!/^\d{1,4}$/.test(numero)) {
+    alert("O número da casa deve conter de 1 a 4 dígitos.");
+    campoNumero?.focus();
+    return false;
+  }
+
+  return true;
   }
 
   const campos = ["rua", "numero", "bairro", "cidade"];
