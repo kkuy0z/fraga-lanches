@@ -478,6 +478,48 @@ function gerarPixComValor(valorCentavos, codigoReferencia) {
   return `${payloadFinal}${calcularCRC16(payloadFinal)}`;
 }
 
+async function validarCEPComViaCEP(cep, endereco) {
+  const cepLimpo = String(cep || "").replace(/\D/g, "");
+  if (!/^\d{8}$/.test(cepLimpo)) {
+    throw criarErroValidacao("Informe um CEP válido com 8 números.");
+  }
+
+  let resposta;
+  try {
+    resposta = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch {
+    throw criarErroValidacao("Não foi possível validar o CEP agora. Tente novamente.");
+  }
+
+  if (!resposta.ok) {
+    throw criarErroValidacao("O serviço de CEP está indisponível. Tente novamente.");
+  }
+
+  const dados = await resposta.json();
+  if (dados.erro) {
+    throw criarErroValidacao("O CEP informado não foi encontrado.");
+  }
+
+  const normalizar = (valor) => String(valor || "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .trim().toLowerCase().replace(/\s+/g, " ");
+
+  const divergencias = [
+    ["rua", dados.logradouro],
+    ["bairro", dados.bairro],
+    ["cidade", dados.localidade],
+  ].filter(([campo, oficial]) => oficial && normalizar(endereco[campo]) !== normalizar(oficial));
+
+  if (divergencias.length) {
+    throw criarErroValidacao("O endereço informado não corresponde ao CEP. Consulte o CEP e confira rua, bairro e cidade.");
+  }
+
+  return cepLimpo;
+}
+
 // ======================================================
 // CRIAR PEDIDO
 // ======================================================
@@ -544,6 +586,8 @@ router.post("/", autenticarCliente, async (req, res) => {
         );
       }
 
+      const cepValidado = await validarCEPComViaCEP(endereco.cep, endereco);
+
       if (!/^\d{1,4}$/.test(String(endereco.numero).trim())) {
         throw criarErroValidacao(
           "O número da casa deve conter de 1 a 4 dígitos.",
@@ -551,6 +595,7 @@ router.post("/", autenticarCliente, async (req, res) => {
       }
 
       enderecoValidado = {
+        cep: cepValidado,
         rua: endereco.rua.trim(),
         numero: endereco.numero.trim(),
         bairro: endereco.bairro.trim(),
