@@ -691,6 +691,100 @@
         font-size: 12px;
       }
 
+
+      /* ==========================================
+         FINANCEIRO DO ENTREGADOR
+      ========================================== */
+      .financeiro-card {
+        width: 100%;
+        margin-bottom: 24px;
+      }
+
+      .financeiro-resumo {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .financeiro-indicador {
+        min-width: 0;
+        padding: 18px;
+        border: 1px solid var(--ent-border);
+        border-radius: 4px;
+        background: var(--ent-surface);
+      }
+
+      .financeiro-indicador span {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--ent-muted);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .financeiro-indicador strong {
+        color: var(--ent-yellow);
+        font-family: "Anton", sans-serif;
+        font-size: clamp(24px, 4vw, 34px);
+        font-weight: 400;
+      }
+
+      .financeiro-historico {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .financeiro-linha {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 12px 14px;
+        border: 1px solid var(--ent-border);
+        border-radius: 4px;
+        background: var(--ent-card);
+      }
+
+      .financeiro-linha div {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .financeiro-linha strong {
+        color: var(--ent-text);
+        font-size: 12px;
+      }
+
+      .financeiro-linha small {
+        color: var(--ent-muted);
+        font-size: 10px;
+      }
+
+      .financeiro-valor {
+        color: #86efac !important;
+        font-size: 14px !important;
+        white-space: nowrap;
+      }
+
+      .financeiro-vazio {
+        padding: 18px 12px;
+        color: var(--ent-muted);
+        font-size: 12px;
+        text-align: center;
+      }
+
+      @media (max-width: 640px) {
+        .financeiro-resumo {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
       @media (max-width: 1024px) {
         .ent-grid {
           grid-template-columns: minmax(0, 1fr) !important;
@@ -905,6 +999,32 @@
           </p>
           <div class="yellow-line"></div>
         </div>
+
+
+        <!-- FINANCEIRO -->
+        <section class="ent-card financeiro-card" aria-labelledby="tituloFinanceiro">
+          <div class="ent-card-header">
+            <h3 class="ent-card-title" id="tituloFinanceiro">Meu financeiro</h3>
+            <p class="ent-card-desc">
+              Ganhos de R$ 7,00 por entrega, contabilizados após a confirmação do cliente.
+            </p>
+          </div>
+
+          <div class="financeiro-resumo">
+            <div class="financeiro-indicador">
+              <span>Total ganho</span>
+              <strong id="financeiroTotal">R$ 0,00</strong>
+            </div>
+            <div class="financeiro-indicador">
+              <span>Entregas concluídas</span>
+              <strong id="financeiroQuantidade">0</strong>
+            </div>
+          </div>
+
+          <div class="financeiro-historico" id="financeiroHistorico" aria-live="polite">
+            <p class="financeiro-vazio">Carregando seu histórico financeiro...</p>
+          </div>
+        </section>
 
         <div class="ent-grid">
           <!-- ENTREGAS -->
