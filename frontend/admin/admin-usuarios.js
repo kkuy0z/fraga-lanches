@@ -147,11 +147,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${escapar(u.email)}</td>
           <td><span class="badge badge-info">${escapar(PERFIS[u.tipo] || u.tipo)}</span></td>
           <td>${escapar(formatarData(u.data_cadastro))}</td>
-          <td><span class="badge ${ativo ? "badge-success" : "badge-danger"}">${ativo ? "Ativo" : "Inativo"}</span></td>
+          <td><span class="badge badge-info" style="color:${ativo ? "#86efac" : "#fca5a5"};border-color:${ativo ? "#166534" : "#7f1d1d"};background:${ativo ? "rgba(34,197,94,.12)" : "rgba(248,113,113,.12)"}">${ativo ? "Ativo" : "Inativo"}</span></td>
           <td>
             <div class="acoes" style="display:flex;flex-wrap:wrap;gap:6px">
               <button type="button" class="btn btn-secondary" data-acao="editar" data-id="${Number(u.id)}">Editar</button>
-              <button type="button" class="btn ${ativo ? "btn-danger" : "btn-primary"}" data-acao="status" data-id="${Number(u.id)}">${ativo ? "Desativar" : "Ativar"}</button>
+              <button type="button" class="btn ${ativo ? "btn-secondary" : "btn-primary"}" data-acao="status" data-id="${Number(u.id)}">${ativo ? "Desativar" : "Ativar"}</button>
             </div>
           </td>
         </tr>
