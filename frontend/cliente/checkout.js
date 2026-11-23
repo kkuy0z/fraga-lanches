@@ -1882,14 +1882,7 @@ function mostrarEtapa(numero) {
 
 function validarEndereco() {
   if (tipoEntrega.value === "retirada") {
-    const numero = campoNumero?.value.trim() || "";
-  if (!/^\d{1,4}$/.test(numero)) {
-    alert("O número da casa deve conter de 1 a 4 dígitos.");
-    campoNumero?.focus();
-    return false;
-  }
-
-  return true;
+    return true;
   }
 
   const campos = ["rua", "numero", "bairro", "cidade"];
@@ -1908,9 +1901,15 @@ function validarEndereco() {
     }
   }
 
+  const numero = campoNumero?.value.trim() || "";
+  if (!/^\\d{1,4}$/.test(numero)) {
+    alert("O número da casa deve conter de 1 a 4 dígitos.");
+    campoNumero?.focus();
+    return false;
+  }
+
   return true;
 }
-
 // ======================================================
 // CONFIRMAÇÃO
 // ======================================================
