@@ -93,6 +93,39 @@ app.get("/internal/users", exigirServicoInterno, async (req, res) => {
   }
 });
 
+app.patch("/internal/users/:id/profile", exigirServicoInterno, async (req, res) => {
+  const id = Number(req.params.id);
+  const nome = String(req.body.nome || "").trim();
+  const telefone = String(req.body.telefone || "").trim();
+  if (!Number.isSafeInteger(id) || id <= 0 || nome.length < 2 || nome.length > 100 || telefone.length > 20) {
+    return res.status(400).json({ mensagem: "Dados de perfil inválidos." });
+  }
+  if (telefone) {
+    const digitos = telefone.replace(/\\D/g, "");
+    if (digitos.length < 10 || digitos.length > 15) {
+      return res.status(400).json({ mensagem: "Telefone inválido." });
+    }
+  }
+  try {
+    const [resultado] = await db.query(
+      "UPDATE usuarios SET nome = ?, telefone = ? WHERE id = ? AND tipo = 'entregador' AND ativo = 1",
+      [nome, telefone || null, id],
+    );
+    if (resultado.affectedRows !== 1) {
+      const [existentes] = await db.query("SELECT id FROM usuarios WHERE id = ? AND tipo = 'entregador' AND ativo = 1 LIMIT 1", [id]);
+      if (!existentes.length) return res.status(404).json({ mensagem: "Entregador não encontrado ou inativo." });
+    }
+    const [usuarios] = await db.query(
+      "SELECT id, nome, email, telefone, tipo, data_cadastro FROM usuarios WHERE id = ? LIMIT 1",
+      [id],
+    );
+    return res.json({ usuario: usuarios[0] });
+  } catch (erro) {
+    console.error("[Auth] Falha ao atualizar perfil interno:", erro.message);
+    return res.status(503).json({ mensagem: "Banco de identidade indisponível." });
+  }
+});
+
 app.get("/internal/users/count", exigirServicoInterno, async (req, res) => {
   const tipo = String(req.query.tipo || "").trim();
   const ativo = req.query.ativo === undefined ? null : Number(req.query.ativo);
