@@ -234,6 +234,20 @@ async function carregarDashboard() {
     if (nomeUsuario) {
       nomeUsuario.textContent = usuario.nome;
     }
+    const respostaDashboard = await fetch("/api/cliente/dashboard", {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+    });
+    if (!respostaDashboard.ok) {
+      throw new Error("Não foi possível carregar seus pedidos.");
+    }
+    const dadosDashboard = await respostaDashboard.json();
+    const totalPedidos = document.getElementById("pedidos-feitos");
+    if (totalPedidos) {
+      totalPedidos.textContent = Number(dadosDashboard.indicadores?.pedidosTotal || 0);
+    }
   } catch (erro) {
     console.error("Erro ao verificar acesso:", erro);
 
