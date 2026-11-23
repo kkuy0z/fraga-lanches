@@ -6,7 +6,6 @@ const dotenv = require("dotenv");
 const path = require("path");
 const http = require("http");
 const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
 const { WebSocketServer, WebSocket } = require("ws");
 
 // O Gateway usa somente configuracoes compartilhadas; nao acessa o MySQL.
@@ -14,8 +13,8 @@ dotenv.config({
   path: path.resolve(__dirname, "../../.env"),
 });
 
-if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
-  throw new Error("[Gateway] JWT_SECRET precisa ter pelo menos 32 caracteres.");
+if (!process.env.INTERNAL_SERVICE_SECRET) {
+  throw new Error("[Gateway] INTERNAL_SERVICE_SECRET nao configurada.");
 }
 
 const app = express();
@@ -192,21 +191,27 @@ function obterCookie(req, nome) {
   }
 }
 
-// A identidade vem do JWT assinado pelo servico Auth.
-// O Gateway nao consulta nem compartilha o banco de usuarios.
-function autenticarConexao(req) {
-  const token = obterCookie(req, "fraga_session");
-  if (!token) throw new Error("Sessao nao encontrada.");
+// A validacao de JWT e do estado do usuario pertence ao microsservico Auth.
+// O Gateway apenas encaminha a sessao para validacao interna.
+async function autenticarConexao(req) {
+  const cookie = req.headers.cookie || "";
+  if (!obterCookie(req, "fraga_session")) throw new Error("Sessao nao encontrada.");
 
-  const usuario = jwt.verify(token, process.env.JWT_SECRET);
-  if (!usuario || !usuario.id || !usuario.tipo) throw new Error("Token invalido.");
+  const resposta = await fetch("http://127.0.0.1:4001/internal/session", {
+    method: "GET",
+    headers: {
+      cookie,
+      "x-internal-service-secret": process.env.INTERNAL_SERVICE_SECRET,
+    },
+    signal: AbortSignal.timeout(5000),
+  });
 
-  return {
-    id: usuario.id,
-    nome: usuario.nome || "Usuario",
-    email: usuario.email || null,
-    tipo: usuario.tipo,
-  };
+  const dados = await resposta.json().catch(() => ({}));
+  if (!resposta.ok || !dados.usuario || !dados.usuario.id || !dados.usuario.tipo) {
+    throw new Error(dados.mensagem || "Sessao invalida.");
+  }
+
+  return dados.usuario;
 }
 
 function origemPermitida(req) {
@@ -231,7 +236,7 @@ server.on("upgrade", (req, socket, head) => {
       return socket.destroy();
     }
 
-    const usuario = autenticarConexao(req);
+    const usuario = await autenticarConexao(req);
     wss.handleUpgrade(req, socket, head, (ws) => {
       ws.usuario = usuario;
       wss.emit("connection", ws, req);
