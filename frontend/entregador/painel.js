@@ -310,6 +310,15 @@ async function salvarPerfil(evento) {
     return;
   }
 
+  const telefoneValidado = window.FragaTelefone
+    ? window.FragaTelefone.validar(telefone)
+    : { valido: false, mensagem: "Validador de telefone ainda não carregou. Atualize a página." };
+  if (!telefoneValidado.valido) {
+    mostrarMensagemPerfil(telefoneValidado.mensagem || "Informe um telefone válido.", true);
+    perfilTelefone.focus();
+    return;
+  }
+
   btnSalvarPerfil.disabled = true;
   btnSalvarPerfil.textContent = "Salvando...";
 
@@ -318,7 +327,7 @@ async function salvarPerfil(evento) {
       method: "PATCH",
       body: JSON.stringify({
         nome,
-        telefone,
+        telefone: telefoneValidado.numero || "",
       }),
     });
 
