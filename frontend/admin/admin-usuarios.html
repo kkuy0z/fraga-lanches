@@ -1018,7 +1018,7 @@
             <div>
               <h1 class="page-title">Gestão de Usuários</h1>
               <p class="page-subtitle">
-                Gerencie usuários do painel administrativo
+                Cadastre, edite, ative e desative os acessos da equipe
               </p>
             </div>
 
@@ -1047,7 +1047,7 @@
               aria-label="Filtrar por perfil"
             >
               <option value="">Todos os perfis</option>
-              <option value="administrador">Administrador</option>
+              <option value="admin">Administrador</option>
               <option value="atendente">Atendente</option>
               <option value="cozinha">Cozinha</option>
               <option value="entregador">Entregador</option>
@@ -1077,7 +1077,7 @@
                   <th>Nome</th>
                   <th>E-mail</th>
                   <th>Perfil</th>
-                  <th>Último Login</th>
+                  <th>Data de Cadastro</th>
                   <th>Status</th>
                   <th>Ações</th>
                 </tr>
@@ -1268,7 +1268,7 @@
               required
             >
               <option value="">Selecione o perfil</option>
-              <option value="administrador">Administrador</option>
+              <option value="admin">Administrador</option>
               <option value="atendente">Atendente</option>
               <option value="cozinha">Cozinha</option>
               <option value="entregador">Entregador</option>
@@ -1288,22 +1288,7 @@
             </span>
           </label>
 
-          <label
-            class="form-check"
-            id="forcaTrocaSenhaGroup"
-            for="usuarioForcaTrocaSenha"
-            style="display: none"
-          >
-            <input
-              type="checkbox"
-              id="usuarioForcaTrocaSenha"
-              name="forca_troca_senha"
-              class="form-check-input"
-            />
-            <span class="form-check-label">
-              Forçar troca de senha no próximo login
-            </span>
-          </label>
+
         </form>
 
         <div class="modal-footer">

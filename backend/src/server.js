@@ -67,7 +67,7 @@ const servicos = [
   {
     nome: "Administracao",
     target: "http://127.0.0.1:4008",
-    paths: ["/api/admin/categorias", "/api/admin/produtos", "/api/admin/dashboard", "/api/admin/pagamentos"],
+    paths: ["/api/admin/categorias", "/api/admin/produtos", "/api/admin/dashboard", "/api/admin/pagamentos", "/api/admin/usuarios"],
   },
   {
     nome: "Atendimento",
