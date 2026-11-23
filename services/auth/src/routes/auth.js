@@ -2,6 +2,7 @@ const express = require("express");
 const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
 const db = require("../database");
+const { parsePhoneNumberFromString } = require("libphonenumber-js/max");
 
 const router = express.Router();
 
@@ -80,20 +81,18 @@ router.post("/cadastro", async (req, res) => {
         let telefoneLimpo = null;
 
         if (telefoneInformado) {
-            const telefoneValido = /^\+?[\d\s().-]+$/.test(telefoneInformado);
-            const telefoneDigitos = telefoneInformado.replace(/\D/g, "");
+            const telefoneParseado = parsePhoneNumberFromString(
+                telefoneInformado,
+                telefoneInformado.startsWith("+") ? undefined : "BR"
+            );
 
-            if (
-                !telefoneValido ||
-                telefoneDigitos.length < 8 ||
-                telefoneDigitos.length > 15
-            ) {
+            if (!telefoneParseado || !telefoneParseado.isValid()) {
                 return res.status(400).json({
-                    mensagem: "Informe um telefone válido com 8 a 15 dígitos. Para números internacionais, inclua o código do país."
+                    mensagem: "Informe um número de telefone válido. Confira o DDD e o código do país."
                 });
             }
 
-            telefoneLimpo = `${telefoneInformado.startsWith("+") ? "+" : ""}${telefoneDigitos}`;
+            telefoneLimpo = telefoneParseado.number;
         }
 
         if (nomeLimpo.length < 2 || nomeLimpo.length > 100) {
