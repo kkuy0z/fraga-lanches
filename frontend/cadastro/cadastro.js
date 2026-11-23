@@ -1,3 +1,31 @@
+import { AsYouType, parsePhoneNumberFromString } from "https://cdn.jsdelivr.net/npm/libphonenumber-js@1.11.20/+esm";
+
+const campoTelefone = document.getElementById("telefone");
+
+if (campoTelefone) {
+    campoTelefone.addEventListener("input", () => {
+        const valor = campoTelefone.value;
+        const internacional = valor.trim().startsWith("+");
+        const formatador = new AsYouType(internacional ? undefined : "BR");
+        campoTelefone.value = formatador.input(valor);
+        campoTelefone.setCustomValidity("");
+    });
+
+    campoTelefone.addEventListener("blur", () => {
+        const valor = campoTelefone.value.trim();
+        if (!valor) return;
+
+        const numero = parsePhoneNumberFromString(
+            valor,
+            valor.startsWith("+") ? undefined : "BR"
+        );
+
+        if (numero && numero.isValid()) {
+            campoTelefone.value = numero.formatInternational();
+        }
+    });
+}
+
 const formCadastro = document.getElementById("form-cadastro");
 
 if (formCadastro) {
@@ -25,17 +53,17 @@ if (formCadastro) {
             valido = false;
         }
 
-        const telefoneDigitos = telefone.replace(/\D/g, "");
-        const telefoneFormatoValido = /^\+?[\d\s().-]+$/.test(telefone);
+        const telefoneParseado = telefone
+            ? parsePhoneNumberFromString(
+                telefone,
+                telefone.startsWith("+") ? undefined : "BR"
+            )
+            : null;
 
-        if (
-            !telefoneFormatoValido ||
-            telefoneDigitos.length < 8 ||
-            telefoneDigitos.length > 15
-        ) {
+        if (!telefoneParseado || !telefoneParseado.isValid()) {
             mostrarErro(
                 "erro-telefone",
-                "Informe um telefone válido com 8 a 15 dígitos. Para números internacionais, inclua o código do país."
+                "Número inválido ou inexistente na numeração oficial. Confira o DDD e o código do país."
             );
             valido = false;
         }
@@ -69,7 +97,7 @@ if (formCadastro) {
                 body: JSON.stringify({
                     nome,
                     email,
-                    telefone,
+                    telefone: telefoneParseado.number,
                     senha
                 })
             });
