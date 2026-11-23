@@ -1,89 +1,16 @@
 "use strict";
 
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 const db = require("../database");
+const autenticarCozinha = require("../../../_shared/autenticar")(["cozinha"]);
 
 const STATUS_COZINHA = ["novo", "em_preparo", "pronto"];
 
 // ======================================================
 // AUTENTICAÇÃO DA COZINHA
 // ======================================================
-
-function lerCookie(req, nome) {
-  const cookies = String(req.headers.cookie || "").split(";");
-
-  for (const cookie of cookies) {
-    const separador = cookie.indexOf("=");
-
-    if (separador === -1) continue;
-
-    const chave = cookie.slice(0, separador).trim();
-    const valor = cookie.slice(separador + 1).trim();
-
-    if (chave === nome) {
-      return decodeURIComponent(valor);
-    }
-  }
-
-  return null;
-}
-
-async function autenticarCozinha(req, res, next) {
-  try {
-    const token = lerCookie(req, "fraga_session");
-
-    if (!token) {
-      return res.status(401).json({
-        mensagem: "Autenticação necessária.",
-      });
-    }
-
-    const sessao = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (!sessao || !sessao.id) {
-      return res.status(401).json({
-        mensagem: "Sessão inválida.",
-      });
-    }
-
-    const [usuarios] = await db.query(
-      `
-        SELECT id, nome, email, tipo, ativo
-        FROM usuarios
-        WHERE id = ?
-        LIMIT 1
-      `,
-      [sessao.id],
-    );
-
-    if (usuarios.length === 0 || !usuarios[0].ativo) {
-      return res.status(401).json({
-        mensagem: "Usuário não encontrado ou inativo.",
-      });
-    }
-
-    if (usuarios[0].tipo !== "cozinha") {
-      return res.status(403).json({
-        mensagem: "Acesso permitido somente à cozinha.",
-      });
-    }
-
-    req.usuario = usuarios[0];
-
-    next();
-  } catch (erro) {
-    console.error("Erro na autenticação da cozinha:", erro);
-
-    return res.status(401).json({
-      mensagem: "Sessão inválida ou expirada.",
-    });
-  }
-}
-
-router.use(autenticarCozinha);
 
 // ======================================================
 // LISTAR PEDIDOS DA COZINHA
