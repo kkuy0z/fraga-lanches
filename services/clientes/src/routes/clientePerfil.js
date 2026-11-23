@@ -51,6 +51,13 @@ function validarEndereco(dados) {
     };
   }
 
+  if (!/^\d{1,4}$/.test(endereco.numero)) {
+    return {
+      valido: false,
+      mensagem: "O número da casa deve conter de 1 a 4 dígitos.",
+    };
+  }
+
   if (
     endereco.rua.length > 150 ||
     endereco.numero.length > 20 ||
