@@ -11,6 +11,7 @@
     "dotenv": "latest",
     "express": "latest",
     "jsonwebtoken": "latest",
+    "libphonenumber-js": "^1.11.20",
     "mysql2": "latest",
     "qrcode": "^1.5.4"
   }
